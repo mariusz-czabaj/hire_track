@@ -2,14 +2,10 @@
 name: 10x-rule-review
 description: >
   Review the condition of an "AI rules" file (CLAUDE.md, AGENTS.md,
-  .cursor/rules/*.mdc, .github/copilot-instructions.md, .windsurfrules,
-  nested per-area rule files, or any other rule-for-AI markdown) and produce
-  a 5-point scorecard with concrete, actionable fixes. Use when the user
-  invokes /10x-rule-review with a path to a rules file, or asks to "review
-  AI rules", "audit AGENTS.md", "check my CLAUDE.md", "score my agent
-  instructions", "is this rules file healthy", or similar. The skill is
-  agnostic to which tool the rules file targets — it scores the file as a
-  rule-for-AI artifact, not as a project document.
+  .cursor/rules/*.mdc, copilot-instructions.md, .windsurfrules, or similar)
+  and produce a 5-point scorecard with concrete fixes, regardless of which
+  tool the rules target. Use when the user asks to "review AI rules",
+  "audit AGENTS.md", "check my CLAUDE.md", "score my agent instructions".
 allowed-tools:
   - Read
   - Glob
