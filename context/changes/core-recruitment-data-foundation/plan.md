@@ -264,26 +264,26 @@ Greenfield schema — no existing production data to migrate or backfill.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly: `npx supabase db reset`
-- [x] 1.2 Lint is clean: `npx supabase db lint --local`
-- [x] 1.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally
+- [x] 1.1 Migration applies cleanly: `npx supabase db reset` — 17263ca
+- [x] 1.2 Lint is clean: `npx supabase db lint --local` — 17263ca
+- [x] 1.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally — 17263ca
 
 #### Manual
 
-- [x] 1.4 Supabase Studio Table Editor shows `security_groups`, `group_memberships`, `group_operations` with expected columns and the `operation` enum
+- [x] 1.4 Supabase Studio Table Editor shows `security_groups`, `group_memberships`, `group_operations` with expected columns and the `operation` enum — 17263ca
 
 ### Phase 2: Recruitment & Candidate Domain Schema
 
 #### Automated
 
-- [ ] 2.1 Migration applies cleanly: `npx supabase db reset`
-- [ ] 2.2 Lint is clean: `npx supabase db lint --local`
-- [ ] 2.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally
+- [x] 2.1 Migration applies cleanly: `npx supabase db reset`
+- [x] 2.2 Lint is clean: `npx supabase db lint --local`
+- [x] 2.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally
 
 #### Manual
 
-- [ ] 2.4 Supabase Studio shows all six domain tables with expected columns
-- [ ] 2.5 `kanban_stages` has exactly 6 default rows (`recruitment_id IS NULL`), correctly named and ordered
+- [x] 2.4 Supabase Studio shows all six domain tables with expected columns
+- [x] 2.5 `kanban_stages` has exactly 6 default rows (`recruitment_id IS NULL`), correctly named and ordered
 
 ### Phase 3: RLS Policies
 
