@@ -214,7 +214,7 @@ Populates local/dev fixtures matching PRD's example groups and S-01's stated pre
 #### Automated Verification:
 
 - `npx supabase db reset` runs `seed.sql` without error
-- Verification script passes with no raised exceptions: `npx supabase db query --local -f supabase/tests/rls_verification.sql`
+- Verification script passes with no raised exceptions: `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` (note: `npx supabase db query --local -f` cannot run a multi-statement script — it errors with "cannot insert multiple commands into a prepared statement"; the local Postgres container's own `psql` is used instead, since no `psql` client is installed on this machine)
 
 #### Manual Verification:
 
@@ -237,7 +237,7 @@ Populates local/dev fixtures matching PRD's example groups and S-01's stated pre
 1. `npx supabase db reset` and confirm it completes without error.
 2. Open Supabase Studio (`http://127.0.0.1:54323`), inspect each table's columns/constraints against Phases 1-2's contracts.
 3. Run the anonymous `curl` check from Phase 3's manual verification.
-4. Run `npx supabase db query --local -f supabase/tests/rls_verification.sql` and confirm no exceptions.
+4. Run `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` and confirm no exceptions.
 
 ## Performance Considerations
 
@@ -289,21 +289,21 @@ Greenfield schema — no existing production data to migrate or backfill.
 
 #### Automated
 
-- [x] 3.1 Migration applies cleanly: `npx supabase db reset`
-- [x] 3.2 Lint is clean: `npx supabase db lint --local`
-- [x] 3.3 RLS enabled on every public table: verification query returns zero rows
+- [x] 3.1 Migration applies cleanly: `npx supabase db reset` — 97e61e8
+- [x] 3.2 Lint is clean: `npx supabase db lint --local` — 97e61e8
+- [x] 3.3 RLS enabled on every public table: verification query returns zero rows — 97e61e8
 
 #### Manual
 
-- [x] 3.4 Anonymous REST request to `/rest/v1/recruitments` returns `[]`
+- [x] 3.4 Anonymous REST request to `/rest/v1/recruitments` returns `[]` — 97e61e8
 
 ### Phase 4: Seed Data + RLS Verification
 
 #### Automated
 
-- [ ] 4.1 `npx supabase db reset` runs `seed.sql` without error
-- [ ] 4.2 `npx supabase db query --local -f supabase/tests/rls_verification.sql` passes with no raised exceptions
+- [x] 4.1 `npx supabase db reset` runs `seed.sql` without error
+- [x] 4.2 `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` passes with no raised exceptions
 
 #### Manual
 
-- [ ] 4.3 Supabase Studio shows seeded groups/recruitment/candidates matching S-01's expected starting fixture
+- [x] 4.3 Supabase Studio shows seeded groups/recruitment/candidates matching S-01's expected starting fixture
