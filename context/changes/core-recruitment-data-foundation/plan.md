@@ -301,9 +301,9 @@ Greenfield schema — no existing production data to migrate or backfill.
 
 #### Automated
 
-- [x] 4.1 `npx supabase db reset` runs `seed.sql` without error
-- [x] 4.2 `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` passes with no raised exceptions
+- [x] 4.1 `npx supabase db reset` runs `seed.sql` without error — 44d5621
+- [x] 4.2 `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` passes with no raised exceptions — 44d5621
 
 #### Manual
 
-- [x] 4.3 Supabase Studio shows seeded groups/recruitment/candidates matching S-01's expected starting fixture
+- [x] 4.3 Supabase Studio shows seeded groups/recruitment/candidates matching S-01's expected starting fixture — 44d5621
