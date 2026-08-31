@@ -87,4 +87,26 @@ begin
 end $$;
 rollback;
 
+-- (5) A user whose only group (Administrator) is NOT assigned to the
+-- seeded recruitment sees zero recruitment rows -- the actual isolation
+-- guarantee recruitment_security_groups exists to enforce, as opposed to
+-- assertions (1)/(3) above which only exercise groups that ARE assigned.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  visible_count int;
+begin
+  select count(*) into visible_count from recruitments;
+  if visible_count <> 0 then
+    raise exception 'FAIL: user in an unrelated group unexpectedly sees % recruitment row(s)', visible_count;
+  end if;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;

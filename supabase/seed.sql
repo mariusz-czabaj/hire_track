@@ -21,9 +21,11 @@ insert into group_operations (group_id, operation) values
   ((select id from security_groups where name = 'Hiring Manager'), 'candidate.read'),
   ((select id from security_groups where name = 'Administrator'), 'group.manage');
 
--- Two local test accounts -- one per group that actually does something
--- in the RLS model (Administrator has no read/write ops to exercise
--- here; S-07 will seed its own admin flows). Standard Supabase
+-- Three local test accounts -- one per group. The Administrator account
+-- has no recruitment/candidate operations and isn't assigned to the
+-- seeded recruitment, so it doubles as the cross-group-isolation fixture
+-- rls_verification.sql uses (a user with zero visibility into the
+-- HR/Rekruter + Hiring Manager-scoped recruitment). Standard Supabase
 -- local-seed pattern: insert directly into auth.users + auth.identities
 -- with an encrypted password via pgcrypto.
 insert into auth.users (
@@ -49,6 +51,15 @@ insert into auth.users (
     extensions.crypt('password123', extensions.gen_salt('bf')),
     now(), '{"provider":"email","providers":["email"]}', '{}',
     now(), now(), '', '', '', ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000000',
+    '33333333-3333-3333-3333-333333333333',
+    'authenticated', 'authenticated',
+    'admin.test@example.com',
+    extensions.crypt('password123', extensions.gen_salt('bf')),
+    now(), '{"provider":"email","providers":["email"]}', '{}',
+    now(), now(), '', '', '', ''
   );
 
 insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
@@ -64,11 +75,18 @@ values
     '22222222-2222-2222-2222-222222222222',
     jsonb_build_object('sub', '22222222-2222-2222-2222-222222222222', 'email', 'hiring-manager.test@example.com'),
     'email', now(), now(), now()
+  ),
+  (
+    '33333333-3333-3333-3333-333333333333',
+    '33333333-3333-3333-3333-333333333333',
+    jsonb_build_object('sub', '33333333-3333-3333-3333-333333333333', 'email', 'admin.test@example.com'),
+    'email', now(), now(), now()
   );
 
 insert into group_memberships (group_id, user_id) values
   ((select id from security_groups where name = 'HR/Rekruter'), '11111111-1111-1111-1111-111111111111'),
-  ((select id from security_groups where name = 'Hiring Manager'), '22222222-2222-2222-2222-222222222222');
+  ((select id from security_groups where name = 'Hiring Manager'), '22222222-2222-2222-2222-222222222222'),
+  ((select id from security_groups where name = 'Administrator'), '33333333-3333-3333-3333-333333333333');
 
 -- One seeded recruitment, visible to both HR/Rekruter (full access) and
 -- Hiring Manager (read-only) -- a hiring manager overseeing an HR-run
