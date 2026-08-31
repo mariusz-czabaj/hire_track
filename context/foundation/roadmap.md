@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 1
 status: draft
 created: 2026-08-27
-updated: 2026-08-27
+updated: 2026-08-31
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -41,7 +41,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 
 | ID | Change ID | Outcome (user can …) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
-| F-01 | core-recruitment-data-foundation | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa | — | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | ready |
+| F-01 | core-recruitment-data-foundation | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa | — | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
 | S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | proposed |
 | S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | proposed |
 | S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji | F-01, S-01 | FR-004 | proposed |
@@ -84,7 +84,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sekwencjonowany jako pierwszy, bo praktycznie każdy wycinek zależy od jakiegoś podzbioru tego schematu (Baseline: Data = absent) — zrobienie tego później oznaczałoby przebudowę RLS pod istniejące dane. Zakres celowo minimalny: tylko tabele i polityki potrzebne pod S-01/S-02/S-07, bez pełnej logiki notatek czy CV (te dochodzą wraz z S-04/S-05).
-- **Status:** ready
+- **Status:** in-progress
 
 ## Slices
 
