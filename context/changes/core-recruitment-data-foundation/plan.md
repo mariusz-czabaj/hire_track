@@ -276,26 +276,26 @@ Greenfield schema — no existing production data to migrate or backfill.
 
 #### Automated
 
-- [x] 2.1 Migration applies cleanly: `npx supabase db reset`
-- [x] 2.2 Lint is clean: `npx supabase db lint --local`
-- [x] 2.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally
+- [x] 2.1 Migration applies cleanly: `npx supabase db reset` — ec3ce70
+- [x] 2.2 Lint is clean: `npx supabase db lint --local` — ec3ce70
+- [x] 2.3 Migration is tracked: `npx supabase migration list --local` shows the new file as applied locally — ec3ce70
 
 #### Manual
 
-- [x] 2.4 Supabase Studio shows all six domain tables with expected columns
-- [x] 2.5 `kanban_stages` has exactly 6 default rows (`recruitment_id IS NULL`), correctly named and ordered
+- [x] 2.4 Supabase Studio shows all six domain tables with expected columns — ec3ce70
+- [x] 2.5 `kanban_stages` has exactly 6 default rows (`recruitment_id IS NULL`), correctly named and ordered — ec3ce70
 
 ### Phase 3: RLS Policies
 
 #### Automated
 
-- [ ] 3.1 Migration applies cleanly: `npx supabase db reset`
-- [ ] 3.2 Lint is clean: `npx supabase db lint --local`
-- [ ] 3.3 RLS enabled on every public table: verification query returns zero rows
+- [x] 3.1 Migration applies cleanly: `npx supabase db reset`
+- [x] 3.2 Lint is clean: `npx supabase db lint --local`
+- [x] 3.3 RLS enabled on every public table: verification query returns zero rows
 
 #### Manual
 
-- [ ] 3.4 Anonymous REST request to `/rest/v1/recruitments` returns `[]`
+- [x] 3.4 Anonymous REST request to `/rest/v1/recruitments` returns `[]`
 
 ### Phase 4: Seed Data + RLS Verification
 
