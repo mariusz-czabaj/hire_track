@@ -48,5 +48,13 @@ jobs:
         run: |
           npm run db:types
           git diff --exit-code src/db/database.types.ts
+      - name: Run HTTP integration tests
+        run: |
+          npm run dev &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4321/ -o /dev/null && break
+            sleep 2
+          done
+          npm run test:integration
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

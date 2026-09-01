@@ -7,8 +7,8 @@ export function jsonOk(data: unknown, status = 200): Response {
   });
 }
 
-export function jsonError(status: number, code: string, message: string): Response {
-  const body: ApiErrorBody = { error: { code, message } };
+export function jsonError(status: number, code: string, message: string, fields?: Record<string, string>): Response {
+  const body: ApiErrorBody = { error: { code, message, ...(fields ? { fields } : {}) } };
   return new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },

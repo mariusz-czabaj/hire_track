@@ -43,7 +43,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 |---|---|---|---|---|---|
 | F-01 | core-recruitment-data-foundation | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa | — | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
 | S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | in-progress |
-| S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | proposed |
+| S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | in-progress |
 | S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji | F-01, S-01 | FR-004 | proposed |
 | S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu) | S-01, S-02 | FR-006, FR-008, FR-009, FR-013, Business Logic | proposed |
 | S-05 | candidate-profile-and-cv-upload | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach | S-04 | FR-011, FR-012, FR-013a, NFR-retencja | proposed |
@@ -111,7 +111,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Bez tego wycinka S-01 działa tylko na zasianych danych — to jest krok, który czyni produkt realnie używalnym (rekruter sam zakłada rekrutacje), stąd sekwencjonowany zaraz po north star.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-03: Rekruter dostosowuje etapy kanban per rekrutacja
 

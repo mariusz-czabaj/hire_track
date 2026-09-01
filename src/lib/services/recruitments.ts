@@ -2,9 +2,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
 import {
   recruitmentStatusSchema,
+  type CreateRecruitmentCommand,
   type KanbanBoardDto,
   type RecruitmentListItemDto,
   type RecruitmentStatus,
+  type RecruitmentStatusDto,
 } from "@/types";
 
 type Client = SupabaseClient<Database>;
@@ -53,6 +55,70 @@ export async function listRecruitments(
     status: toRecruitmentStatus(row.status),
     candidateCount: row.candidate_recruitments[0]?.count ?? 0,
   }));
+}
+
+export async function createRecruitment(
+  client: Client,
+  command: CreateRecruitmentCommand,
+): Promise<RecruitmentListItemDto> {
+  const { data: recruitmentId, error: rpcError } = await client.rpc("create_recruitment", {
+    p_title: command.title,
+    p_department: command.department,
+    p_location: command.location,
+    p_employment_type: command.employmentType,
+    p_opened_at: command.openedAt,
+    p_group_ids: command.groupIds,
+  });
+
+  if (rpcError) {
+    throw rpcError;
+  }
+
+  const { data: row, error: fetchError } = await client
+    .from("recruitments")
+    .select("id, title, department, location, opened_at, status")
+    .eq("id", recruitmentId)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    department: row.department,
+    location: row.location,
+    openedAt: row.opened_at,
+    status: toRecruitmentStatus(row.status),
+    candidateCount: 0,
+  };
+}
+
+export async function updateRecruitmentStatus(
+  client: Client,
+  recruitmentId: number,
+  status: RecruitmentStatus,
+): Promise<RecruitmentStatusDto | null> {
+  const { data: row, error } = await client
+    .from("recruitments")
+    .update({ status })
+    .eq("id", recruitmentId)
+    .select("id, status")
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    status: toRecruitmentStatus(row.status),
+  };
 }
 
 export async function getKanbanBoard(client: Client, recruitmentId: number): Promise<KanbanBoardDto | null> {

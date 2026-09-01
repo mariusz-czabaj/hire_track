@@ -8,6 +8,31 @@ import { z } from "zod";
 export const recruitmentStatusSchema = z.enum(["draft", "live", "closed"]);
 export type RecruitmentStatus = z.infer<typeof recruitmentStatusSchema>;
 
+// Fixed list of employment types (FR-001). The `employment_type` column
+// itself is free-text with no CHECK constraint (see recruitmentStatusSchema's
+// comment above for the same drift-discipline concern) -- this zod enum is
+// the single source of truth for the values the UI and API accept.
+export const employmentTypeSchema = z.enum(["full-time", "part-time", "contract", "internship"]);
+export type EmploymentType = z.infer<typeof employmentTypeSchema>;
+
+export interface CreateRecruitmentCommand {
+  title: string;
+  department: string;
+  location: string;
+  employmentType: EmploymentType;
+  openedAt: string;
+  groupIds: number[];
+}
+
+export interface UpdateRecruitmentStatusCommand {
+  status: RecruitmentStatus;
+}
+
+export interface RecruitmentStatusDto {
+  id: number;
+  status: RecruitmentStatus;
+}
+
 export interface RecruitmentListItemDto {
   id: number;
   title: string;
@@ -48,5 +73,6 @@ export interface ApiErrorBody {
   error: {
     code: string;
     message: string;
+    fields?: Record<string, string>;
   };
 }

@@ -344,17 +344,17 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Manual
 
-- [x] 1.4 Migration SQL hardening reviewed against mark_rls_helpers_stable.sql pattern
+- [x] 1.4 Migration SQL hardening reviewed against mark_rls_helpers_stable.sql pattern — 321d70b
 
 ### Phase 2: API endpoints
 
 #### Automated
 
-- [ ] 2.1 Type checking passes
-- [ ] 2.2 Linting passes
-- [ ] 2.3 Unit tests pass for service functions
-- [ ] 2.4 Integration tests pass for both endpoints, all 3 role fixtures
-- [ ] 2.8 HTTP integration-test harness built and documented
+- [x] 2.1 Type checking passes
+- [x] 2.2 Linting passes
+- [x] 2.3 Unit tests pass for service functions
+- [x] 2.4 Integration tests pass for both endpoints, all 3 role fixtures
+- [x] 2.8 HTTP integration-test harness built and documented
 
 #### Manual
 

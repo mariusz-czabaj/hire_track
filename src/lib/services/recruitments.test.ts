@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
-import { getKanbanBoard, listRecruitments } from "@/lib/services/recruitments";
+import {
+  createRecruitment,
+  getKanbanBoard,
+  listRecruitments,
+  updateRecruitmentStatus,
+} from "@/lib/services/recruitments";
 
 type Client = SupabaseClient<Database>;
 
@@ -35,7 +40,15 @@ class FakeQueryBuilder<T> implements PromiseLike<QueryResult<T>> {
     return this;
   }
 
+  update(): this {
+    return this;
+  }
+
   maybeSingle(): Promise<QueryResult<T>> {
+    return Promise.resolve(this.result);
+  }
+
+  single(): Promise<QueryResult<T>> {
     return Promise.resolve(this.result);
   }
 
@@ -113,6 +126,98 @@ function makeBoardClient(config: {
     from: (table: string) => tables[table],
   } as unknown as Client;
 }
+
+function makeCreateClient(config: {
+  rpc: { data: number | null; error: { message: string; code?: string } | null };
+  row?: QueryResult<RecruitmentListRow>;
+}): Client {
+  const { rpc, row } = config;
+  return {
+    rpc: () => Promise.resolve(rpc),
+    from: () => new FakeQueryBuilder<RecruitmentListRow>(row ?? { data: null, error: null }),
+  } as unknown as Client;
+}
+
+function makeUpdateStatusClient(result: QueryResult<{ id: number; status: string }>): Client {
+  return {
+    from: () => new FakeQueryBuilder<{ id: number; status: string }>(result),
+  } as unknown as Client;
+}
+
+describe("createRecruitment", () => {
+  it("calls the RPC and re-fetches the created row as a DTO with candidateCount 0", async () => {
+    const client = makeCreateClient({
+      rpc: { data: 42, error: null },
+      row: {
+        data: {
+          id: 42,
+          title: "Backend Engineer",
+          department: "Engineering",
+          location: "Remote",
+          opened_at: "2026-01-01",
+          status: "draft",
+          candidate_recruitments: [],
+        },
+        error: null,
+      },
+    });
+
+    const dto = await createRecruitment(client, {
+      title: "Backend Engineer",
+      department: "Engineering",
+      location: "Remote",
+      employmentType: "full-time",
+      openedAt: "2026-01-01",
+      groupIds: [1],
+    });
+
+    expect(dto).toEqual({
+      id: 42,
+      title: "Backend Engineer",
+      department: "Engineering",
+      location: "Remote",
+      openedAt: "2026-01-01",
+      status: "draft",
+      candidateCount: 0,
+    });
+  });
+
+  it("propagates an RPC error as a throw", async () => {
+    const client = makeCreateClient({
+      rpc: { data: null, error: { message: "insufficient_privilege", code: "42501" } },
+    });
+
+    await expect(
+      createRecruitment(client, {
+        title: "Backend Engineer",
+        department: "Engineering",
+        location: "Remote",
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+        groupIds: [1],
+      }),
+    ).rejects.toEqual({ message: "insufficient_privilege", code: "42501" });
+  });
+});
+
+describe("updateRecruitmentStatus", () => {
+  it("returns the updated status DTO on a match", async () => {
+    const client = makeUpdateStatusClient({ data: { id: 1, status: "live" }, error: null });
+    const dto = await updateRecruitmentStatus(client, 1, "live");
+    expect(dto).toEqual({ id: 1, status: "live" });
+  });
+
+  it("returns null when no row matches (not found or not authorized)", async () => {
+    const client = makeUpdateStatusClient({ data: null, error: null });
+    const dto = await updateRecruitmentStatus(client, 999999, "live");
+    expect(dto).toBeNull();
+  });
+
+  it("propagates a Supabase error as a throw", async () => {
+    const client = makeUpdateStatusClient({ data: null, error: { message: "boom" } });
+    await expect(updateRecruitmentStatus(client, 1, "live")).rejects.toEqual({ message: "boom" });
+  });
+});
 
 describe("listRecruitments", () => {
   it("passes the status filter through", async () => {
