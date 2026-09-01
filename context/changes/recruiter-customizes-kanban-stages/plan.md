@@ -526,27 +526,27 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 5.1 Component and unit tests pass
-- [x] 5.2 Linting passes
-- [x] 5.3 Build passes
+- [x] 5.1 Component and unit tests pass — 20593af
+- [x] 5.2 Linting passes — 20593af
+- [x] 5.3 Build passes — 20593af
 
 #### Manual
 
-- [x] 5.4 HR customizes stages and the board re-renders
-- [x] 5.5 Reset restores the 6 defaults
-- [x] 5.6 Seeded recruitment's editor is read-only with an explanation
-- [x] 5.7 Hiring Manager gets a clean 403, no crash
-- [x] 5.8 Reorder and removal behave correctly across several edits
+- [x] 5.4 HR customizes stages and the board re-renders — 20593af
+- [x] 5.5 Reset restores the 6 defaults — 20593af
+- [x] 5.6 Seeded recruitment's editor is read-only with an explanation — 20593af
+- [x] 5.7 Hiring Manager gets a clean 403, no crash — 20593af
+- [x] 5.8 Reorder and removal behave correctly across several edits — 20593af
 
 ### Phase 6: End-to-End Coverage
 
 #### Automated
 
-- [ ] 6.1 E2E suite passes
-- [ ] 6.2 Full CI pipeline passes
-- [ ] 6.3 database.types.ts diff is clean
+- [x] 6.1 E2E suite passes
+- [x] 6.2 Full CI pipeline passes
+- [x] 6.3 database.types.ts diff is clean
 
 #### Manual
 
-- [ ] 6.4 E2E run is stable across two consecutive runs
-- [ ] 6.5 S-01's recruitments.spec.ts still passes unmodified
+- [x] 6.4 E2E run is stable across two consecutive runs
+- [x] 6.5 S-01's recruitments.spec.ts still passes unmodified
