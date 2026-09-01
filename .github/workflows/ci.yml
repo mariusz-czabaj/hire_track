@@ -42,8 +42,8 @@ jobs:
         run: supabase status -o env >> "$GITHUB_ENV"
       - name: Map local Supabase env to app vars
         run: |
-          echo "SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
-          echo "SUPABASE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_URL=${API_URL//\"/}" >> "$GITHUB_ENV"
+          echo "SUPABASE_KEY=${PUBLISHABLE_KEY//\"/}" >> "$GITHUB_ENV"
       - name: Regenerate database types and fail on drift
         run: |
           npm run db:types
