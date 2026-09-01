@@ -27,7 +27,8 @@ export const GET: APIRoute = async (context) => {
   try {
     const recruitments = await listRecruitments(supabase, { status });
     return jsonOk(recruitments);
-  } catch {
+  } catch (error) {
+    console.error(error);
     return jsonError(500, "internal", "Failed to load recruitments");
   }
 };

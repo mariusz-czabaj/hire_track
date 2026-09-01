@@ -26,7 +26,8 @@ export const GET: APIRoute = async (context) => {
       return jsonError(404, "not_found", "Recruitment not found");
     }
     return jsonOk(board);
-  } catch {
+  } catch (error) {
+    console.error(error);
     return jsonError(500, "internal", "Failed to load kanban board");
   }
 };

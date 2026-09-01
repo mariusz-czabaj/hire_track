@@ -1,7 +1,7 @@
 ---
 change_id: recruiter-views-kanban-board
 title: Rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów
-status: implemented
+status: impl_reviewed
 created: 2026-09-01
 updated: 2026-09-01
 archived_at: null
