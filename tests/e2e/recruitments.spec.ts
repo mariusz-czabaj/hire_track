@@ -67,6 +67,24 @@ test("Hiring Manager sees the identical read-only board", async ({ page }) => {
   const headings = page.getByRole("heading", { level: 2 });
   await expect(headings).toHaveText(STAGE_ORDER);
   await expect(page.getByTestId("kanban-columns").getByRole("button")).toHaveCount(0);
+
+  // StatusControl has no client-side role gating (RLS is the enforcement
+  // boundary, per the plan's "no client-side capability check" decision),
+  // so the Hiring Manager does see the status buttons. Clicking a status
+  // other than the current one must surface a clean denial (the API's
+  // 404-for-forbidden-or-missing rule) rather than crashing or silently
+  // succeeding. The seed data seeds this recruitment as "live".
+  const statusControl = page.getByTestId("status-control");
+  await expect(statusControl.getByRole("button")).not.toHaveCount(0);
+
+  const draftButton = statusControl.getByRole("button", { name: "Draft" });
+  await draftButton.click();
+  await expect(statusControl.getByText(/not found|denied|error/i)).toBeVisible();
+
+  // Confirm the denial didn't silently persist: the recruitment's status
+  // is still "live" after a reload.
+  await page.reload();
+  await expect(statusControl.getByRole("button", { name: "Live" })).toHaveClass(/bg-white\/20/);
 });
 
 test("Administrator sees an empty list and a not-found board", async ({ page }) => {

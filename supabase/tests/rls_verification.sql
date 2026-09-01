@@ -123,19 +123,19 @@ set local role authenticated;
 do $$
 declare
   v_group_id bigint;
-  v_recruitment_id bigint;
+  v_recruitment public.recruitments;
 begin
   select id into v_group_id from security_groups where name = 'HR/Rekruter';
-  select public.create_recruitment(
+  select * into v_recruitment from public.create_recruitment(
     'RLS Test Recruitment',
     'Engineering',
     'Remote',
     'full-time',
     current_date,
     array[v_group_id]
-  ) into v_recruitment_id;
+  );
 
-  if not exists (select 1 from recruitments where id = v_recruitment_id) then
+  if not exists (select 1 from recruitments where id = v_recruitment.id) then
     raise exception 'FAIL: HR user cannot see the recruitment they just created via create_recruitment';
   end if;
 end $$;

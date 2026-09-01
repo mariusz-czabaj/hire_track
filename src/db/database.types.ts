@@ -344,7 +344,23 @@ export type Database = {
           p_opened_at: string;
           p_title: string;
         };
-        Returns: number;
+        Returns: {
+          created_at: string;
+          department: string | null;
+          employment_type: string | null;
+          id: number;
+          location: string | null;
+          opened_at: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "recruitments";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
     };
     Enums: {

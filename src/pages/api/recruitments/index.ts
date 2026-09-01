@@ -78,6 +78,11 @@ export const POST: APIRoute = async (context) => {
         groupIds: "At least one security group is required",
       });
     }
+    if (code === "23503") {
+      return jsonError(422, "invalid_request", "One or more security groups do not exist", {
+        groupIds: "One or more security groups do not exist",
+      });
+    }
     console.error(error);
     return jsonError(500, "internal", "Failed to create recruitment");
   }

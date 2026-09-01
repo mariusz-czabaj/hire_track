@@ -127,14 +127,20 @@ function makeBoardClient(config: {
   } as unknown as Client;
 }
 
+interface CreateRecruitmentRow {
+  id: number;
+  title: string;
+  department: string | null;
+  location: string | null;
+  opened_at: string | null;
+  status: string;
+}
+
 function makeCreateClient(config: {
-  rpc: { data: number | null; error: { message: string; code?: string } | null };
-  row?: QueryResult<RecruitmentListRow>;
+  rpc: { data: CreateRecruitmentRow | null; error: { message: string; code?: string } | null };
 }): Client {
-  const { rpc, row } = config;
   return {
-    rpc: () => Promise.resolve(rpc),
-    from: () => new FakeQueryBuilder<RecruitmentListRow>(row ?? { data: null, error: null }),
+    rpc: () => Promise.resolve(config.rpc),
   } as unknown as Client;
 }
 
@@ -145,10 +151,9 @@ function makeUpdateStatusClient(result: QueryResult<{ id: number; status: string
 }
 
 describe("createRecruitment", () => {
-  it("calls the RPC and re-fetches the created row as a DTO with candidateCount 0", async () => {
+  it("maps the RPC's returned row into a DTO with candidateCount 0", async () => {
     const client = makeCreateClient({
-      rpc: { data: 42, error: null },
-      row: {
+      rpc: {
         data: {
           id: 42,
           title: "Backend Engineer",
@@ -156,7 +161,6 @@ describe("createRecruitment", () => {
           location: "Remote",
           opened_at: "2026-01-01",
           status: "draft",
-          candidate_recruitments: [],
         },
         error: null,
       },

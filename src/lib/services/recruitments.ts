@@ -61,7 +61,7 @@ export async function createRecruitment(
   client: Client,
   command: CreateRecruitmentCommand,
 ): Promise<RecruitmentListItemDto> {
-  const { data: recruitmentId, error: rpcError } = await client.rpc("create_recruitment", {
+  const { data: row, error: rpcError } = await client.rpc("create_recruitment", {
     p_title: command.title,
     p_department: command.department,
     p_location: command.location,
@@ -72,16 +72,6 @@ export async function createRecruitment(
 
   if (rpcError) {
     throw rpcError;
-  }
-
-  const { data: row, error: fetchError } = await client
-    .from("recruitments")
-    .select("id, title, department, location, opened_at, status")
-    .eq("id", recruitmentId)
-    .single();
-
-  if (fetchError) {
-    throw fetchError;
   }
 
   return {
