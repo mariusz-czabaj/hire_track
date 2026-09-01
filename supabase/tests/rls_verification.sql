@@ -218,4 +218,156 @@ begin
 end $$;
 rollback;
 
+-- (10) S-03: the seeded HR user inserts an override stage row on the
+-- seeded recruitment (which they are linked to via HR/Rekruter) -- allowed.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_recruitment_id bigint;
+begin
+  select id into v_recruitment_id from recruitments where title = 'Backend Engineer';
+  insert into kanban_stages (recruitment_id, name, sort_order) values (v_recruitment_id, 'RLS Test Stage', 100);
+exception
+  when others then
+    raise exception 'FAIL: HR user could not insert an override stage on a linked recruitment (% - %)', sqlstate, sqlerrm;
+end $$;
+rollback;
+
+-- (11) The seeded HR user attempts to insert a global default stage row
+-- -- denied; defaults stay administrator-only.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+begin
+  begin
+    insert into kanban_stages (recruitment_id, name, sort_order) values (null, 'Should Fail', 100);
+    raise exception 'FAIL: HR user was able to insert a global default stage (write should be denied)';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
+-- (12) The seeded HR user attempts to insert an override stage row on a
+-- recruitment they are NOT linked to -- denied.
+begin;
+do $$
+declare
+  v_other_recruitment_id bigint;
+begin
+  insert into recruitments (title, location, department, employment_type, opened_at, status)
+  values ('Unlinked Recruitment', 'Remote', 'Engineering', 'full-time', current_date, 'draft')
+  returning id into v_other_recruitment_id;
+
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+    true
+  );
+  set local role authenticated;
+
+  begin
+    insert into kanban_stages (recruitment_id, name, sort_order) values (v_other_recruitment_id, 'Should Fail', 100);
+    raise exception 'FAIL: HR user was able to insert an override stage on a recruitment they are not linked to';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
+-- (13) An Administrator user updates a global default stage's name --
+-- allowed.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+begin
+  update kanban_stages set name = 'New' where recruitment_id is null and name = 'New';
+exception
+  when others then
+    raise exception 'FAIL: Administrator could not update a global default stage (% - %)', sqlstate, sqlerrm;
+end $$;
+rollback;
+
+-- (14) An Administrator user (group.manage only) attempts to insert an
+-- override stage row on a recruitment they are not linked to -- denied;
+-- group.manage is not a recruitment scope. The recruitment id is read as
+-- the unrestricted migration role, before switching to `authenticated`,
+-- since the Administrator has no recruitment.read scope on it either.
+begin;
+do $$
+declare
+  v_recruitment_id bigint;
+begin
+  select id into v_recruitment_id from recruitments where title = 'Backend Engineer';
+
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+    true
+  );
+  set local role authenticated;
+
+  begin
+    insert into kanban_stages (recruitment_id, name, sort_order) values (v_recruitment_id, 'Should Fail', 100);
+    raise exception 'FAIL: Administrator was able to insert an override stage on an unlinked recruitment';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
+-- (15) The stage<->recruitment consistency trigger rejects pointing a
+-- candidate at another recruitment's override stage.
+begin;
+do $$
+declare
+  v_recruitment_id bigint;
+  v_other_recruitment_id bigint;
+  v_other_stage_id bigint;
+  v_candidate_id bigint;
+begin
+  select id into v_recruitment_id from recruitments where title = 'Backend Engineer';
+
+  insert into recruitments (title, location, department, employment_type, opened_at, status)
+  values ('Other Recruitment', 'Remote', 'Engineering', 'full-time', current_date, 'draft')
+  returning id into v_other_recruitment_id;
+
+  insert into kanban_stages (recruitment_id, name, sort_order)
+  values (v_other_recruitment_id, 'Other Stage', 1)
+  returning id into v_other_stage_id;
+
+  select id into v_candidate_id from candidates where email = 'anna.kowalska@example.com';
+
+  begin
+    insert into candidate_recruitments (candidate_id, recruitment_id, current_stage_id)
+    values (v_candidate_id, v_recruitment_id, v_other_stage_id);
+    raise exception 'FAIL: candidate_recruitments accepted a stage belonging to a different recruitment';
+  exception
+    when others then
+      if sqlstate <> '22023' then
+        raise exception 'FAIL: consistency trigger raised an unexpected error (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;
