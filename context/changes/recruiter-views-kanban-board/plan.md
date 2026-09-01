@@ -591,10 +591,10 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 3.1 Unit tests pass
-- [x] 3.2 Empty-column test fails when grouping is inverted
-- [x] 3.3 Linting passes on test files
-- [x] 3.4 Typechecking passes
+- [x] 3.1 Unit tests pass — 2ac3462
+- [x] 3.2 Empty-column test fails when grouping is inverted — 2ac3462
+- [x] 3.3 Linting passes on test files — 2ac3462
+- [x] 3.4 Typechecking passes — 2ac3462
 
 #### Manual
 
@@ -604,19 +604,19 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [ ] 4.1 Typechecking passes
-- [ ] 4.2 Linting passes
-- [ ] 4.3 Unit tests still pass
-- [ ] 4.4 Build passes
+- [x] 4.1 Typechecking passes
+- [x] 4.2 Linting passes
+- [x] 4.3 Unit tests still pass
+- [x] 4.4 Build passes
 
 #### Manual
 
-- [ ] 4.5 Signed out, /recruitments redirects to sign-in
-- [ ] 4.6 HR list shows recruitment with metadata and count 5
-- [ ] 4.7 Filter chips work and persist across reload
-- [ ] 4.8 Admin sees empty state, not an error
-- [ ] 4.9 Skeleton appears during load; existing pages still correct after .dark
-- [ ] 4.10 Expired session on refetch redirects to /auth/signin, not the error state
+- [x] 4.5 Signed out, /recruitments redirects to sign-in
+- [x] 4.6 HR list shows recruitment with metadata and count 5
+- [x] 4.7 Filter chips work and persist across reload
+- [x] 4.8 Admin sees empty state, not an error
+- [x] 4.9 Skeleton appears during load; existing pages still correct after .dark
+- [x] 4.10 Expired session on refetch redirects to /auth/signin, not the error state
 
 ### Phase 5: Kanban Board View
 

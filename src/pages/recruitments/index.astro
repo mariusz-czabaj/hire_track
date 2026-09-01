@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { RecruitmentList } from "@/components/recruitments/RecruitmentList";
+
+const initialStatus = Astro.url.searchParams.get("status") ?? undefined;
+---
+
+<Layout title="Recruitments">
+  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
+    <div class="mx-auto max-w-4xl">
+      <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+        Recruitments
+      </h1>
+      <RecruitmentList initialStatus={initialStatus} client:load />
+    </div>
+  </div>
+</Layout>
