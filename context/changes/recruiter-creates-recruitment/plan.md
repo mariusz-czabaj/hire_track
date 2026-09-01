@@ -383,11 +383,11 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Automated
 
-- [x] 4.1 npm run test passes (unit + component + integration)
-- [x] 4.2 npm run test:e2e passes
-- [x] 4.3 rls_verification.sql passes
-- [x] 4.4 lint and build pass
+- [x] 4.1 npm run test passes (unit + component + integration) — 712bbe3
+- [x] 4.2 npm run test:e2e passes — 712bbe3
+- [x] 4.3 rls_verification.sql passes — 712bbe3
+- [x] 4.4 lint and build pass — 712bbe3
 
 #### Manual
 
-- [x] 4.5 Full manual pass through create → status-change flow
+- [x] 4.5 Full manual pass through create → status-change flow — 712bbe3
