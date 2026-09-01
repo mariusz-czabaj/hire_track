@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
 import {
   recruitmentStatusSchema,
+  type CandidateCardDto,
   type CreateRecruitmentCommand,
   type KanbanBoardDto,
   type KanbanStageDto,
@@ -230,18 +231,23 @@ export async function getKanbanBoard(client: Client, recruitmentId: number): Pro
 
   const { data: candidateRows, error: candidatesError } = await client
     .from("candidate_recruitments")
-    .select("current_stage_id, added_at, candidates(id, full_name)")
+    .select("id, current_stage_id, added_at, candidates(id, full_name)")
     .eq("recruitment_id", recruitmentId);
 
   if (candidatesError) {
     throw candidatesError;
   }
 
-  const candidatesByStage = new Map<number, { id: number; fullName: string; addedAt: string }[]>();
+  const candidatesByStage = new Map<number, CandidateCardDto[]>();
 
   for (const row of candidateRows) {
     const bucket = candidatesByStage.get(row.current_stage_id) ?? [];
-    bucket.push({ id: row.candidates.id, fullName: row.candidates.full_name, addedAt: row.added_at });
+    bucket.push({
+      id: row.candidates.id,
+      fullName: row.candidates.full_name,
+      addedAt: row.added_at,
+      candidateRecruitmentId: row.id,
+    });
     candidatesByStage.set(row.current_stage_id, bucket);
   }
 

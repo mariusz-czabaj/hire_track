@@ -58,6 +58,7 @@ export interface CandidateCardDto {
   id: number;
   fullName: string;
   addedAt: string;
+  candidateRecruitmentId: number;
 }
 
 export interface KanbanBoardStageDto extends KanbanStageDto {

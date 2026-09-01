@@ -16,7 +16,7 @@ export async function addCandidateToRecruitment(
   client: Client,
   recruitmentId: number,
   command: AddCandidateCommand,
-): Promise<CandidateCardDto & { candidateRecruitmentId: number }> {
+): Promise<CandidateCardDto> {
   const { data, error } = await client.rpc("add_candidate_to_recruitment", {
     target_recruitment_id: recruitmentId,
     full_name: command.fullName,
@@ -30,10 +30,7 @@ export async function addCandidateToRecruitment(
 
   // The RPC returns the candidate_recruitments row only (no candidates
   // columns), so fullName is derived from the submitted command -- the
-  // RPC applies the same trim() before storing it. candidateRecruitmentId
-  // is additive to CandidateCardDto (which stays keyed by candidates.id,
-  // matching the board's existing mapping) -- it is the only way a caller
-  // can discover the id the other candidate routes are keyed by.
+  // RPC applies the same trim() before storing it.
   return {
     id: data.candidate_id,
     fullName: command.fullName.trim(),

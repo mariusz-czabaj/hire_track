@@ -49,7 +49,7 @@ async function addCandidate(
       ...overrides,
     }),
   });
-  const card = (await response.json()) as CandidateCardDto & { candidateRecruitmentId: number };
+  const card = (await response.json()) as CandidateCardDto;
 
   return { candidateRecruitmentId: card.candidateRecruitmentId, card };
 }

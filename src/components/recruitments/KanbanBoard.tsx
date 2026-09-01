@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { ServerError } from "@/components/auth/ServerError";
+import { AddCandidateDialog } from "@/components/recruitments/AddCandidateDialog";
+import { MoveCandidateDialog } from "@/components/recruitments/MoveCandidateDialog";
 import { StageEditor } from "@/components/recruitments/StageEditor";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -121,6 +123,16 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
 
   const { recruitment, stages, stagesSource } = resource.data;
 
+  function handleChanged() {
+    void resource.refetch();
+  }
+
+  const cardIndexById = new Map(
+    stages
+      .flatMap((stage) => stage.candidates)
+      .map((candidate, index) => [candidate.candidateRecruitmentId, index + 1]),
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -130,21 +142,14 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
         <Badge variant={STATUS_PRESENTATION[recruitment.status].variant}>
           {STATUS_PRESENTATION[recruitment.status].label}
         </Badge>
-        <StatusControl
-          recruitmentId={String(recruitment.id)}
-          status={recruitment.status}
-          onChanged={() => {
-            void resource.refetch();
-          }}
-        />
+        <StatusControl recruitmentId={String(recruitment.id)} status={recruitment.status} onChanged={handleChanged} />
         <StageEditor
           recruitmentId={String(recruitment.id)}
           stages={stages}
           stagesSource={stagesSource}
-          onChanged={() => {
-            void resource.refetch();
-          }}
+          onChanged={handleChanged}
         />
+        <AddCandidateDialog recruitmentId={String(recruitment.id)} onChanged={handleChanged} />
       </div>
 
       <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
@@ -162,7 +167,21 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
               )}
               {stage.candidates.map((candidate) => (
                 <Card key={candidate.id} className="gap-1 border-white/10 bg-white/10 p-3 text-white">
-                  <p className="text-sm font-medium">{candidate.fullName}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <a
+                      href={`/recruitments/${recruitment.id}/candidates/${candidate.candidateRecruitmentId}`}
+                      className="text-sm font-medium hover:underline"
+                    >
+                      {candidate.fullName}
+                    </a>
+                    <MoveCandidateDialog
+                      recruitmentId={String(recruitment.id)}
+                      candidateRecruitmentId={candidate.candidateRecruitmentId}
+                      triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
+                      stages={stages}
+                      onChanged={handleChanged}
+                    />
+                  </div>
                   <p className="text-xs text-blue-100/60">Added {formatDate(candidate.addedAt)}</p>
                 </Card>
               ))}

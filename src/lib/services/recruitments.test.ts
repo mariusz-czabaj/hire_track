@@ -131,6 +131,7 @@ class FakeKanbanStagesQueryBuilder implements PromiseLike<QueryResult<StageRow[]
 }
 
 interface CandidateRecruitmentRow {
+  id: number;
   current_stage_id: number;
   added_at: string;
   candidates: { id: number; full_name: string };
@@ -335,7 +336,9 @@ describe("getKanbanBoard", () => {
         error: null,
       },
       candidateRows: {
-        data: [{ current_stage_id: 10, added_at: "2026-01-02", candidates: { id: 100, full_name: "Ada Lovelace" } }],
+        data: [
+          { id: 500, current_stage_id: 10, added_at: "2026-01-02", candidates: { id: 100, full_name: "Ada Lovelace" } },
+        ],
         error: null,
       },
     });
@@ -431,8 +434,13 @@ describe("getKanbanBoard", () => {
       },
       candidateRows: {
         data: [
-          { current_stage_id: 101, added_at: "2026-01-02", candidates: { id: 100, full_name: "Ada Lovelace" } },
-          { current_stage_id: 101, added_at: "2026-01-03", candidates: { id: 101, full_name: "Alan Turing" } },
+          {
+            id: 500,
+            current_stage_id: 101,
+            added_at: "2026-01-02",
+            candidates: { id: 100, full_name: "Ada Lovelace" },
+          },
+          { id: 501, current_stage_id: 101, added_at: "2026-01-03", candidates: { id: 101, full_name: "Alan Turing" } },
         ],
         error: null,
       },

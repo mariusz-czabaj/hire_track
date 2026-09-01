@@ -653,32 +653,32 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass
-- [x] 3.2 Integration tests pass
-- [x] 3.3 Linting passes
-- [x] 3.4 Type checking passes
-- [x] 3.5 Build succeeds
+- [x] 3.1 Unit tests pass — 81d84b4
+- [x] 3.2 Integration tests pass — 81d84b4
+- [x] 3.3 Linting passes — 81d84b4
+- [x] 3.4 Type checking passes — 81d84b4
+- [x] 3.5 Build succeeds — 81d84b4
 
 #### Manual
 
-- [x] 3.6 Blocked move returns actionable 422 note_required
-- [x] 3.7 Note supplied in the PATCH both saves and moves
+- [x] 3.6 Blocked move returns actionable 422 note_required — 81d84b4
+- [x] 3.7 Note supplied in the PATCH both saves and moves — 81d84b4
 
 ### Phase 4: Board interaction
 
 #### Automated
 
-- [ ] 4.1 Unit tests pass
-- [ ] 4.2 Linting passes
-- [ ] 4.3 Type checking passes
-- [ ] 4.4 Build succeeds
+- [x] 4.1 Unit tests pass
+- [x] 4.2 Linting passes
+- [x] 4.3 Type checking passes
+- [x] 4.4 Build succeeds
 
 #### Manual
 
-- [ ] 4.5 Added candidate appears without reload
-- [ ] 4.6 Blank-note move refused, then completes once filled
-- [ ] 4.7 Backward move works
-- [ ] 4.8 Hiring manager gets a clean denial
+- [x] 4.5 Added candidate appears without reload
+- [x] 4.6 Blank-note move refused, then completes once filled
+- [x] 4.7 Backward move works
+- [x] 4.8 Hiring manager gets a clean denial
 
 ### Phase 5: Candidate detail page
 
