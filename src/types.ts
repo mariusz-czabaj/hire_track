@@ -84,6 +84,42 @@ export interface KanbanBoardDto {
   stages: KanbanBoardStageDto[];
 }
 
+export interface AddCandidateCommand {
+  fullName: string;
+  email: string;
+  phone?: string;
+}
+
+export interface MoveCandidateCommand {
+  toStageId: number;
+  note?: string;
+}
+
+export interface UpsertCandidateNoteCommand {
+  stageId: number;
+  body: string;
+}
+
+export interface CandidateNoteDto {
+  stageId: number;
+  stageName: string;
+  body: string | null;
+  authorEmail: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface CandidateDetailDto {
+  id: number;
+  candidateId: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  addedAt: string;
+  currentStageId: number;
+  notes: CandidateNoteDto[];
+}
+
 export interface ApiErrorBody {
   error: {
     code: string;

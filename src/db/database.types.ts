@@ -428,6 +428,13 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      get_user_emails: {
+        Args: { user_ids: string[] };
+        Returns: {
+          email: string;
+          id: string;
+        }[];
+      };
       move_candidate_stage: {
         Args: {
           note?: string;

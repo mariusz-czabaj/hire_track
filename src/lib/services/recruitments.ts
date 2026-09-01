@@ -14,7 +14,7 @@ import {
 
 type Client = SupabaseClient<Database>;
 
-interface KanbanStageRow {
+export interface KanbanStageRow {
   id: number;
   recruitment_id: number | null;
   name: string;
@@ -128,7 +128,7 @@ export async function updateRecruitmentStatus(
  * -- keep each filter a plain, non-interpolating `.is()`/`.eq()` call, so
  * this stays safe if ever called standalone with an untrusted id.
  */
-async function resolveKanbanStages(
+export async function resolveKanbanStages(
   client: Client,
   recruitmentId: number,
 ): Promise<{ stagesSource: "default" | "custom"; stages: KanbanStageRow[] }> {

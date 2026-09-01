@@ -639,30 +639,30 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 2.1 Migrations apply cleanly
-- [x] 2.2 RLS/RPC assertions pass
-- [x] 2.3 Types are in sync
-- [x] 2.4 Linting passes
+- [x] 2.1 Migrations apply cleanly — 7a35b4e
+- [x] 2.2 RLS/RPC assertions pass — 7a35b4e
+- [x] 2.3 Types are in sync — 7a35b4e
+- [x] 2.4 Linting passes — 7a35b4e
 
 #### Manual
 
-- [x] 2.5 Each new assertion observed to fail when its guard is removed
-- [x] 2.6 RPC confirmed as the application's only stage-write path
+- [x] 2.5 Each new assertion observed to fail when its guard is removed — 7a35b4e
+- [x] 2.6 RPC confirmed as the application's only stage-write path — 7a35b4e
 
 ### Phase 3: Service layer and API routes
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass
-- [ ] 3.2 Integration tests pass
-- [ ] 3.3 Linting passes
-- [ ] 3.4 Type checking passes
-- [ ] 3.5 Build succeeds
+- [x] 3.1 Unit tests pass
+- [x] 3.2 Integration tests pass
+- [x] 3.3 Linting passes
+- [x] 3.4 Type checking passes
+- [x] 3.5 Build succeeds
 
 #### Manual
 
-- [ ] 3.6 Blocked move returns actionable 422 note_required
-- [ ] 3.7 Note supplied in the PATCH both saves and moves
+- [x] 3.6 Blocked move returns actionable 422 note_required
+- [x] 3.7 Note supplied in the PATCH both saves and moves
 
 ### Phase 4: Board interaction
 
