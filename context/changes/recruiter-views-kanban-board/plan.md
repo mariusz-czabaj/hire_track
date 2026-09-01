@@ -598,7 +598,7 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Manual
 
-- [x] 3.5 CI run shows typecheck and test steps executing
+- [x] 3.5 CI run shows typecheck and test steps executing — f2e6669
 
 ### Phase 4: UI Foundation & Recruitment List
 
@@ -641,13 +641,13 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 6.1 E2E suite passes locally against seeded Supabase
-- [x] 6.2 Unit and E2E runners do not collect each other's files
-- [x] 6.3 Linting passes on test files
-- [x] 6.4 Typechecking passes
-- [x] 6.5 CI fails on a stale committed database.types.ts (type-drift guard)
+- [x] 6.1 E2E suite passes locally against seeded Supabase — f2e6669
+- [x] 6.2 Unit and E2E runners do not collect each other's files — f2e6669
+- [x] 6.3 Linting passes on test files — f2e6669
+- [x] 6.4 Typechecking passes — f2e6669
+- [x] 6.5 CI fails on a stale committed database.types.ts (type-drift guard) — f2e6669
 
 #### Manual
 
-- [x] 6.6 CI E2E job passes unconditionally, with no gating condition
-- [x] 6.7 Breaking stage grouping makes the Rejected-column spec fail
+- [x] 6.6 CI E2E job passes unconditionally, with no gating condition — f2e6669
+- [x] 6.7 Breaking stage grouping makes the Rejected-column spec fail — f2e6669
