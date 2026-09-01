@@ -512,31 +512,31 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 4.1 Integration tests pass against the local stack
-- [x] 4.2 Unit tests pass
-- [x] 4.3 Linting passes
-- [x] 4.4 Build passes
+- [x] 4.1 Integration tests pass against the local stack — b195a9b
+- [x] 4.2 Unit tests pass — b195a9b
+- [x] 4.3 Linting passes — b195a9b
+- [x] 4.4 Build passes — b195a9b
 
 #### Manual
 
-- [x] 4.5 PUT as HR returns 200 and a changed board response
-- [x] 4.6 The two new refusal cases return distinguishable messages
+- [x] 4.5 PUT as HR returns 200 and a changed board response — b195a9b
+- [x] 4.6 The two new refusal cases return distinguishable messages — b195a9b
 
 ### Phase 5: Stage Editor UI
 
 #### Automated
 
-- [ ] 5.1 Component and unit tests pass
-- [ ] 5.2 Linting passes
-- [ ] 5.3 Build passes
+- [x] 5.1 Component and unit tests pass
+- [x] 5.2 Linting passes
+- [x] 5.3 Build passes
 
 #### Manual
 
-- [ ] 5.4 HR customizes stages and the board re-renders
-- [ ] 5.5 Reset restores the 6 defaults
-- [ ] 5.6 Seeded recruitment's editor is read-only with an explanation
-- [ ] 5.7 Hiring Manager gets a clean 403, no crash
-- [ ] 5.8 Reorder and removal behave correctly across several edits
+- [x] 5.4 HR customizes stages and the board re-renders
+- [x] 5.5 Reset restores the 6 defaults
+- [x] 5.6 Seeded recruitment's editor is read-only with an explanation
+- [x] 5.7 Hiring Manager gets a clean 403, no crash
+- [x] 5.8 Reorder and removal behave correctly across several edits
 
 ### Phase 6: End-to-End Coverage
 

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { ServerError } from "@/components/auth/ServerError";
+import { StageEditor } from "@/components/recruitments/StageEditor";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -118,7 +119,7 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
     return <ServerError message={resource.message} />;
   }
 
-  const { recruitment, stages } = resource.data;
+  const { recruitment, stages, stagesSource } = resource.data;
 
   return (
     <div className="flex flex-col gap-4">
@@ -132,6 +133,14 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
         <StatusControl
           recruitmentId={String(recruitment.id)}
           status={recruitment.status}
+          onChanged={() => {
+            void resource.refetch();
+          }}
+        />
+        <StageEditor
+          recruitmentId={String(recruitment.id)}
+          stages={stages}
+          stagesSource={stagesSource}
           onChanged={() => {
             void resource.refetch();
           }}

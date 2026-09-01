@@ -20,7 +20,7 @@ export interface UseMutationResult<TBody, TResponse> {
 
 export function useMutation<TBody, TResponse>(
   url: string,
-  method: "POST" | "PATCH",
+  method: "POST" | "PATCH" | "PUT" | "DELETE",
 ): UseMutationResult<TBody, TResponse> {
   const [status, setStatus] = useState<MutationStatus>("idle");
   const [error, setError] = useState<string | null>(null);
