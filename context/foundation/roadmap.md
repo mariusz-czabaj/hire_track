@@ -45,7 +45,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 | S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | in-progress |
 | S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | in-progress |
 | S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji | F-01, S-01 | FR-004 | in-progress |
-| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu) | S-01, S-02 | FR-006, FR-008, FR-009, FR-013, Business Logic | proposed |
+| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu) | S-01, S-02 | FR-006, FR-008, FR-009, FR-013, Business Logic | in-progress |
 | S-05 | candidate-profile-and-cv-upload | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach | S-04 | FR-011, FR-012, FR-013a, NFR-retencja | proposed |
 | S-06 | candidate-history-search | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01 | US-02, FR-014, FR-015, FR-016 | proposed |
 | S-07 | admin-manages-security-groups | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników | F-01 | FR-017, FR-018 | proposed |
@@ -135,7 +135,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Reguła biznesowa (blokada bez notatki) jest w PRD w pełni deterministyczna — niskie ryzyko niejednoznaczności; główne ryzyko to UX blokady (jak komunikować brak notatki), do rozstrzygnięcia na poziomie `/10x-plan`.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-05: Profil kandydata i upload CV z retencją
 

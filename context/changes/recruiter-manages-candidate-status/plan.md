@@ -668,32 +668,32 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 4.1 Unit tests pass
-- [x] 4.2 Linting passes
-- [x] 4.3 Type checking passes
-- [x] 4.4 Build succeeds
+- [x] 4.1 Unit tests pass — f404981
+- [x] 4.2 Linting passes — f404981
+- [x] 4.3 Type checking passes — f404981
+- [x] 4.4 Build succeeds — f404981
 
 #### Manual
 
-- [x] 4.5 Added candidate appears without reload
-- [x] 4.6 Blank-note move refused, then completes once filled
-- [x] 4.7 Backward move works
-- [x] 4.8 Hiring manager gets a clean denial
+- [x] 4.5 Added candidate appears without reload — f404981
+- [x] 4.6 Blank-note move refused, then completes once filled — f404981
+- [x] 4.7 Backward move works — f404981
+- [x] 4.8 Hiring manager gets a clean denial — f404981
 
 ### Phase 5: Candidate detail page
 
 #### Automated
 
-- [ ] 5.1 Unit tests pass
-- [ ] 5.2 Linting passes
-- [ ] 5.3 Type checking passes
-- [ ] 5.4 Build succeeds
+- [x] 5.1 Unit tests pass
+- [x] 5.2 Linting passes
+- [x] 5.3 Type checking passes
+- [x] 5.4 Build succeeds
 
 #### Manual
 
-- [ ] 5.5 Card click opens the correct detail page
-- [ ] 5.6 Notes list in stage order; edit persists after reload
-- [ ] 5.7 A note written here unblocks a later move
+- [x] 5.5 Card click opens the correct detail page
+- [x] 5.6 Notes list in stage order; edit persists after reload
+- [x] 5.7 A note written here unblocks a later move
 
 ### Phase 6: End-to-end coverage
 
