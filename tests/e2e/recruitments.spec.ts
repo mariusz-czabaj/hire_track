@@ -79,3 +79,51 @@ test("Administrator sees an empty list and a not-found board", async ({ page }) 
   await expect(page.getByText("This recruitment could not be found.")).toBeVisible();
   await expect(page.getByRole("link", { name: /Back to recruitments/ }).first()).toBeVisible();
 });
+
+test.describe("HR creates a recruitment and manages its status", () => {
+  test.beforeEach(async ({ page }) => {
+    await signInAs(page, "hr");
+  });
+
+  test("create -> appears in list -> status change persists", async ({ page }) => {
+    await page.goto("/recruitments/new");
+
+    const titleInput = page.getByLabel("Title");
+    const departmentInput = page.getByLabel("Department");
+    const locationInput = page.getByLabel("Location");
+    const openedAtInput = page.getByLabel("Opened date");
+    const groupCheckbox = page.getByLabel("HR/Rekruter");
+
+    // CreateRecruitmentForm is a client:load island -- same hydration race
+    // as SignInForm (see support/auth.ts): retry until values actually
+    // stick past React attaching its controlled-input onChange handlers.
+    await expect(async () => {
+      await titleInput.fill("E2E Test Role");
+      await departmentInput.fill("Engineering");
+      await locationInput.fill("Remote");
+      await openedAtInput.fill("2026-02-01");
+      await groupCheckbox.check();
+      await expect(titleInput).toHaveValue("E2E Test Role");
+      await expect(departmentInput).toHaveValue("Engineering");
+      await expect(locationInput).toHaveValue("Remote");
+      await expect(openedAtInput).toHaveValue("2026-02-01");
+      await expect(groupCheckbox).toBeChecked();
+    }).toPass({ timeout: 10_000 });
+
+    await page.getByRole("button", { name: "Create recruitment" }).click();
+
+    await expect(page).toHaveURL(/\/recruitments\/\d+$/);
+    await expect(page.getByRole("heading", { name: "E2E Test Role" })).toBeVisible();
+    await expect(page.locator('[data-slot="badge"]')).toHaveText("Draft");
+
+    await page.goto("/recruitments");
+    await expect(page.getByText("E2E Test Role")).toBeVisible();
+
+    await page.getByText("E2E Test Role").click();
+    await page.getByRole("button", { name: "Live", exact: true }).click();
+    await expect(page.locator('[data-slot="badge"]')).toHaveText("Live");
+
+    await page.reload();
+    await expect(page.locator('[data-slot="badge"]')).toHaveText("Live");
+  });
+});
