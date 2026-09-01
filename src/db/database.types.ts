@@ -1,0 +1,467 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+  public: {
+    Tables: {
+      candidate_recruitment_status_history: {
+        Row: {
+          candidate_recruitment_id: number;
+          changed_at: string;
+          changed_by: string | null;
+          from_stage_id: number | null;
+          id: number;
+          to_stage_id: number;
+        };
+        Insert: {
+          candidate_recruitment_id: number;
+          changed_at?: string;
+          changed_by?: string | null;
+          from_stage_id?: number | null;
+          id?: never;
+          to_stage_id: number;
+        };
+        Update: {
+          candidate_recruitment_id?: number;
+          changed_at?: string;
+          changed_by?: string | null;
+          from_stage_id?: number | null;
+          id?: never;
+          to_stage_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "candidate_recruitment_status_hist_candidate_recruitment_id_fkey";
+            columns: ["candidate_recruitment_id"];
+            isOneToOne: false;
+            referencedRelation: "candidate_recruitments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "candidate_recruitment_status_history_from_stage_id_fkey";
+            columns: ["from_stage_id"];
+            isOneToOne: false;
+            referencedRelation: "kanban_stages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "candidate_recruitment_status_history_to_stage_id_fkey";
+            columns: ["to_stage_id"];
+            isOneToOne: false;
+            referencedRelation: "kanban_stages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      candidate_recruitments: {
+        Row: {
+          added_at: string;
+          candidate_id: number;
+          current_stage_id: number;
+          id: number;
+          recruitment_id: number;
+        };
+        Insert: {
+          added_at?: string;
+          candidate_id: number;
+          current_stage_id: number;
+          id?: never;
+          recruitment_id: number;
+        };
+        Update: {
+          added_at?: string;
+          candidate_id?: number;
+          current_stage_id?: number;
+          id?: never;
+          recruitment_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "candidate_recruitments_candidate_id_fkey";
+            columns: ["candidate_id"];
+            isOneToOne: false;
+            referencedRelation: "candidates";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "candidate_recruitments_current_stage_id_fkey";
+            columns: ["current_stage_id"];
+            isOneToOne: false;
+            referencedRelation: "kanban_stages";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "candidate_recruitments_recruitment_id_fkey";
+            columns: ["recruitment_id"];
+            isOneToOne: false;
+            referencedRelation: "recruitments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      candidates: {
+        Row: {
+          created_at: string;
+          email: string;
+          full_name: string;
+          id: number;
+          phone: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          full_name: string;
+          id?: never;
+          phone?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          id?: never;
+          phone?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      group_memberships: {
+        Row: {
+          created_at: string;
+          group_id: number;
+          id: number;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          group_id: number;
+          id?: never;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          group_id?: number;
+          id?: never;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "group_memberships_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "security_groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      group_operations: {
+        Row: {
+          created_at: string;
+          group_id: number;
+          id: number;
+          operation: Database["public"]["Enums"]["operation"];
+        };
+        Insert: {
+          created_at?: string;
+          group_id: number;
+          id?: never;
+          operation: Database["public"]["Enums"]["operation"];
+        };
+        Update: {
+          created_at?: string;
+          group_id?: number;
+          id?: never;
+          operation?: Database["public"]["Enums"]["operation"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "group_operations_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "security_groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      kanban_stages: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+          recruitment_id: number | null;
+          sort_order: number;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          name: string;
+          recruitment_id?: number | null;
+          sort_order: number;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          name?: string;
+          recruitment_id?: number | null;
+          sort_order?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "kanban_stages_recruitment_id_fkey";
+            columns: ["recruitment_id"];
+            isOneToOne: false;
+            referencedRelation: "recruitments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      recruitment_security_groups: {
+        Row: {
+          created_at: string;
+          group_id: number;
+          id: number;
+          recruitment_id: number;
+        };
+        Insert: {
+          created_at?: string;
+          group_id: number;
+          id?: never;
+          recruitment_id: number;
+        };
+        Update: {
+          created_at?: string;
+          group_id?: number;
+          id?: never;
+          recruitment_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "recruitment_security_groups_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "security_groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "recruitment_security_groups_recruitment_id_fkey";
+            columns: ["recruitment_id"];
+            isOneToOne: false;
+            referencedRelation: "recruitments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      recruitments: {
+        Row: {
+          created_at: string;
+          department: string | null;
+          employment_type: string | null;
+          id: number;
+          location: string | null;
+          opened_at: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          department?: string | null;
+          employment_type?: string | null;
+          id?: never;
+          location?: string | null;
+          opened_at?: string | null;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          department?: string | null;
+          employment_type?: string | null;
+          id?: never;
+          location?: string | null;
+          opened_at?: string | null;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      security_groups: {
+        Row: {
+          created_at: string;
+          id: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          name?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      operation: "recruitment.read" | "recruitment.write" | "candidate.read" | "candidate.write" | "group.manage";
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      operation: ["recruitment.read", "recruitment.write", "candidate.read", "candidate.write", "group.manage"],
+    },
+  },
+} as const;

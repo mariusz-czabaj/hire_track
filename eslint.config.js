@@ -59,6 +59,15 @@ const reactConfig = tseslint.config({
   },
 });
 
+const generatedConfig = tseslint.config({
+  files: ["src/db/database.types.ts"],
+  rules: {
+    "@typescript-eslint/no-redundant-type-constituents": "off",
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/consistent-indexed-object-style": "off",
+  },
+});
+
 const astroConfig = tseslint.config({
   files: ["**/*.astro"],
   rules: {
@@ -75,5 +84,6 @@ export default tseslint.config(
   eslintPluginAstro.configs["flat/recommended"],
   ...eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
   astroConfig,
+  generatedConfig,
   eslintPluginPrettier,
 );

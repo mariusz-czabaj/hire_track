@@ -116,7 +116,7 @@ insert into candidate_recruitments (candidate_id, recruitment_id, current_stage_
   (
     (select id from candidates where email = 'anna.kowalska@example.com'),
     (select id from recruitments where title = 'Backend Engineer'),
-    (select id from kanban_stages where recruitment_id is null and name = 'Nowy'),
+    (select id from kanban_stages where recruitment_id is null and name = 'New'),
     now()
   ),
   (
@@ -128,19 +128,19 @@ insert into candidate_recruitments (candidate_id, recruitment_id, current_stage_
   (
     (select id from candidates where email = 'katarzyna.wisniewska@example.com'),
     (select id from recruitments where title = 'Backend Engineer'),
-    (select id from kanban_stages where recruitment_id is null and name = 'Rozmowa'),
+    (select id from kanban_stages where recruitment_id is null and name = 'Interview'),
     now()
   ),
   (
     (select id from candidates where email = 'marek.zielinski@example.com'),
     (select id from recruitments where title = 'Backend Engineer'),
-    (select id from kanban_stages where recruitment_id is null and name = 'Oferta'),
+    (select id from kanban_stages where recruitment_id is null and name = 'Offer'),
     now()
   ),
   (
     (select id from candidates where email = 'ewa.lewandowska@example.com'),
     (select id from recruitments where title = 'Backend Engineer'),
-    (select id from kanban_stages where recruitment_id is null and name = 'Zatrudniony'),
+    (select id from kanban_stages where recruitment_id is null and name = 'Hired'),
     now()
   );
 

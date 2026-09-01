@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   ci:
@@ -17,6 +17,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx astro sync
+      - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
         env:
