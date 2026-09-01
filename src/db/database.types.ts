@@ -335,7 +335,17 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      create_recruitment: {
+        Args: {
+          p_department: string;
+          p_employment_type: string;
+          p_group_ids: number[];
+          p_location: string;
+          p_opened_at: string;
+          p_title: string;
+        };
+        Returns: number;
+      };
     };
     Enums: {
       operation: "recruitment.read" | "recruitment.write" | "candidate.read" | "candidate.write" | "group.manage";
