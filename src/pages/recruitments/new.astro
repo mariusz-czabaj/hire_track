@@ -1,0 +1,18 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { CreateRecruitmentForm } from "@/components/recruitments/CreateRecruitmentForm";
+---
+
+<Layout title="New recruitment">
+  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
+    <div class="mx-auto max-w-xl">
+      <a href="/recruitments" class="mb-4 inline-block text-sm text-blue-100/60 hover:text-blue-100">
+        &larr; Back to recruitments
+      </a>
+      <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+        New recruitment
+      </h1>
+      <CreateRecruitmentForm client:load />
+    </div>
+  </div>
+</Layout>

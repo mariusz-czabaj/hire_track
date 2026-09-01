@@ -1,11 +1,18 @@
 import { useMemo } from "react";
 import { useApiResource } from "@/components/hooks/useApiResource";
+import { useMutation } from "@/components/hooks/useMutation";
 import { ServerError } from "@/components/auth/ServerError";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { STATUS_PRESENTATION } from "@/lib/recruitment-status";
-import type { KanbanBoardDto } from "@/types";
+import {
+  recruitmentStatusSchema,
+  type KanbanBoardDto,
+  type RecruitmentStatus,
+  type RecruitmentStatusDto,
+} from "@/types";
 
 interface KanbanBoardProps {
   recruitmentId: string | undefined;
@@ -40,6 +47,61 @@ function NotFoundState() {
   );
 }
 
+function StatusControl({
+  recruitmentId,
+  status,
+  onChanged,
+}: {
+  recruitmentId: string;
+  status: RecruitmentStatus;
+  onChanged: () => void;
+}) {
+  const {
+    mutate,
+    status: mutationStatus,
+    error,
+  } = useMutation<{ status: RecruitmentStatus }, RecruitmentStatusDto>(
+    `/api/recruitments/${encodeURIComponent(recruitmentId)}`,
+    "PATCH",
+  );
+
+  async function handleChange(next: RecruitmentStatus) {
+    if (next === status) return;
+    try {
+      await mutate({ status: next });
+      onChanged();
+    } catch {
+      // error state below renders the failure; nothing else to do here.
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex gap-1">
+        {recruitmentStatusSchema.options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            disabled={mutationStatus === "loading"}
+            onClick={() => {
+              void handleChange(option);
+            }}
+            className={cn(
+              "rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50",
+              option === status
+                ? "border-white/30 bg-white/20 text-white"
+                : "border-white/10 bg-white/5 text-blue-100/70 hover:bg-white/10",
+            )}
+          >
+            {STATUS_PRESENTATION[option].label}
+          </button>
+        ))}
+      </div>
+      {mutationStatus === "error" && <ServerError message={error} />}
+    </div>
+  );
+}
+
 export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   const url = useMemo(() => `/api/recruitments/${encodeURIComponent(recruitmentId ?? "")}/board`, [recruitmentId]);
   const resource = useApiResource<KanbanBoardDto>(url);
@@ -60,13 +122,20 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <h1 className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
           {recruitment.title}
         </h1>
         <Badge variant={STATUS_PRESENTATION[recruitment.status].variant}>
           {STATUS_PRESENTATION[recruitment.status].label}
         </Badge>
+        <StatusControl
+          recruitmentId={String(recruitment.id)}
+          status={recruitment.status}
+          onChanged={() => {
+            void resource.refetch();
+          }}
+        />
       </div>
 
       <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">

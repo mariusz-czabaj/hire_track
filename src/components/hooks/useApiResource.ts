@@ -22,9 +22,9 @@ async function readErrorMessage(response: Response): Promise<string> {
  * Fetches a JSON endpoint and exposes loading / success / not-found / error
  * state. A 401 redirects to sign-in rather than surfacing as an error state,
  * since the session may have expired between the server render and this
- * fetch. Re-fetches whenever `url` changes.
+ * fetch. Re-fetches whenever `url` changes, or on demand via `refetch()`.
  */
-export function useApiResource<T>(url: string): ApiResourceState<T> {
+export function useApiResource<T>(url: string): ApiResourceState<T> & { refetch: () => Promise<void> } {
   const [result, setResult] = useState<{ url: string; state: ApiResourceState<T> }>({
     url,
     state: { status: "loading" },
@@ -39,7 +39,7 @@ export function useApiResource<T>(url: string): ApiResourceState<T> {
         const response = await fetch(url);
 
         if (response.status === 401) {
-          window.location.href = "/auth/signin";
+          window.location.assign("/auth/signin");
           return;
         }
 
@@ -66,5 +66,38 @@ export function useApiResource<T>(url: string): ApiResourceState<T> {
     };
   }, [url]);
 
-  return result.url === url ? result.state : { status: "loading" };
+  // Refetch is invoked imperatively by a caller (e.g. after a mutation), not
+  // from within the effect above, so it deliberately duplicates the fetch
+  // logic rather than sharing a hoisted function -- extracting a shared
+  // `load` and calling it from the effect trips the
+  // react-hooks/set-state-in-effect rule, which the inline effect IIFE above
+  // does not.
+  async function refetch(): Promise<void> {
+    try {
+      const response = await fetch(url);
+
+      if (response.status === 401) {
+        window.location.assign("/auth/signin");
+        return;
+      }
+
+      if (response.status === 404) {
+        setResult({ url, state: { status: "not-found" } });
+        return;
+      }
+
+      if (!response.ok) {
+        const message = await readErrorMessage(response);
+        setResult({ url, state: { status: "error", message } });
+        return;
+      }
+
+      const data = (await response.json()) as T;
+      setResult({ url, state: { status: "success", data } });
+    } catch {
+      setResult({ url, state: { status: "error", message: DEFAULT_ERROR_MESSAGE } });
+    }
+  }
+
+  return { ...(result.url === url ? result.state : { status: "loading" }), refetch };
 }

@@ -358,26 +358,26 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Manual
 
-- [x] 2.5 curl POST as HR returns 201 and recruitment is visible — fb3d62b
-- [x] 2.6 curl POST as Hiring Manager returns 403 — fb3d62b
-- [x] 2.7 curl PATCH status as HR returns 200, as Hiring Manager returns 404 — fb3d62b
+- [x] 2.5 curl POST as HR returns 201 and recruitment is visible — 0c6fdb9
+- [x] 2.6 curl POST as Hiring Manager returns 403 — 0c6fdb9
+- [x] 2.7 curl PATCH status as HR returns 200, as Hiring Manager returns 404 — 0c6fdb9
 
 ### Phase 3: Frontend — create form and status control
 
 #### Automated
 
-- [ ] 3.1 Type checking passes
-- [ ] 3.2 Linting passes
-- [ ] 3.3 Build succeeds
-- [ ] 3.4 Component tests pass for CreateRecruitmentForm
+- [x] 3.1 Type checking passes
+- [x] 3.2 Linting passes
+- [x] 3.3 Build succeeds
+- [x] 3.4 Component tests pass for CreateRecruitmentForm
 
 #### Manual
 
-- [ ] 3.5 HR creates recruitment via form, redirect and visibility confirmed
-- [ ] 3.6 Missing required field shows inline error
-- [ ] 3.7 Zero groups selected blocked client-side
-- [ ] 3.8 Hiring Manager sees affordance, gets clean denial on submit
-- [ ] 3.9 Status change works for HR, denied cleanly for Hiring Manager
+- [x] 3.5 HR creates recruitment via form, redirect and visibility confirmed
+- [x] 3.6 Missing required field shows inline error
+- [x] 3.7 Zero groups selected blocked client-side
+- [x] 3.8 Hiring Manager sees affordance, gets clean denial on submit
+- [x] 3.9 Status change works for HR, denied cleanly for Hiring Manager
 
 ### Phase 4: Tests
 

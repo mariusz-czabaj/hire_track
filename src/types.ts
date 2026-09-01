@@ -33,6 +33,11 @@ export interface RecruitmentStatusDto {
   status: RecruitmentStatus;
 }
 
+export interface SecurityGroupDto {
+  id: number;
+  name: string;
+}
+
 export interface RecruitmentListItemDto {
   id: number;
   title: string;
