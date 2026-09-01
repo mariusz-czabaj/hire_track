@@ -559,33 +559,33 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly on a reset
-- [x] 1.2 Default stages are English in sort_order
-- [x] 1.3 Type generation succeeds and is committed with no diff
-- [x] 1.4 Typechecking passes
-- [x] 1.5 Linting passes
-- [x] 1.6 Build passes
+- [x] 1.1 Migration applies cleanly on a reset — 8e8fd17
+- [x] 1.2 Default stages are English in sort_order — 8e8fd17
+- [x] 1.3 Type generation succeeds and is committed with no diff — 8e8fd17
+- [x] 1.4 Typechecking passes — 8e8fd17
+- [x] 1.5 Linting passes — 8e8fd17
+- [x] 1.6 Build passes — 8e8fd17
 
 #### Manual
 
-- [x] 1.7 Seed data loads after db reset with Rejected empty
-- [x] 1.8 Existing sign-in / sign-out still works
+- [x] 1.7 Seed data loads after db reset with Rejected empty — 8e8fd17
+- [x] 1.8 Existing sign-in / sign-out still works — 8e8fd17
 
 ### Phase 2: API Endpoints & Service Layer
 
 #### Automated
 
-- [ ] 2.1 Typechecking passes
-- [ ] 2.2 Linting passes with no no-unsafe-* or no-floating-promises errors
-- [ ] 2.3 Build passes
+- [x] 2.1 Typechecking passes
+- [x] 2.2 Linting passes with no no-unsafe-* or no-floating-promises errors
+- [x] 2.3 Build passes
 
 #### Manual
 
-- [ ] 2.4 Unauthenticated /api/recruitments returns 401 JSON
-- [ ] 2.5 /api/auth/signin still works
-- [ ] 2.6 HR user: list and board return seeded data with Rejected present and empty
-- [ ] 2.7 Admin user: list empty, board 404
-- [ ] 2.8 Filter and id validation return 422 / empty as specified
+- [x] 2.4 Unauthenticated /api/recruitments returns 401 JSON
+- [x] 2.5 /api/auth/signin still works
+- [x] 2.6 HR user: list and board return seeded data with Rejected present and empty
+- [x] 2.7 Admin user: list empty, board 404
+- [x] 2.8 Filter and id validation return 422 / empty as specified
 
 ### Phase 3: Vitest & Service Tests
 

@@ -1,7 +1,8 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
+import { jsonError } from "@/lib/api-response";
 
-const PROTECTED_ROUTES = ["/dashboard"];
+const PROTECTED_ROUTES = ["/dashboard", "/recruitments"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -13,6 +14,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = user ?? null;
   } else {
     context.locals.user = null;
+  }
+
+  const isApiRoute = context.url.pathname.startsWith("/api/") && !context.url.pathname.startsWith("/api/auth/");
+
+  if (isApiRoute) {
+    if (!context.locals.user) {
+      return jsonError(401, "unauthenticated", "Authentication required");
+    }
+    return next();
   }
 
   if (PROTECTED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {

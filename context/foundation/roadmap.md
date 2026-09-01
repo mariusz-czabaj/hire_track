@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 1
 status: draft
 created: 2026-08-27
-updated: 2026-08-31
+updated: 2026-09-01
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -42,7 +42,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 | ID | Change ID | Outcome (user can …) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
 | F-01 | core-recruitment-data-foundation | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa | — | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
-| S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | proposed |
+| S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | in-progress |
 | S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | proposed |
 | S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji | F-01, S-01 | FR-004 | proposed |
 | S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu) | S-01, S-02 | FR-006, FR-008, FR-009, FR-013, Business Logic | proposed |
@@ -99,7 +99,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Unknowns:**
   - Jaki dokładnie zakres ma widzieć Hiring Manager (read-only) vs Rekruter (edycja) na tym samym widoku, zanim S-07 dostarczy pełny model operacja→grupa? — Owner: user. Block: nie (F-01 startuje z grubszym podziałem ról, S-07 doprecyzowuje).
 - **Risk:** To jest gwiazda przewodnia — sekwencjonowana najwcześniej jak pozwala F-01, mimo że tworzenie rekrutacji (FR-001) jest osobnym wycinkiem (S-02); używa zasianych danych, żeby nie czekać na S-02.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-02: Rekruter tworzy i zarządza statusem rekrutacji
 
