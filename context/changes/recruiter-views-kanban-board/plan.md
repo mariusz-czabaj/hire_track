@@ -575,26 +575,26 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 2.1 Typechecking passes
-- [x] 2.2 Linting passes with no no-unsafe-* or no-floating-promises errors
-- [x] 2.3 Build passes
+- [x] 2.1 Typechecking passes — d9855c8
+- [x] 2.2 Linting passes with no no-unsafe-* or no-floating-promises errors — d9855c8
+- [x] 2.3 Build passes — d9855c8
 
 #### Manual
 
-- [x] 2.4 Unauthenticated /api/recruitments returns 401 JSON
-- [x] 2.5 /api/auth/signin still works
-- [x] 2.6 HR user: list and board return seeded data with Rejected present and empty
-- [x] 2.7 Admin user: list empty, board 404
-- [x] 2.8 Filter and id validation return 422 / empty as specified
+- [x] 2.4 Unauthenticated /api/recruitments returns 401 JSON — d9855c8
+- [x] 2.5 /api/auth/signin still works — d9855c8
+- [x] 2.6 HR user: list and board return seeded data with Rejected present and empty — d9855c8
+- [x] 2.7 Admin user: list empty, board 404 — d9855c8
+- [x] 2.8 Filter and id validation return 422 / empty as specified — d9855c8
 
 ### Phase 3: Vitest & Service Tests
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass
-- [ ] 3.2 Empty-column test fails when grouping is inverted
-- [ ] 3.3 Linting passes on test files
-- [ ] 3.4 Typechecking passes
+- [x] 3.1 Unit tests pass
+- [x] 3.2 Empty-column test fails when grouping is inverted
+- [x] 3.3 Linting passes on test files
+- [x] 3.4 Typechecking passes
 
 #### Manual
 
