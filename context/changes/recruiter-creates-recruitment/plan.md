@@ -350,17 +350,17 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Automated
 
-- [x] 2.1 Type checking passes
-- [x] 2.2 Linting passes
-- [x] 2.3 Unit tests pass for service functions
-- [x] 2.4 Integration tests pass for both endpoints, all 3 role fixtures
-- [x] 2.8 HTTP integration-test harness built and documented
+- [x] 2.1 Type checking passes — fb3d62b
+- [x] 2.2 Linting passes — fb3d62b
+- [x] 2.3 Unit tests pass for service functions — fb3d62b
+- [x] 2.4 Integration tests pass for both endpoints, all 3 role fixtures — fb3d62b
+- [x] 2.8 HTTP integration-test harness built and documented — fb3d62b
 
 #### Manual
 
-- [ ] 2.5 curl POST as HR returns 201 and recruitment is visible
-- [ ] 2.6 curl POST as Hiring Manager returns 403
-- [ ] 2.7 curl PATCH status as HR returns 200, as Hiring Manager returns 404
+- [x] 2.5 curl POST as HR returns 201 and recruitment is visible — fb3d62b
+- [x] 2.6 curl POST as Hiring Manager returns 403 — fb3d62b
+- [x] 2.7 curl PATCH status as HR returns 200, as Hiring Manager returns 404 — fb3d62b
 
 ### Phase 3: Frontend — create form and status control
 
