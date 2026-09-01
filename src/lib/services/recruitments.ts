@@ -4,12 +4,22 @@ import {
   recruitmentStatusSchema,
   type CreateRecruitmentCommand,
   type KanbanBoardDto,
+  type KanbanStageDto,
   type RecruitmentListItemDto,
+  type RecruitmentStagesDto,
   type RecruitmentStatus,
   type RecruitmentStatusDto,
+  type ReplaceRecruitmentStagesCommand,
 } from "@/types";
 
 type Client = SupabaseClient<Database>;
+
+interface KanbanStageRow {
+  id: number;
+  recruitment_id: number | null;
+  name: string;
+  sort_order: number;
+}
 
 interface RecruitmentListRow {
   id: number;
@@ -111,26 +121,17 @@ export async function updateRecruitmentStatus(
   };
 }
 
-export async function getKanbanBoard(client: Client, recruitmentId: number): Promise<KanbanBoardDto | null> {
-  const { data: recruitment, error: recruitmentError } = await client
-    .from("recruitments")
-    .select("id, title, status")
-    .eq("id", recruitmentId)
-    .maybeSingle();
-
-  if (recruitmentError) {
-    throw recruitmentError;
-  }
-
-  if (!recruitment) {
-    return null;
-  }
-
-  // Fetch both partitions and pick the override set when one exists,
-  // falling back to defaults otherwise (all-or-nothing). Two separate
-  // queries -- rather than one .or("recruitment_id.is.null,recruitment_id.eq.…")
-  // -- keep each filter a plain, non-interpolating `.is()`/`.eq()` call, so
-  // this stays safe if ever called standalone with an untrusted id.
+/**
+ * Fetch both partitions and pick the override set when one exists,
+ * falling back to defaults otherwise (all-or-nothing). Two separate
+ * queries -- rather than one .or("recruitment_id.is.null,recruitment_id.eq.…")
+ * -- keep each filter a plain, non-interpolating `.is()`/`.eq()` call, so
+ * this stays safe if ever called standalone with an untrusted id.
+ */
+async function resolveKanbanStages(
+  client: Client,
+  recruitmentId: number,
+): Promise<{ stagesSource: "default" | "custom"; stages: KanbanStageRow[] }> {
   const [{ data: defaultStages, error: defaultStagesError }, { data: overrideStages, error: overrideStagesError }] =
     await Promise.all([
       client
@@ -154,7 +155,78 @@ export async function getKanbanBoard(client: Client, recruitmentId: number): Pro
   }
 
   const stagesSource: "default" | "custom" = overrideStages.length > 0 ? "custom" : "default";
-  const stages = stagesSource === "custom" ? overrideStages : defaultStages;
+  return { stagesSource, stages: stagesSource === "custom" ? overrideStages : defaultStages };
+}
+
+export async function getRecruitmentStages(
+  client: Client,
+  recruitmentId: number,
+): Promise<RecruitmentStagesDto | null> {
+  const { data: recruitment, error: recruitmentError } = await client
+    .from("recruitments")
+    .select("id")
+    .eq("id", recruitmentId)
+    .maybeSingle();
+
+  if (recruitmentError) {
+    throw recruitmentError;
+  }
+
+  if (!recruitment) {
+    return null;
+  }
+
+  const { stagesSource, stages } = await resolveKanbanStages(client, recruitmentId);
+
+  return {
+    stagesSource,
+    stages: stages.map((stage) => ({ id: stage.id, name: stage.name, sortOrder: stage.sort_order })),
+  };
+}
+
+export async function replaceRecruitmentStages(
+  client: Client,
+  recruitmentId: number,
+  command: ReplaceRecruitmentStagesCommand,
+): Promise<KanbanStageDto[]> {
+  const { data, error } = await client.rpc("replace_recruitment_stages", {
+    target_recruitment_id: recruitmentId,
+    stage_names: command.stageNames,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((row) => ({ id: row.id, name: row.name, sortOrder: row.sort_order }));
+}
+
+export async function resetRecruitmentStages(client: Client, recruitmentId: number): Promise<KanbanStageDto[]> {
+  const { data, error } = await client.rpc("reset_recruitment_stages", { target_recruitment_id: recruitmentId });
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((row) => ({ id: row.id, name: row.name, sortOrder: row.sort_order }));
+}
+
+export async function getKanbanBoard(client: Client, recruitmentId: number): Promise<KanbanBoardDto | null> {
+  const { data: recruitment, error: recruitmentError } = await client
+    .from("recruitments")
+    .select("id, title, status")
+    .eq("id", recruitmentId)
+    .maybeSingle();
+
+  if (recruitmentError) {
+    throw recruitmentError;
+  }
+
+  if (!recruitment) {
+    return null;
+  }
+
+  const { stagesSource, stages } = await resolveKanbanStages(client, recruitmentId);
 
   const { data: candidateRows, error: candidatesError } = await client
     .from("candidate_recruitments")

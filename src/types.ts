@@ -65,6 +65,15 @@ export interface KanbanBoardStageDto extends KanbanStageDto {
   candidates: CandidateCardDto[];
 }
 
+export interface ReplaceRecruitmentStagesCommand {
+  stageNames: string[];
+}
+
+export interface RecruitmentStagesDto {
+  stagesSource: "default" | "custom";
+  stages: KanbanStageDto[];
+}
+
 export interface KanbanBoardDto {
   recruitment: {
     id: number;

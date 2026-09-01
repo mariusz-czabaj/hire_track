@@ -499,28 +499,28 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 3.1 Unit tests pass
-- [x] 3.2 Linting passes
-- [x] 3.3 Build passes
+- [x] 3.1 Unit tests pass — 3821355
+- [x] 3.2 Linting passes — 3821355
+- [x] 3.3 Build passes — 3821355
 
 #### Manual
 
-- [x] 3.4 Seeded board renders exactly as before
-- [x] 3.5 A manually inserted override set renders with stagesSource "custom"
+- [x] 3.4 Seeded board renders exactly as before — 3821355
+- [x] 3.5 A manually inserted override set renders with stagesSource "custom" — 3821355
 
 ### Phase 4: Stages API Endpoint
 
 #### Automated
 
-- [ ] 4.1 Integration tests pass against the local stack
-- [ ] 4.2 Unit tests pass
-- [ ] 4.3 Linting passes
-- [ ] 4.4 Build passes
+- [x] 4.1 Integration tests pass against the local stack
+- [x] 4.2 Unit tests pass
+- [x] 4.3 Linting passes
+- [x] 4.4 Build passes
 
 #### Manual
 
-- [ ] 4.5 PUT as HR returns 200 and a changed board response
-- [ ] 4.6 The two new refusal cases return distinguishable messages
+- [x] 4.5 PUT as HR returns 200 and a changed board response
+- [x] 4.6 The two new refusal cases return distinguishable messages
 
 ### Phase 5: Stage Editor UI
 
