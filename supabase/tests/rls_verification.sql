@@ -770,4 +770,69 @@ begin
 end $$;
 rollback;
 
+-- (27) S-04 impl-review F1/F6: get_user_emails_for_candidate only
+-- resolves emails for note authors on a candidate_recruitment the
+-- caller has recruitment.read on. HR (has recruitment.read/write on
+-- Backend Engineer) gets the author's email back for a note on that
+-- candidate; an unrelated user (Administrator, no access to Backend
+-- Engineer) is denied with P0002.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_source_stage_id bigint;
+  v_resolved_email text;
+begin
+  select cr.id, cr.current_stage_id into v_cr_id, v_source_stage_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  insert into candidate_stage_notes (candidate_recruitment_id, stage_id, body, created_by)
+  values (v_cr_id, v_source_stage_id, 'Note for email-resolution assertion.', '11111111-1111-1111-1111-111111111111')
+  on conflict (candidate_recruitment_id, stage_id) do update set body = excluded.body, created_by = excluded.created_by;
+
+  select email into v_resolved_email
+  from public.get_user_emails_for_candidate(v_cr_id, array['11111111-1111-1111-1111-111111111111']::uuid[]);
+
+  if v_resolved_email is distinct from 'hr.test@example.com' then
+    raise exception 'FAIL: get_user_emails_for_candidate did not resolve the HR caller''s own visible note author, got %', v_resolved_email;
+  end if;
+end $$;
+rollback;
+
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  begin
+    perform public.get_user_emails_for_candidate(v_cr_id, array['11111111-1111-1111-1111-111111111111']::uuid[]);
+    raise exception 'FAIL: an unrelated user resolved emails for a candidate_recruitment they cannot read';
+  exception
+    when others then
+      if sqlstate <> 'P0002' then
+        raise exception 'FAIL: get_user_emails_for_candidate raised an unexpected error for an unrelated caller (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;

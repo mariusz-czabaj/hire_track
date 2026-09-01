@@ -132,7 +132,10 @@ export async function getCandidateDetail(
   const authorIds = [...new Set(noteRows.map((note) => note.created_by).filter((id): id is string => id !== null))];
   const emailByAuthorId = new Map<string, string>();
   if (authorIds.length > 0) {
-    const { data: users, error: usersError } = await client.rpc("get_user_emails", { user_ids: authorIds });
+    const { data: users, error: usersError } = await client.rpc("get_user_emails_for_candidate", {
+      target_candidate_recruitment_id: candidateRecruitmentId,
+      user_ids: authorIds,
+    });
     if (usersError) {
       throw usersError;
     }
@@ -208,14 +211,15 @@ export async function upsertCandidateNote(
     throw userError;
   }
 
-  const { data: stageRow, error: stageError } = await client
-    .from("kanban_stages")
-    .select("id, name")
-    .eq("id", command.stageId)
-    .maybeSingle();
+  // stageId must belong to this recruitment's own resolved stage set --
+  // otherwise a caller with recruitment.write on a different recruitment
+  // could attach a note to a stage that isn't part of this candidate's
+  // pipeline at all.
+  const { stages } = await resolveKanbanStages(client, recruitmentId);
+  const stageRow = stages.find((stage) => stage.id === command.stageId);
 
-  if (stageError) {
-    throw stageError;
+  if (!stageRow) {
+    throw Object.assign(new Error("Stage does not belong to this recruitment"), { code: "22023" });
   }
 
   const { data, error } = await client
@@ -238,7 +242,7 @@ export async function upsertCandidateNote(
 
   return {
     stageId: data.stage_id,
-    stageName: stageRow?.name ?? "",
+    stageName: stageRow.name,
     body: data.body,
     authorEmail: user?.email ?? null,
     createdAt: data.created_at,

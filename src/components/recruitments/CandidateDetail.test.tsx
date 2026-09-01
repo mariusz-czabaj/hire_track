@@ -67,7 +67,7 @@ describe("CandidateDetail", () => {
     vi.unstubAllGlobals();
   });
 
-  it("lists only stages with an existing note, in stage order, hiding stages with none", async () => {
+  it("lists every resolved stage in order, with an empty-state line for stages with no note", async () => {
     vi.stubGlobal("fetch", mockFetch({}));
 
     render(<CandidateDetail recruitmentId="1" candidateRecruitmentId="5" />);
@@ -79,27 +79,9 @@ describe("CandidateDetail", () => {
     expect(newNote).toHaveTextContent("Great first impression.");
     expect(newNote).toHaveTextContent("hr.test@example.com");
 
-    expect(screen.queryByTestId("note-20")).not.toBeInTheDocument();
-  });
-
-  it("shows an empty-state message when no stage has a note yet", async () => {
-    vi.stubGlobal(
-      "fetch",
-      mockFetch({
-        detailResponse: {
-          status: 200,
-          body: buildDetail({
-            notes: [{ stageId: 10, stageName: "New", body: null, authorEmail: null, createdAt: null, updatedAt: null }],
-          }),
-        },
-      }),
-    );
-
-    render(<CandidateDetail recruitmentId="1" candidateRecruitmentId="5" />);
-
-    expect(await screen.findByText("Ada Lovelace")).toBeInTheDocument();
-    expect(screen.getByText("No notes yet.")).toBeInTheDocument();
-    expect(screen.queryByTestId("note-10")).not.toBeInTheDocument();
+    const screeningNote = screen.getByTestId("note-20");
+    expect(screeningNote).toHaveTextContent("Screening");
+    expect(screeningNote).toHaveTextContent("No note yet");
   });
 
   it("sends the exact PUT body on a successful edit and refetches", async () => {

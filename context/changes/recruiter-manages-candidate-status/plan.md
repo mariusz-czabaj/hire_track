@@ -416,6 +416,12 @@ Each card links to `/recruitments/{id}/candidates/{candidateRecruitmentId}` and 
 indexed, name-bearing `aria-label` so both RTL and Playwright can target it by role. `CandidateCardDto` is
 unchanged, so the board read path and its existing tests are untouched.
 
+**Addendum (impl-review F7)**: `CandidateCardDto` in fact *does* gain a `candidateRecruitmentId` field —
+the card→detail link above requires it, and no other identifier in the DTO can produce that URL. `resolveKanbanStages`
+and `KanbanStageRow` in `src/lib/services/recruitments.ts` were also exported for reuse in `candidates.ts`, per this
+phase's own stage-resolution rule. Both changes were correctly made during implementation; this note corrects the
+plan text, which was internally inconsistent (it also required the card→detail link that this DTO change enables).
+
 #### 5. Component tests
 
 **Files**: `src/components/recruitments/AddCandidateDialog.test.tsx`, `MoveCandidateDialog.test.tsx`

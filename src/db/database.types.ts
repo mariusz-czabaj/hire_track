@@ -428,8 +428,8 @@ export type Database = {
           isSetofReturn: false;
         };
       };
-      get_user_emails: {
-        Args: { user_ids: string[] };
+      get_user_emails_for_candidate: {
+        Args: { target_candidate_recruitment_id: number; user_ids: string[] };
         Returns: {
           email: string;
           id: string;

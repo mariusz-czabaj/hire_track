@@ -100,7 +100,11 @@ function NoteCard({
         </div>
       ) : (
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm text-blue-100/80">{note.body}</p>
+          {note.body !== null ? (
+            <p className="text-sm text-blue-100/80">{note.body}</p>
+          ) : (
+            <p className="text-sm text-blue-100/40 italic">No note yet</p>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -186,31 +190,25 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
       </div>
 
       <div className="flex flex-col gap-3">
-        {candidate.notes.some((note) => note.body !== null) ? (
-          candidate.notes
-            .filter((note) => note.body !== null)
-            .map((note) => (
-              <NoteCard
-                key={note.stageId}
-                note={note}
-                isCurrentStage={note.stageId === candidate.currentStageId}
-                isEditing={editingStageId === note.stageId}
-                draftBody={draftBody}
-                onDraftChange={setDraftBody}
-                onStartEdit={() => {
-                  startEdit(note);
-                }}
-                onCancelEdit={cancelEdit}
-                onSave={() => {
-                  void saveEdit(note.stageId);
-                }}
-                saving={upsertNote.status === "loading"}
-                error={editingStageId === note.stageId ? upsertNote.fieldErrors?.body : undefined}
-              />
-            ))
-        ) : (
-          <p className="text-sm text-blue-100/60">No notes yet.</p>
-        )}
+        {candidate.notes.map((note) => (
+          <NoteCard
+            key={note.stageId}
+            note={note}
+            isCurrentStage={note.stageId === candidate.currentStageId}
+            isEditing={editingStageId === note.stageId}
+            draftBody={draftBody}
+            onDraftChange={setDraftBody}
+            onStartEdit={() => {
+              startEdit(note);
+            }}
+            onCancelEdit={cancelEdit}
+            onSave={() => {
+              void saveEdit(note.stageId);
+            }}
+            saving={upsertNote.status === "loading"}
+            error={editingStageId === note.stageId ? upsertNote.fieldErrors?.body : undefined}
+          />
+        ))}
       </div>
 
       {editingStageId !== null && upsertNote.status === "error" && !upsertNote.fieldErrors && (

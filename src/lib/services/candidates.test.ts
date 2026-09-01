@@ -251,7 +251,7 @@ describe("getCandidateDetail", () => {
         throw new Error(`Unexpected table: ${table}`);
       },
       rpc: (fn: string) => {
-        if (fn === "get_user_emails") {
+        if (fn === "get_user_emails_for_candidate") {
           return Promise.resolve(config.userEmails ?? { data: [], error: null });
         }
         throw new Error(`Unexpected rpc: ${fn}`);
@@ -344,7 +344,7 @@ describe("getCandidateDetail", () => {
     ]);
   });
 
-  it("propagates a get_user_emails RPC error as a throw", async () => {
+  it("propagates a get_user_emails_for_candidate RPC error as a throw", async () => {
     const client = makeDetailClient({
       row: {
         data: {
@@ -387,7 +387,8 @@ describe("upsertCandidateNote", () => {
 
   function makeNoteClient(config: {
     scope: QueryResult<{ id: number }>;
-    stage?: QueryResult<{ id: number; name: string }>;
+    defaultStages?: QueryResult<StageRow[]>;
+    overrideStages?: QueryResult<StageRow[]>;
     upsert?: QueryResult<NoteRow>;
     user?: { id: string; email: string } | null;
   }): Client {
@@ -397,7 +398,10 @@ describe("upsertCandidateNote", () => {
           return new FakeQueryBuilder<{ id: number }>(config.scope);
         }
         if (table === "kanban_stages") {
-          return new FakeQueryBuilder<{ id: number; name: string }>(config.stage ?? { data: null, error: null });
+          return new FakeKanbanStagesQueryBuilder(
+            config.defaultStages ?? { data: [], error: null },
+            config.overrideStages ?? { data: [], error: null },
+          );
         }
         if (table === "candidate_stage_notes") {
           return new FakeQueryBuilder<NoteRow>(config.upsert ?? { data: null, error: null });
@@ -421,10 +425,22 @@ describe("upsertCandidateNote", () => {
     await expect(upsertCandidateNote(client, 1, 5, { stageId: 10, body: "Note" })).rejects.toEqual({ message: "boom" });
   });
 
+  it("rejects a stageId that isn't part of the recruitment's resolved stage set", async () => {
+    const client = makeNoteClient({
+      scope: { data: { id: 5 }, error: null },
+      defaultStages: { data: [{ id: 10, recruitment_id: null, name: "New", sort_order: 1 }], error: null },
+    });
+
+    await expect(upsertCandidateNote(client, 1, 5, { stageId: 999, body: "Note" })).rejects.toMatchObject({
+      code: "22023",
+      message: "Stage does not belong to this recruitment",
+    });
+  });
+
   it("upserts the note and attributes it to the caller's own session, never the request body", async () => {
     const client = makeNoteClient({
       scope: { data: { id: 5 }, error: null },
-      stage: { data: { id: 10, name: "New" }, error: null },
+      defaultStages: { data: [{ id: 10, recruitment_id: null, name: "New", sort_order: 1 }], error: null },
       upsert: {
         data: {
           stage_id: 10,
@@ -453,7 +469,7 @@ describe("upsertCandidateNote", () => {
   it("propagates an upsert error (e.g. RLS denial) as a throw", async () => {
     const client = makeNoteClient({
       scope: { data: { id: 5 }, error: null },
-      stage: { data: { id: 10, name: "New" }, error: null },
+      defaultStages: { data: [{ id: 10, recruitment_id: null, name: "New", sort_order: 1 }], error: null },
       upsert: { data: null, error: { message: "insufficient_privilege", code: "42501" } },
       user: { id: "22222222-2222-2222-2222-222222222222", email: "hiring-manager.test@example.com" },
     });
