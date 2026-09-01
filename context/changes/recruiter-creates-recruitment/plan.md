@@ -366,18 +366,18 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Automated
 
-- [x] 3.1 Type checking passes
-- [x] 3.2 Linting passes
-- [x] 3.3 Build succeeds
-- [x] 3.4 Component tests pass for CreateRecruitmentForm
+- [x] 3.1 Type checking passes — 065811e
+- [x] 3.2 Linting passes — 065811e
+- [x] 3.3 Build succeeds — 065811e
+- [x] 3.4 Component tests pass for CreateRecruitmentForm — 065811e
 
 #### Manual
 
-- [x] 3.5 HR creates recruitment via form, redirect and visibility confirmed
-- [x] 3.6 Missing required field shows inline error
-- [x] 3.7 Zero groups selected blocked client-side
-- [x] 3.8 Hiring Manager sees affordance, gets clean denial on submit
-- [x] 3.9 Status change works for HR, denied cleanly for Hiring Manager
+- [x] 3.5 HR creates recruitment via form, redirect and visibility confirmed — 065811e
+- [x] 3.6 Missing required field shows inline error — 065811e
+- [x] 3.7 Zero groups selected blocked client-side — 065811e
+- [x] 3.8 Hiring Manager sees affordance, gets clean denial on submit — 065811e
+- [x] 3.9 Status change works for HR, denied cleanly for Hiring Manager — 065811e
 
 ### Phase 4: Tests
 
