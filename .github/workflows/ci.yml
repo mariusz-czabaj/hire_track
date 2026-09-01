@@ -51,10 +51,15 @@ jobs:
       - name: Run HTTP integration tests
         run: |
           npm run dev &
+          DEV_PID=$!
           for i in $(seq 1 30); do
             curl -sf http://localhost:4321/ -o /dev/null && break
             sleep 2
           done
           npm run test:integration
+          TEST_EXIT=$?
+          kill "$DEV_PID" 2>/dev/null || true
+          pkill -f "astro dev" 2>/dev/null || true
+          exit $TEST_EXIT
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
