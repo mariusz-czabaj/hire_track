@@ -625,29 +625,29 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 1.1 Migrations apply cleanly
-- [x] 1.2 Types are in sync
-- [x] 1.3 Linting passes
-- [x] 1.4 Type checking passes
+- [x] 1.1 Migrations apply cleanly — e30cd19
+- [x] 1.2 Types are in sync — e30cd19
+- [x] 1.3 Linting passes — e30cd19
+- [x] 1.4 Type checking passes — e30cd19
 
 #### Manual
 
-- [ ] 1.5 Note insert without recruitment.write is rejected by RLS
-- [ ] 1.6 Deleting a note-referenced default stage raises PA002
+- [x] 1.5 Note insert without recruitment.write is rejected by RLS
+- [x] 1.6 Deleting a note-referenced default stage raises PA002
 
 ### Phase 2: Domain RPCs
 
 #### Automated
 
-- [ ] 2.1 Migrations apply cleanly
-- [ ] 2.2 RLS/RPC assertions pass
-- [ ] 2.3 Types are in sync
-- [ ] 2.4 Linting passes
+- [x] 2.1 Migrations apply cleanly
+- [x] 2.2 RLS/RPC assertions pass
+- [x] 2.3 Types are in sync
+- [x] 2.4 Linting passes
 
 #### Manual
 
-- [ ] 2.5 Each new assertion observed to fail when its guard is removed
-- [ ] 2.6 RPC confirmed as the application's only stage-write path
+- [x] 2.5 Each new assertion observed to fail when its guard is removed
+- [x] 2.6 RPC confirmed as the application's only stage-write path
 
 ### Phase 3: Service layer and API routes
 

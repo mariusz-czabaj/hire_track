@@ -475,4 +475,299 @@ begin
 end $$;
 rollback;
 
+-- (19) S-04: moving a candidate with no note for the stage being left
+-- is refused (PA004), and the stage does not change.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_stage_before bigint;
+  v_stage_after bigint;
+  v_offer_stage_id bigint;
+begin
+  select cr.id, cr.current_stage_id into v_cr_id, v_stage_before
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  select id into v_offer_stage_id from kanban_stages where recruitment_id is null and name = 'Offer';
+
+  begin
+    perform public.move_candidate_stage(v_cr_id, v_offer_stage_id, null);
+    raise exception 'FAIL: move_candidate_stage allowed a move with no source-stage note';
+  exception
+    when others then
+      if sqlstate <> 'PA004' then
+        raise exception 'FAIL: move_candidate_stage raised an unexpected error for a missing note (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+
+  select current_stage_id into v_stage_after from candidate_recruitments where id = v_cr_id;
+  if v_stage_after is distinct from v_stage_before then
+    raise exception 'FAIL: candidate stage changed despite the blocked move';
+  end if;
+end $$;
+rollback;
+
+-- (20) The same move succeeds once a note is supplied, and writes
+-- exactly one new history row.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_offer_stage_id bigint;
+  v_history_count_before int;
+  v_history_count_after int;
+  v_stage_after bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  select id into v_offer_stage_id from kanban_stages where recruitment_id is null and name = 'Offer';
+
+  select count(*) into v_history_count_before
+  from candidate_recruitment_status_history
+  where candidate_recruitment_id = v_cr_id;
+
+  perform public.move_candidate_stage(v_cr_id, v_offer_stage_id, 'Strong technical screen, moving forward.');
+
+  select current_stage_id into v_stage_after from candidate_recruitments where id = v_cr_id;
+  if v_stage_after is distinct from v_offer_stage_id then
+    raise exception 'FAIL: move_candidate_stage did not update current_stage_id, got %', v_stage_after;
+  end if;
+
+  select count(*) into v_history_count_after
+  from candidate_recruitment_status_history
+  where candidate_recruitment_id = v_cr_id;
+  if v_history_count_after <> v_history_count_before + 1 then
+    raise exception 'FAIL: move_candidate_stage wrote % history rows instead of exactly 1', v_history_count_after - v_history_count_before;
+  end if;
+end $$;
+rollback;
+
+-- (21) A backward move works identically, gated on a note for the
+-- stage being left.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_new_stage_id bigint;
+  v_stage_after bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'katarzyna.wisniewska@example.com';
+
+  select id into v_new_stage_id from kanban_stages where recruitment_id is null and name = 'New';
+
+  perform public.move_candidate_stage(v_cr_id, v_new_stage_id, 'Reopening -- schedule was cancelled.');
+
+  select current_stage_id into v_stage_after from candidate_recruitments where id = v_cr_id;
+  if v_stage_after is distinct from v_new_stage_id then
+    raise exception 'FAIL: backward move_candidate_stage did not update current_stage_id, got %', v_stage_after;
+  end if;
+end $$;
+rollback;
+
+-- (22) A Hiring-Manager-only user (recruitment.read but no
+-- recruitment.write) is denied by move_candidate_stage (42501).
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '22222222-2222-2222-2222-222222222222', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_offer_stage_id bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  select id into v_offer_stage_id from kanban_stages where recruitment_id is null and name = 'Offer';
+
+  begin
+    perform public.move_candidate_stage(v_cr_id, v_offer_stage_id, 'Attempted by a hiring manager.');
+    raise exception 'FAIL: Hiring Manager was able to move a candidate (write should be denied)';
+  exception
+    when others then
+      if sqlstate <> '42501' then
+        raise exception 'FAIL: move_candidate_stage raised an unexpected error for a HM caller (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
+-- (23) A user unrelated to the recruitment (Administrator, not assigned
+-- to Backend Engineer) gets not_found (P0002) from move_candidate_stage.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_cr_id bigint;
+  v_offer_stage_id bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  select id into v_offer_stage_id from kanban_stages where recruitment_id is null and name = 'Offer';
+
+  begin
+    perform public.move_candidate_stage(v_cr_id, v_offer_stage_id, 'Attempted by an unrelated user.');
+    raise exception 'FAIL: an unrelated user was able to move a candidate (should be not_found)';
+  exception
+    when others then
+      if sqlstate <> 'P0002' then
+        raise exception 'FAIL: move_candidate_stage raised an unexpected error for an unrelated caller (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
+-- (24) S-04: add_candidate_to_recruitment links to an existing profile
+-- on an email match instead of duplicating it. The fixture recruitment
+-- is created as the unrestricted migration role, before switching to
+-- `authenticated`, for the same chicken-and-egg reason as block (15) --
+-- recruitments_select has nothing to scope against until the group link
+-- exists.
+begin;
+do $$
+declare
+  v_new_recruitment_id bigint;
+begin
+  insert into recruitments (title, location, department, employment_type, opened_at, status)
+  values ('Second Recruitment', 'Remote', 'Engineering', 'full-time', current_date, 'draft')
+  returning id into v_new_recruitment_id;
+
+  insert into recruitment_security_groups (recruitment_id, group_id)
+  values (v_new_recruitment_id, (select id from security_groups where name = 'HR/Rekruter'));
+
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+    true
+  );
+  set local role authenticated;
+
+  declare
+    v_existing_candidate_id bigint;
+    v_cr public.candidate_recruitments%rowtype;
+    v_candidate_count int;
+  begin
+    select id into v_existing_candidate_id from candidates where email = 'piotr.nowak@example.com';
+    select count(*) into v_candidate_count from candidates;
+
+    select * into v_cr from public.add_candidate_to_recruitment(
+      v_new_recruitment_id, 'Piotr Nowak', 'piotr.nowak@example.com', null
+    );
+
+    if v_cr.candidate_id is distinct from v_existing_candidate_id then
+      raise exception 'FAIL: add_candidate_to_recruitment did not link to the existing candidate profile';
+    end if;
+
+    if (select count(*) from candidates) <> v_candidate_count then
+      raise exception 'FAIL: add_candidate_to_recruitment duplicated the candidate profile on an email match';
+    end if;
+  end;
+end $$;
+rollback;
+
+-- (25) add_candidate_to_recruitment refuses an email match under a
+-- different name (PA003). Same fixture-before-role-switch ordering as
+-- block (24).
+begin;
+do $$
+declare
+  v_new_recruitment_id bigint;
+begin
+  insert into recruitments (title, location, department, employment_type, opened_at, status)
+  values ('Third Recruitment', 'Remote', 'Engineering', 'full-time', current_date, 'draft')
+  returning id into v_new_recruitment_id;
+
+  insert into recruitment_security_groups (recruitment_id, group_id)
+  values (v_new_recruitment_id, (select id from security_groups where name = 'HR/Rekruter'));
+
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+    true
+  );
+  set local role authenticated;
+
+  begin
+    perform public.add_candidate_to_recruitment(
+      v_new_recruitment_id, 'Somebody Else', 'piotr.nowak@example.com', null
+    );
+    raise exception 'FAIL: add_candidate_to_recruitment linked an email match under a mismatched name';
+  exception
+    when others then
+      if sqlstate <> 'PA003' then
+        raise exception 'FAIL: add_candidate_to_recruitment raised an unexpected error for a name mismatch (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
+-- (26) S-04: a note insert by a user not linked to the recruitment
+-- (Administrator) is denied by RLS on candidate_stage_notes.
+begin;
+do $$
+declare
+  v_cr_id bigint;
+begin
+  select cr.id into v_cr_id
+  from candidate_recruitments cr
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'piotr.nowak@example.com';
+
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+    true
+  );
+  set local role authenticated;
+
+  begin
+    insert into candidate_stage_notes (candidate_recruitment_id, stage_id, body)
+    values (v_cr_id, (select current_stage_id from candidate_recruitments where id = v_cr_id), 'Should be denied.');
+    raise exception 'FAIL: an unrelated user was able to insert a candidate stage note';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;

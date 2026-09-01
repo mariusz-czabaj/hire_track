@@ -380,6 +380,27 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      add_candidate_to_recruitment: {
+        Args: {
+          email: string;
+          full_name: string;
+          phone?: string;
+          target_recruitment_id: number;
+        };
+        Returns: {
+          added_at: string;
+          candidate_id: number;
+          current_stage_id: number;
+          id: number;
+          recruitment_id: number;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "candidate_recruitments";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       create_recruitment: {
         Args: {
           p_department: string;
@@ -403,6 +424,26 @@ export type Database = {
         SetofOptions: {
           from: "*";
           to: "recruitments";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      move_candidate_stage: {
+        Args: {
+          note?: string;
+          target_candidate_recruitment_id: number;
+          to_stage_id: number;
+        };
+        Returns: {
+          added_at: string;
+          candidate_id: number;
+          current_stage_id: number;
+          id: number;
+          recruitment_id: number;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "candidate_recruitments";
           isOneToOne: true;
           isSetofReturn: false;
         };
