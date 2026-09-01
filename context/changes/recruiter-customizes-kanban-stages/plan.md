@@ -484,29 +484,29 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 2.1 Migration applies cleanly
-- [x] 2.2 npm run db:types produces no diff
-- [x] 2.3 Type checking passes
+- [x] 2.1 Migration applies cleanly — c227e6a
+- [x] 2.2 npm run db:types produces no diff — c227e6a
+- [x] 2.3 Type checking passes — c227e6a
 
 #### Manual
 
-- [x] 2.4 HR replaces a candidate-free recruitment's stages with contiguous sort_order
-- [x] 2.5 Candidates-exist refusal fires on the seeded recruitment
-- [x] 2.6 Two-phase renumber succeeds on the default set
-- [x] 2.7 Removing a referenced default stage is refused, naming the stage
+- [x] 2.4 HR replaces a candidate-free recruitment's stages with contiguous sort_order — c227e6a
+- [x] 2.5 Candidates-exist refusal fires on the seeded recruitment — c227e6a
+- [x] 2.6 Two-phase renumber succeeds on the default set — c227e6a
+- [x] 2.7 Removing a referenced default stage is refused, naming the stage — c227e6a
 
 ### Phase 3: Override-Aware Read Path
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass
-- [ ] 3.2 Linting passes
-- [ ] 3.3 Build passes
+- [x] 3.1 Unit tests pass
+- [x] 3.2 Linting passes
+- [x] 3.3 Build passes
 
 #### Manual
 
-- [ ] 3.4 Seeded board renders exactly as before
-- [ ] 3.5 A manually inserted override set renders with stagesSource "custom"
+- [x] 3.4 Seeded board renders exactly as before
+- [x] 3.5 A manually inserted override set renders with stagesSource "custom"
 
 ### Phase 4: Stages API Endpoint
 

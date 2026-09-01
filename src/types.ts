@@ -71,6 +71,7 @@ export interface KanbanBoardDto {
     title: string;
     status: RecruitmentStatus;
   };
+  stagesSource: "default" | "custom";
   stages: KanbanBoardStageDto[];
 }
 

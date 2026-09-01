@@ -82,8 +82,52 @@ interface RecruitmentRow {
 
 interface StageRow {
   id: number;
+  recruitment_id: number | null;
   name: string;
   sort_order: number;
+}
+
+/**
+ * Dedicated mock for the `kanban_stages` table: `getKanbanBoard` issues
+ * two concurrent queries against it (one filtered with `.is()` for
+ * defaults, one filtered with `.eq()` for overrides), so a shared
+ * single-result `FakeQueryBuilder` can't tell them apart. A fresh
+ * instance per `.from("kanban_stages")` call avoids a race between the
+ * two chains over which filter was called last.
+ */
+class FakeKanbanStagesQueryBuilder implements PromiseLike<QueryResult<StageRow[]>> {
+  private mode: "defaults" | "override" = "defaults";
+
+  constructor(
+    private readonly defaults: QueryResult<StageRow[]>,
+    private readonly overrides: QueryResult<StageRow[]>,
+  ) {}
+
+  select(): this {
+    return this;
+  }
+
+  order(): this {
+    return this;
+  }
+
+  is(): this {
+    this.mode = "defaults";
+    return this;
+  }
+
+  eq(): this {
+    this.mode = "override";
+    return this;
+  }
+
+  then<TResult1 = QueryResult<StageRow[]>, TResult2 = never>(
+    onfulfilled?: ((value: QueryResult<StageRow[]>) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+  ): PromiseLike<TResult1 | TResult2> {
+    const result = this.mode === "override" ? this.overrides : this.defaults;
+    return Promise.resolve(result).then(onfulfilled, onrejected);
+  }
 }
 
 interface CandidateRecruitmentRow {
@@ -113,17 +157,27 @@ function makeListClient(rows: RecruitmentListRow[], error: { message: string } |
 
 function makeBoardClient(config: {
   recruitment: QueryResult<RecruitmentRow>;
-  stages?: QueryResult<StageRow[]>;
+  defaultStages?: QueryResult<StageRow[]>;
+  overrideStages?: QueryResult<StageRow[]>;
   candidateRows?: QueryResult<CandidateRecruitmentRow[]>;
 }): Client {
-  const { recruitment, stages, candidateRows } = config;
-  const tables: Record<string, unknown> = {
-    recruitments: new FakeQueryBuilder<RecruitmentRow>(recruitment),
-    kanban_stages: new FakeQueryBuilder<StageRow[]>(stages ?? { data: [], error: null }),
-    candidate_recruitments: new FakeQueryBuilder<CandidateRecruitmentRow[]>(candidateRows ?? { data: [], error: null }),
-  };
+  const { recruitment, defaultStages, overrideStages, candidateRows } = config;
   return {
-    from: (table: string) => tables[table],
+    from: (table: string) => {
+      if (table === "recruitments") {
+        return new FakeQueryBuilder<RecruitmentRow>(recruitment);
+      }
+      if (table === "kanban_stages") {
+        return new FakeKanbanStagesQueryBuilder(
+          defaultStages ?? { data: [], error: null },
+          overrideStages ?? { data: [], error: null },
+        );
+      }
+      if (table === "candidate_recruitments") {
+        return new FakeQueryBuilder<CandidateRecruitmentRow[]>(candidateRows ?? { data: [], error: null });
+      }
+      throw new Error(`Unexpected table in makeBoardClient: ${table}`);
+    },
   } as unknown as Client;
 }
 
@@ -273,10 +327,10 @@ describe("getKanbanBoard", () => {
   it("renders a stage with zero candidates as an empty column", async () => {
     const client = makeBoardClient({
       recruitment: { data: { id: 1, title: "Backend Engineer", status: "live" }, error: null },
-      stages: {
+      defaultStages: {
         data: [
-          { id: 10, name: "New", sort_order: 1 },
-          { id: 60, name: "Rejected", sort_order: 6 },
+          { id: 10, recruitment_id: null, name: "New", sort_order: 1 },
+          { id: 60, recruitment_id: null, name: "Rejected", sort_order: 6 },
         ],
         error: null,
       },
@@ -298,11 +352,11 @@ describe("getKanbanBoard", () => {
   it("preserves the sort_order-ascending order returned by the stages query", async () => {
     const client = makeBoardClient({
       recruitment: { data: { id: 1, title: "Backend Engineer", status: "live" }, error: null },
-      stages: {
+      defaultStages: {
         data: [
-          { id: 10, name: "New", sort_order: 1 },
-          { id: 20, name: "Screening", sort_order: 2 },
-          { id: 60, name: "Rejected", sort_order: 6 },
+          { id: 10, recruitment_id: null, name: "New", sort_order: 1 },
+          { id: 20, recruitment_id: null, name: "Screening", sort_order: 2 },
+          { id: 60, recruitment_id: null, name: "Rejected", sort_order: 6 },
         ],
         error: null,
       },
@@ -315,5 +369,81 @@ describe("getKanbanBoard", () => {
   it("propagates a Supabase error as a throw", async () => {
     const client = makeBoardClient({ recruitment: { data: null, error: { message: "boom" } } });
     await expect(getKanbanBoard(client, 1)).rejects.toEqual({ message: "boom" });
+  });
+
+  it("falls back to the global defaults and reports stagesSource 'default' when no override rows exist", async () => {
+    const client = makeBoardClient({
+      recruitment: { data: { id: 1, title: "Backend Engineer", status: "live" }, error: null },
+      defaultStages: {
+        data: [
+          { id: 10, recruitment_id: null, name: "New", sort_order: 1 },
+          { id: 20, recruitment_id: null, name: "Screening", sort_order: 2 },
+        ],
+        error: null,
+      },
+      overrideStages: { data: [], error: null },
+    });
+
+    const board = await getKanbanBoard(client, 1);
+
+    expect(board?.stagesSource).toBe("default");
+    expect(board?.stages.map((stage) => stage.name)).toEqual(["New", "Screening"]);
+  });
+
+  it("resolves to only the override rows, sorted, and reports stagesSource 'custom' when overrides exist", async () => {
+    const client = makeBoardClient({
+      recruitment: { data: { id: 1, title: "Backend Engineer", status: "live" }, error: null },
+      defaultStages: {
+        data: [
+          { id: 10, recruitment_id: null, name: "New", sort_order: 1 },
+          { id: 20, recruitment_id: null, name: "Screening", sort_order: 2 },
+        ],
+        error: null,
+      },
+      overrideStages: {
+        data: [
+          { id: 101, recruitment_id: 1, name: "Applied", sort_order: 1 },
+          { id: 102, recruitment_id: 1, name: "Tech Interview", sort_order: 2 },
+        ],
+        error: null,
+      },
+    });
+
+    const board = await getKanbanBoard(client, 1);
+
+    expect(board?.stagesSource).toBe("custom");
+    expect(board?.stages.map((stage) => stage.name)).toEqual(["Applied", "Tech Interview"]);
+  });
+
+  it("places candidates on the correct override columns with accurate counts", async () => {
+    const client = makeBoardClient({
+      recruitment: { data: { id: 1, title: "Backend Engineer", status: "live" }, error: null },
+      defaultStages: {
+        data: [{ id: 10, recruitment_id: null, name: "New", sort_order: 1 }],
+        error: null,
+      },
+      overrideStages: {
+        data: [
+          { id: 101, recruitment_id: 1, name: "Applied", sort_order: 1 },
+          { id: 102, recruitment_id: 1, name: "Tech Interview", sort_order: 2 },
+        ],
+        error: null,
+      },
+      candidateRows: {
+        data: [
+          { current_stage_id: 101, added_at: "2026-01-02", candidates: { id: 100, full_name: "Ada Lovelace" } },
+          { current_stage_id: 101, added_at: "2026-01-03", candidates: { id: 101, full_name: "Alan Turing" } },
+        ],
+        error: null,
+      },
+    });
+
+    const board = await getKanbanBoard(client, 1);
+
+    const applied = board?.stages.find((stage) => stage.name === "Applied");
+    const techInterview = board?.stages.find((stage) => stage.name === "Tech Interview");
+    expect(applied?.candidateCount).toBe(2);
+    expect(applied?.candidates.map((c) => c.fullName)).toEqual(["Ada Lovelace", "Alan Turing"]);
+    expect(techInterview?.candidateCount).toBe(0);
   });
 });

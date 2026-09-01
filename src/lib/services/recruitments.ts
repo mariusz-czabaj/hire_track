@@ -126,15 +126,35 @@ export async function getKanbanBoard(client: Client, recruitmentId: number): Pro
     return null;
   }
 
-  const { data: stages, error: stagesError } = await client
-    .from("kanban_stages")
-    .select("id, name, sort_order")
-    .is("recruitment_id", null)
-    .order("sort_order", { ascending: true });
+  // Fetch both partitions and pick the override set when one exists,
+  // falling back to defaults otherwise (all-or-nothing). Two separate
+  // queries -- rather than one .or("recruitment_id.is.null,recruitment_id.eq.…")
+  // -- keep each filter a plain, non-interpolating `.is()`/`.eq()` call, so
+  // this stays safe if ever called standalone with an untrusted id.
+  const [{ data: defaultStages, error: defaultStagesError }, { data: overrideStages, error: overrideStagesError }] =
+    await Promise.all([
+      client
+        .from("kanban_stages")
+        .select("id, recruitment_id, name, sort_order")
+        .is("recruitment_id", null)
+        .order("sort_order", { ascending: true }),
+      client
+        .from("kanban_stages")
+        .select("id, recruitment_id, name, sort_order")
+        .eq("recruitment_id", recruitmentId)
+        .order("sort_order", { ascending: true }),
+    ]);
 
-  if (stagesError) {
-    throw stagesError;
+  if (defaultStagesError) {
+    throw defaultStagesError;
   }
+
+  if (overrideStagesError) {
+    throw overrideStagesError;
+  }
+
+  const stagesSource: "default" | "custom" = overrideStages.length > 0 ? "custom" : "default";
+  const stages = stagesSource === "custom" ? overrideStages : defaultStages;
 
   const { data: candidateRows, error: candidatesError } = await client
     .from("candidate_recruitments")
@@ -159,6 +179,7 @@ export async function getKanbanBoard(client: Client, recruitmentId: number): Pro
       title: recruitment.title,
       status: toRecruitmentStatus(recruitment.status),
     },
+    stagesSource,
     stages: stages.map((stage) => {
       const candidates = candidatesByStage.get(stage.id) ?? [];
       return {
