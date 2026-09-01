@@ -64,6 +64,14 @@ jobs:
             curl -s -o /dev/null http://localhost:4321/api/security-groups && break
             sleep 2
           done
+          # Same lazy-module-graph hazard applies per route, not just once --
+          # the candidates routes are new in this slice and load a distinct
+          # dependency graph (RPC error mapping, zod schemas) that the
+          # security-groups probe above never touches. Poll one of them too.
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null http://localhost:4321/api/recruitments/1/candidates/1 && break
+            sleep 2
+          done
           # The dev server responding isn't enough: right after `supabase
           # start`, the GoTrue and PostgREST containers' clocks can be
           # briefly out of sync, so PostgREST rejects a freshly-issued JWT

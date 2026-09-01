@@ -66,7 +66,13 @@ test("Hiring Manager sees the identical read-only board", async ({ page }) => {
 
   const headings = page.getByRole("heading", { level: 2 });
   await expect(headings).toHaveText(STAGE_ORDER);
-  await expect(page.getByTestId("kanban-columns").getByRole("button")).toHaveCount(0);
+
+  // recruiter-manages-candidate-status (S-04) added a per-card move button,
+  // and the plan carries forward S-02's "no client-side capability gating"
+  // decision -- so the Hiring Manager does see it, same as the status
+  // control below. Denial on click (rather than the button being absent)
+  // is exercised in candidates.spec.ts's hiring-manager case.
+  await expect(page.getByTestId("kanban-columns").getByRole("button", { name: /^Move candidate/ })).not.toHaveCount(0);
 
   // StatusControl has no client-side role gating (RLS is the enforcement
   // boundary, per the plan's "no client-side capability check" decision),

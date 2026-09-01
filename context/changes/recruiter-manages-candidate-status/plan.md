@@ -684,27 +684,27 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 5.1 Unit tests pass
-- [x] 5.2 Linting passes
-- [x] 5.3 Type checking passes
-- [x] 5.4 Build succeeds
+- [x] 5.1 Unit tests pass — 4478f59
+- [x] 5.2 Linting passes — 4478f59
+- [x] 5.3 Type checking passes — 4478f59
+- [x] 5.4 Build succeeds — 4478f59
 
 #### Manual
 
-- [x] 5.5 Card click opens the correct detail page
-- [x] 5.6 Notes list in stage order; edit persists after reload
-- [x] 5.7 A note written here unblocks a later move
+- [x] 5.5 Card click opens the correct detail page — 4478f59
+- [x] 5.6 Notes list in stage order; edit persists after reload — 4478f59
+- [x] 5.7 A note written here unblocks a later move — 4478f59
 
 ### Phase 6: End-to-end coverage
 
 #### Automated
 
-- [ ] 6.1 Full suite passes from a clean database
-- [ ] 6.2 Linting passes
-- [ ] 6.3 Type checking passes
-- [ ] 6.4 Build succeeds
+- [x] 6.1 Full suite passes from a clean database
+- [x] 6.2 Linting passes
+- [x] 6.3 Type checking passes
+- [x] 6.4 Build succeeds
 
 #### Manual
 
-- [ ] 6.5 E2E passes twice without a DB reset between runs
+- [x] 6.5 E2E passes twice without a DB reset between runs
 - [ ] 6.6 CI passes on a pushed branch
