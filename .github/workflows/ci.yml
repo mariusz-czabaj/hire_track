@@ -52,8 +52,16 @@ jobs:
         run: |
           npm run dev &
           DEV_PID=$!
+          # Poll an actual API route, not just "/" -- Astro dev's Vite
+          # optimizer lazily reloads dependency bundles (e.g. @supabase/ssr)
+          # on the first request that touches a given route's module graph.
+          # The root page can respond fine while an API route is still mid
+          # reload, which raced the first integration test in CI once.
+          # No -f here: /api/security-groups is auth-gated and correctly
+          # returns 401 when unauthenticated -- any HTTP response (not a
+          # connection error) is what "ready" means for this probe.
           for i in $(seq 1 30); do
-            curl -sf http://localhost:4321/ -o /dev/null && break
+            curl -s -o /dev/null http://localhost:4321/api/security-groups && break
             sleep 2
           done
           npm run test:integration
