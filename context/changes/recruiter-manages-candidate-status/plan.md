@@ -699,12 +699,12 @@ seeded recruitments already have candidates and are therefore already locked.
 
 #### Automated
 
-- [x] 6.1 Full suite passes from a clean database
-- [x] 6.2 Linting passes
-- [x] 6.3 Type checking passes
-- [x] 6.4 Build succeeds
+- [x] 6.1 Full suite passes from a clean database — d9aff05
+- [x] 6.2 Linting passes — d9aff05
+- [x] 6.3 Type checking passes — d9aff05
+- [x] 6.4 Build succeeds — d9aff05
 
 #### Manual
 
-- [x] 6.5 E2E passes twice without a DB reset between runs
-- [ ] 6.6 CI passes on a pushed branch
+- [x] 6.5 E2E passes twice without a DB reset between runs — d9aff05
+- [x] 6.6 CI passes on a pushed branch

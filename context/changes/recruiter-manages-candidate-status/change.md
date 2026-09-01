@@ -1,7 +1,7 @@
 ---
 change_id: recruiter-manages-candidate-status
 title: Recruiter manages candidate status with required note
-status: implementing
+status: implemented
 created: 2026-09-01
 updated: 2026-09-01
 archived_at: null
