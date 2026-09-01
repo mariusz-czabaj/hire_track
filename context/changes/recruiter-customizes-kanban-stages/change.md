@@ -1,7 +1,7 @@
 ---
 change_id: recruiter-customizes-kanban-stages
 title: Recruiter customizes kanban stages
-status: implementing
+status: implemented
 created: 2026-09-01
 updated: 2026-09-01
 archived_at: null

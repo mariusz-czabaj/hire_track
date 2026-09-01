@@ -542,11 +542,11 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 6.1 E2E suite passes
-- [x] 6.2 Full CI pipeline passes
-- [x] 6.3 database.types.ts diff is clean
+- [x] 6.1 E2E suite passes — d578ec9
+- [x] 6.2 Full CI pipeline passes — d578ec9
+- [x] 6.3 database.types.ts diff is clean — d578ec9
 
 #### Manual
 
-- [x] 6.4 E2E run is stable across two consecutive runs
-- [x] 6.5 S-01's recruitments.spec.ts still passes unmodified
+- [x] 6.4 E2E run is stable across two consecutive runs — d578ec9
+- [x] 6.5 S-01's recruitments.spec.ts still passes unmodified — d578ec9
