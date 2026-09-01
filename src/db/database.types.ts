@@ -362,6 +362,54 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      replace_recruitment_stages: {
+        Args: { stage_names: string[]; target_recruitment_id: number };
+        Returns: {
+          created_at: string;
+          id: number;
+          name: string;
+          recruitment_id: number | null;
+          sort_order: number;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "kanban_stages";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      reset_recruitment_stages: {
+        Args: { target_recruitment_id: number };
+        Returns: {
+          created_at: string;
+          id: number;
+          name: string;
+          recruitment_id: number | null;
+          sort_order: number;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "kanban_stages";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      update_default_stages: {
+        Args: { stages: Json };
+        Returns: {
+          created_at: string;
+          id: number;
+          name: string;
+          recruitment_id: number | null;
+          sort_order: number;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "kanban_stages";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
     };
     Enums: {
       operation: "recruitment.read" | "recruitment.write" | "candidate.read" | "candidate.write" | "group.manage";

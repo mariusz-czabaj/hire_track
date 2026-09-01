@@ -470,30 +470,30 @@ Note also that the repo's English-only rule ([lessons.md](../../../context/found
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly on a fresh reset
-- [x] 1.2 rls_verification.sql passes end to end via the docker exec invocation
-- [x] 1.3 Linting passes
-- [x] 1.4 Existing unit tests still pass
+- [x] 1.1 Migration applies cleanly on a fresh reset — 373759a
+- [x] 1.2 rls_verification.sql passes end to end via the docker exec invocation — 373759a
+- [x] 1.3 Linting passes — 373759a
+- [x] 1.4 Existing unit tests still pass — 373759a
 
 #### Manual
 
-- [x] 1.5 Seed data loads unchanged
-- [x] 1.6 HR insert of a global default row is denied with 42501
+- [x] 1.5 Seed data loads unchanged — 373759a
+- [x] 1.6 HR insert of a global default row is denied with 42501 — 373759a
 
 ### Phase 2: Stage-Write RPCs
 
 #### Automated
 
-- [ ] 2.1 Migration applies cleanly
-- [ ] 2.2 npm run db:types produces no diff
-- [ ] 2.3 Type checking passes
+- [x] 2.1 Migration applies cleanly
+- [x] 2.2 npm run db:types produces no diff
+- [x] 2.3 Type checking passes
 
 #### Manual
 
-- [ ] 2.4 HR replaces a candidate-free recruitment's stages with contiguous sort_order
-- [ ] 2.5 Candidates-exist refusal fires on the seeded recruitment
-- [ ] 2.6 Two-phase renumber succeeds on the default set
-- [ ] 2.7 Removing a referenced default stage is refused, naming the stage
+- [x] 2.4 HR replaces a candidate-free recruitment's stages with contiguous sort_order
+- [x] 2.5 Candidates-exist refusal fires on the seeded recruitment
+- [x] 2.6 Two-phase renumber succeeds on the default set
+- [x] 2.7 Removing a referenced default stage is refused, naming the stage
 
 ### Phase 3: Override-Aware Read Path
 
