@@ -604,38 +604,38 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 4.1 Typechecking passes
-- [x] 4.2 Linting passes
-- [x] 4.3 Unit tests still pass
-- [x] 4.4 Build passes
+- [x] 4.1 Typechecking passes — 0f42535
+- [x] 4.2 Linting passes — 0f42535
+- [x] 4.3 Unit tests still pass — 0f42535
+- [x] 4.4 Build passes — 0f42535
 
 #### Manual
 
-- [x] 4.5 Signed out, /recruitments redirects to sign-in
-- [x] 4.6 HR list shows recruitment with metadata and count 5
-- [x] 4.7 Filter chips work and persist across reload
-- [x] 4.8 Admin sees empty state, not an error
-- [x] 4.9 Skeleton appears during load; existing pages still correct after .dark
-- [x] 4.10 Expired session on refetch redirects to /auth/signin, not the error state
+- [x] 4.5 Signed out, /recruitments redirects to sign-in — 0f42535
+- [x] 4.6 HR list shows recruitment with metadata and count 5 — 0f42535
+- [x] 4.7 Filter chips work and persist across reload — 0f42535
+- [x] 4.8 Admin sees empty state, not an error — 0f42535
+- [x] 4.9 Skeleton appears during load; existing pages still correct after .dark — 0f42535
+- [x] 4.10 Expired session on refetch redirects to /auth/signin, not the error state — 0f42535
 
 ### Phase 5: Kanban Board View
 
 #### Automated
 
-- [ ] 5.1 Typechecking passes
-- [ ] 5.2 Linting passes
-- [ ] 5.3 Unit tests still pass
-- [ ] 5.4 Build passes
+- [x] 5.1 Typechecking passes
+- [x] 5.2 Linting passes
+- [x] 5.3 Unit tests still pass
+- [x] 5.4 Build passes
 
 #### Manual
 
-- [ ] 5.5 HR board shows 6 ordered columns, counts summing to 5, name and date per card
-- [ ] 5.6 Rejected renders as a visible empty column
-- [ ] 5.7 Hiring Manager sees identical read-only board
-- [ ] 5.8 Admin user sees not-found for the same recruitment URL
-- [ ] 5.9 Nonexistent id shows not-found; non-numeric id does not crash
-- [ ] 5.10 Views render within ~2s at seed scale; board scrolls horizontally
-- [ ] 5.11 Verified in Chrome plus Firefox or Edge
+- [x] 5.5 HR board shows 6 ordered columns, counts summing to 5, name and date per card
+- [x] 5.6 Rejected renders as a visible empty column
+- [x] 5.7 Hiring Manager sees identical read-only board
+- [x] 5.8 Admin user sees not-found for the same recruitment URL
+- [x] 5.9 Nonexistent id shows not-found; non-numeric id does not crash
+- [x] 5.10 Views render within ~2s at seed scale; board scrolls horizontally
+- [x] 5.11 Verified in Chrome plus Firefox or Edge
 
 ### Phase 6: Playwright E2E
 
