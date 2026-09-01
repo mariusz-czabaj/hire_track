@@ -338,13 +338,13 @@ Single new migration (Phase 1). No existing data to migrate — this is additive
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly
-- [x] 1.2 db:types regenerated and committed
-- [x] 1.3 rls_verification.sql RPC scenarios pass
+- [x] 1.1 Migration applies cleanly — e696c83
+- [x] 1.2 db:types regenerated and committed — e696c83
+- [x] 1.3 rls_verification.sql RPC scenarios pass — e696c83
 
 #### Manual
 
-- [ ] 1.4 Migration SQL hardening reviewed against mark_rls_helpers_stable.sql pattern
+- [x] 1.4 Migration SQL hardening reviewed against mark_rls_helpers_stable.sql pattern
 
 ### Phase 2: API endpoints
 
