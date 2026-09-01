@@ -598,7 +598,7 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Manual
 
-- [ ] 3.5 CI run shows typecheck and test steps executing
+- [x] 3.5 CI run shows typecheck and test steps executing
 
 ### Phase 4: UI Foundation & Recruitment List
 
@@ -622,32 +622,32 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 
 #### Automated
 
-- [x] 5.1 Typechecking passes
-- [x] 5.2 Linting passes
-- [x] 5.3 Unit tests still pass
-- [x] 5.4 Build passes
+- [x] 5.1 Typechecking passes — 7cb73c4
+- [x] 5.2 Linting passes — 7cb73c4
+- [x] 5.3 Unit tests still pass — 7cb73c4
+- [x] 5.4 Build passes — 7cb73c4
 
 #### Manual
 
-- [x] 5.5 HR board shows 6 ordered columns, counts summing to 5, name and date per card
-- [x] 5.6 Rejected renders as a visible empty column
-- [x] 5.7 Hiring Manager sees identical read-only board
-- [x] 5.8 Admin user sees not-found for the same recruitment URL
-- [x] 5.9 Nonexistent id shows not-found; non-numeric id does not crash
-- [x] 5.10 Views render within ~2s at seed scale; board scrolls horizontally
-- [x] 5.11 Verified in Chrome plus Firefox or Edge
+- [x] 5.5 HR board shows 6 ordered columns, counts summing to 5, name and date per card — 7cb73c4
+- [x] 5.6 Rejected renders as a visible empty column — 7cb73c4
+- [x] 5.7 Hiring Manager sees identical read-only board — 7cb73c4
+- [x] 5.8 Admin user sees not-found for the same recruitment URL — 7cb73c4
+- [x] 5.9 Nonexistent id shows not-found; non-numeric id does not crash — 7cb73c4
+- [x] 5.10 Views render within ~2s at seed scale; board scrolls horizontally — 7cb73c4
+- [x] 5.11 Verified in Chrome plus Firefox or Edge — 7cb73c4
 
 ### Phase 6: Playwright E2E
 
 #### Automated
 
-- [ ] 6.1 E2E suite passes locally against seeded Supabase
-- [ ] 6.2 Unit and E2E runners do not collect each other's files
-- [ ] 6.3 Linting passes on test files
-- [ ] 6.4 Typechecking passes
-- [ ] 6.5 CI fails on a stale committed database.types.ts (type-drift guard)
+- [x] 6.1 E2E suite passes locally against seeded Supabase
+- [x] 6.2 Unit and E2E runners do not collect each other's files
+- [x] 6.3 Linting passes on test files
+- [x] 6.4 Typechecking passes
+- [x] 6.5 CI fails on a stale committed database.types.ts (type-drift guard)
 
 #### Manual
 
-- [ ] 6.6 CI E2E job passes unconditionally, with no gating condition
-- [ ] 6.7 Breaking stage grouping makes the Rejected-column spec fail
+- [x] 6.6 CI E2E job passes unconditionally, with no gating condition
+- [x] 6.7 Breaking stage grouping makes the Rejected-column spec fail

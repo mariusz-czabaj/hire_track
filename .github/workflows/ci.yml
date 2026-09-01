@@ -24,3 +24,29 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase start
+      - name: Export local Supabase connection info
+        run: supabase status -o env >> "$GITHUB_ENV"
+      - name: Map local Supabase env to app vars
+        run: |
+          echo "SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+      - name: Regenerate database types and fail on drift
+        run: |
+          npm run db:types
+          git diff --exit-code src/db/database.types.ts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

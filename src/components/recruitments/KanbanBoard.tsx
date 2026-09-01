@@ -69,7 +69,7 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
         </Badge>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2">
+      <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
         {stages.map((stage) => (
           <div key={stage.id} className="w-64 shrink-0 rounded-xl border border-white/10 bg-white/5 p-3">
             <div className="mb-3 flex items-center justify-between px-1">
