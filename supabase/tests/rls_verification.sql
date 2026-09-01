@@ -298,11 +298,17 @@ select set_config(
 );
 set local role authenticated;
 do $$
+declare
+  v_updated_name text;
 begin
-  update kanban_stages set name = 'New' where recruitment_id is null and name = 'New';
-exception
-  when others then
-    raise exception 'FAIL: Administrator could not update a global default stage (% - %)', sqlstate, sqlerrm;
+  update kanban_stages
+  set name = 'RLS Test Renamed Stage'
+  where recruitment_id is null and name = 'New'
+  returning name into v_updated_name;
+
+  if v_updated_name is distinct from 'RLS Test Renamed Stage' then
+    raise exception 'FAIL: Administrator update did not land -- no row matched or the name did not change';
+  end if;
 end $$;
 rollback;
 
@@ -367,6 +373,105 @@ begin
         raise exception 'FAIL: consistency trigger raised an unexpected error (% - %)', sqlstate, sqlerrm;
       end if;
   end;
+end $$;
+rollback;
+
+-- (16) S-03: Administrator renames and reorders the default set via
+-- update_default_stages -- proves the RPC's rename-in-place and
+-- two-phase negate-then-assign renumber (see
+-- 20260901162000_kanban_stage_rpcs.sql) actually work end to end, not
+-- just via the ad hoc psql checks done during implementation.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_names text[];
+begin
+  select array_agg(name order by sort_order) into v_names
+  from public.update_default_stages(
+    jsonb_build_array(
+      jsonb_build_object('id', 6, 'name', 'Rejected'),
+      jsonb_build_object('id', 1, 'name', 'Renamed New'),
+      jsonb_build_object('id', 2, 'name', 'Screening'),
+      jsonb_build_object('id', 3, 'name', 'Interview'),
+      jsonb_build_object('id', 4, 'name', 'Offer'),
+      jsonb_build_object('id', 5, 'name', 'Hired')
+    )
+  );
+
+  if v_names is distinct from array['Rejected', 'Renamed New', 'Screening', 'Interview', 'Offer', 'Hired'] then
+    raise exception 'FAIL: update_default_stages did not rename/reorder as submitted, got %', v_names;
+  end if;
+end $$;
+rollback;
+
+-- (17) update_default_stages refuses to remove a default stage that
+-- candidates or history still reference, naming the stage (PA002).
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+begin
+  begin
+    -- Omits stage 1 ("New"), which the seeded HR candidate Anna Kowalska
+    -- currently occupies -- must be refused, not silently dropped.
+    perform public.update_default_stages(
+      jsonb_build_array(
+        jsonb_build_object('id', 2, 'name', 'Screening'),
+        jsonb_build_object('id', 3, 'name', 'Interview'),
+        jsonb_build_object('id', 4, 'name', 'Offer'),
+        jsonb_build_object('id', 5, 'name', 'Hired'),
+        jsonb_build_object('id', 6, 'name', 'Rejected')
+      )
+    );
+    raise exception 'FAIL: update_default_stages removed a stage still referenced by a candidate';
+  exception
+    when others then
+      if sqlstate <> 'PA002' then
+        raise exception 'FAIL: update_default_stages raised an unexpected error for a referenced removal (% - %)', sqlstate, sqlerrm;
+      end if;
+  end;
+end $$;
+rollback;
+
+-- (18) update_default_stages successfully removes an unreferenced
+-- default stage ("Rejected" -- no seeded candidate or history row
+-- points at it) and inserts a net addition in the same call.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_names text[];
+begin
+  select array_agg(name order by sort_order) into v_names
+  from public.update_default_stages(
+    jsonb_build_array(
+      jsonb_build_object('id', 1, 'name', 'New'),
+      jsonb_build_object('id', 2, 'name', 'Screening'),
+      jsonb_build_object('id', 3, 'name', 'Interview'),
+      jsonb_build_object('id', 4, 'name', 'Offer'),
+      jsonb_build_object('id', 5, 'name', 'Hired'),
+      jsonb_build_object('name', 'Onboarding')
+    )
+  );
+
+  if v_names is distinct from array['New', 'Screening', 'Interview', 'Offer', 'Hired', 'Onboarding'] then
+    raise exception 'FAIL: update_default_stages did not apply the net removal + addition as submitted, got %', v_names;
+  end if;
 end $$;
 rollback;
 
