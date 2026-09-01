@@ -64,6 +64,26 @@ jobs:
             curl -s -o /dev/null http://localhost:4321/api/security-groups && break
             sleep 2
           done
+          # The dev server responding isn't enough: right after `supabase
+          # start`, the GoTrue and PostgREST containers' clocks can be
+          # briefly out of sync, so PostgREST rejects a freshly-issued JWT
+          # with "JWT issued at future" (PGRST303) on the first authenticated
+          # request -- this raced the integration suite's very first test
+          # twice in CI. Do a real sign-in + authenticated GET here and keep
+          # retrying until it actually succeeds, so that clock-skew window
+          # resolves before the test suite runs instead of inside it.
+          for i in $(seq 1 30); do
+            rm -f /tmp/ci-cookies.txt
+            curl -s -o /dev/null -c /tmp/ci-cookies.txt \
+              -H "Origin: http://localhost:4321" \
+              --data-urlencode "email=hr.test@example.com" \
+              --data-urlencode "password=password123" \
+              http://localhost:4321/api/auth/signin
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" -b /tmp/ci-cookies.txt \
+              http://localhost:4321/api/recruitments)
+            [ "$STATUS" = "200" ] && break
+            sleep 2
+          done
           npm run test:integration
           TEST_EXIT=$?
           kill "$DEV_PID" 2>/dev/null || true
