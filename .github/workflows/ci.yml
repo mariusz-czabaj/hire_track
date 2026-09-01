@@ -61,5 +61,11 @@ jobs:
           kill "$DEV_PID" 2>/dev/null || true
           pkill -f "astro dev" 2>/dev/null || true
           exit $TEST_EXIT
+      - name: Reset local database to pristine seed
+        # The HTTP integration tests above create real recruitments (there's
+        # no DELETE policy on `recruitments` by design -- see F-01's plan),
+        # so the DB must go back to a clean seed before the E2E suite runs
+        # against the same local Supabase instance.
+        run: npx supabase db reset --local
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
