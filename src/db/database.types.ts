@@ -123,6 +123,51 @@ export type Database = {
           },
         ];
       };
+      candidate_stage_notes: {
+        Row: {
+          body: string;
+          candidate_recruitment_id: number;
+          created_at: string;
+          created_by: string | null;
+          id: number;
+          stage_id: number;
+          updated_at: string;
+        };
+        Insert: {
+          body: string;
+          candidate_recruitment_id: number;
+          created_at?: string;
+          created_by?: string | null;
+          id?: never;
+          stage_id: number;
+          updated_at?: string;
+        };
+        Update: {
+          body?: string;
+          candidate_recruitment_id?: number;
+          created_at?: string;
+          created_by?: string | null;
+          id?: never;
+          stage_id?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "candidate_stage_notes_candidate_recruitment_id_fkey";
+            columns: ["candidate_recruitment_id"];
+            isOneToOne: false;
+            referencedRelation: "candidate_recruitments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "candidate_stage_notes_stage_id_fkey";
+            columns: ["stage_id"];
+            isOneToOne: false;
+            referencedRelation: "kanban_stages";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       candidates: {
         Row: {
           created_at: string;
