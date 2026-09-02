@@ -28,6 +28,62 @@ export type Database = {
   };
   public: {
     Tables: {
+      candidate_cvs: {
+        Row: {
+          candidate_id: number;
+          created_at: string;
+          created_by: string | null;
+          expires_at: string;
+          id: number;
+          mime_type: string;
+          object_deleted_at: string | null;
+          original_filename: string;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          updated_at: string;
+          uploaded_at: string;
+        };
+        Insert: {
+          candidate_id: number;
+          created_at?: string;
+          created_by?: string | null;
+          expires_at: string;
+          id?: never;
+          mime_type: string;
+          object_deleted_at?: string | null;
+          original_filename: string;
+          size_bytes: number;
+          status?: string;
+          storage_path: string;
+          updated_at?: string;
+          uploaded_at?: string;
+        };
+        Update: {
+          candidate_id?: number;
+          created_at?: string;
+          created_by?: string | null;
+          expires_at?: string;
+          id?: never;
+          mime_type?: string;
+          object_deleted_at?: string | null;
+          original_filename?: string;
+          size_bytes?: number;
+          status?: string;
+          storage_path?: string;
+          updated_at?: string;
+          uploaded_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "candidate_cvs_candidate_id_fkey";
+            columns: ["candidate_id"];
+            isOneToOne: false;
+            referencedRelation: "candidates";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       candidate_recruitment_status_history: {
         Row: {
           candidate_recruitment_id: number;

@@ -118,6 +118,17 @@ file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]
 # objects_path = "./images"
 
+# S-05: private bucket for candidate CVs. Per-bucket limits are the only
+# server-side enforcement available on a browser-direct signed-URL
+# upload -- the app never sees the bytes, so these are the real boundary.
+[storage.buckets.candidate-cvs]
+public = false
+file_size_limit = "5MiB"
+allowed_mime_types = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]
+
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
 enabled = true

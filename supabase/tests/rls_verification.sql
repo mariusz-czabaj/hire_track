@@ -835,4 +835,198 @@ begin
 end $$;
 rollback;
 
+-- (28) S-05: HR can INSERT and SELECT a candidate_cvs row for a
+-- candidate they have candidate.write on.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_candidate_id bigint;
+  v_cv_id bigint;
+begin
+  select id into v_candidate_id from candidates where email = 'piotr.nowak@example.com';
+
+  insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes, created_by)
+  values (v_candidate_id, v_candidate_id || '/rls-test-28.pdf', 'cv.pdf', 'application/pdf', 1024, '11111111-1111-1111-1111-111111111111')
+  returning id into v_cv_id;
+
+  if v_cv_id is null then
+    raise exception 'FAIL: HR insert into candidate_cvs did not return an id';
+  end if;
+
+  if not exists (select 1 from candidate_cvs where id = v_cv_id) then
+    raise exception 'FAIL: HR cannot select the candidate_cvs row it just inserted';
+  end if;
+end $$;
+rollback;
+
+-- (29) S-05: the Hiring Manager (candidate.read but no candidate.write)
+-- is denied INSERT on candidate_cvs.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '22222222-2222-2222-2222-222222222222', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_candidate_id bigint;
+begin
+  select id into v_candidate_id from candidates where email = 'piotr.nowak@example.com';
+
+  begin
+    insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes)
+    values (v_candidate_id, v_candidate_id || '/rls-test-29.pdf', 'cv.pdf', 'application/pdf', 1024);
+    raise exception 'FAIL: Hiring Manager was able to insert a candidate_cvs row';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
+-- (30) S-05: the Hiring Manager is denied INSERT on storage.objects in
+-- the candidate-cvs bucket -- the actual gate a signed-upload mint would
+-- pass through.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '22222222-2222-2222-2222-222222222222', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+begin
+  begin
+    insert into storage.objects (bucket_id, name) values ('candidate-cvs', 'rls-test-30.pdf');
+    raise exception 'FAIL: Hiring Manager was able to insert a storage object in candidate-cvs';
+  exception
+    when insufficient_privilege then
+      null; -- expected: RLS denies the write
+  end;
+end $$;
+rollback;
+
+-- (31) S-05: the Administrator (group.manage only, no candidate
+-- operation) is denied SELECT on candidate_cvs but IS allowed DELETE on
+-- storage.objects in the candidate-cvs bucket -- this is the disjunctive
+-- purge gate (candidate.write OR group.manage) that lets an
+-- Administrator run the purge endpoint despite holding no candidate
+-- operation at all. storage.allow_delete_query is set because
+-- storage.objects has a statement-level guard trigger rejecting raw SQL
+-- DELETE outright; the app's purge code goes through the Storage API,
+-- which sets this the same way -- setting it here isolates the RLS
+-- policy from that separate guard.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_candidate_id bigint;
+begin
+  select id into v_candidate_id from candidates where email = 'piotr.nowak@example.com';
+
+  insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes, created_by)
+  values (v_candidate_id, v_candidate_id || '/rls-test-31.pdf', 'cv.pdf', 'application/pdf', 1024, '11111111-1111-1111-1111-111111111111');
+
+  -- Insert the storage object as HR (candidate.write) -- the
+  -- Administrator holds no candidate operation and could not insert
+  -- one; only the DELETE side of the disjunctive gate is under test.
+  insert into storage.objects (bucket_id, name) values ('candidate-cvs', 'rls-test-31.pdf');
+end $$;
+
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '33333333-3333-3333-3333-333333333333', 'role', 'authenticated')::text,
+  true
+);
+set local storage.allow_delete_query = 'true';
+do $$
+declare
+  v_deleted_name text;
+begin
+  -- SELECT-side RLS denial is silent (rows are filtered, not an
+  -- exception) -- so the proof is that the row HR just inserted, above,
+  -- is invisible to the Administrator.
+  if (select count(*) from candidate_cvs) <> 0 then
+    raise exception 'FAIL: Administrator can see candidate_cvs rows it should not';
+  end if;
+
+  delete from storage.objects
+  where bucket_id = 'candidate-cvs' and name = 'rls-test-31.pdf'
+  returning name into v_deleted_name;
+
+  if v_deleted_name is distinct from 'rls-test-31.pdf' then
+    raise exception 'FAIL: Administrator delete on storage.objects did not remove the row it inserted';
+  end if;
+end $$;
+rollback;
+
+-- (32) S-05: the partial unique index rejects a second 'active' CV for
+-- the same candidate.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_candidate_id bigint;
+begin
+  select id into v_candidate_id from candidates where email = 'piotr.nowak@example.com';
+
+  insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes, status, created_by)
+  values (v_candidate_id, v_candidate_id || '/rls-test-32a.pdf', 'cv.pdf', 'application/pdf', 1024, 'active', '11111111-1111-1111-1111-111111111111');
+
+  begin
+    insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes, status, created_by)
+    values (v_candidate_id, v_candidate_id || '/rls-test-32b.pdf', 'cv.pdf', 'application/pdf', 1024, 'active', '11111111-1111-1111-1111-111111111111');
+    raise exception 'FAIL: a second active CV was inserted for the same candidate';
+  exception
+    when unique_violation then
+      null; -- expected: candidate_cvs_one_active_idx rejects it
+  end;
+end $$;
+rollback;
+
+-- (33) S-05: a backdated uploaded_at produces an expires_at in the past,
+-- proving the set_candidate_cv_expires_at trigger -- and that it derives
+-- from the *inserted* uploaded_at, not from now(), which is what lets
+-- tests exercise 12-month expiry without waiting a year.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_candidate_id bigint;
+  v_expires_at timestamptz;
+begin
+  select id into v_candidate_id from candidates where email = 'piotr.nowak@example.com';
+
+  insert into candidate_cvs (candidate_id, storage_path, original_filename, mime_type, size_bytes, uploaded_at, created_by)
+  values (v_candidate_id, v_candidate_id || '/rls-test-33.pdf', 'cv.pdf', 'application/pdf', 1024, now() - interval '13 months', '11111111-1111-1111-1111-111111111111')
+  returning expires_at into v_expires_at;
+
+  if v_expires_at >= now() then
+    raise exception 'FAIL: a CV backdated 13 months did not produce a past expires_at, got %', v_expires_at;
+  end if;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;
