@@ -758,30 +758,30 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [x] 3.1 Migrations apply cleanly
-- [x] 3.2 RLS/RPC assertions pass
-- [x] 3.3 Types are in sync
-- [x] 3.4 Unit tests pass
-- [x] 3.5 Integration tests pass
-- [x] 3.6 Linting passes
-- [x] 3.7 Type checking passes
-- [x] 3.8 Build succeeds
+- [x] 3.1 Migrations apply cleanly — 150c24e
+- [x] 3.2 RLS/RPC assertions pass — 150c24e
+- [x] 3.3 Types are in sync — 150c24e
+- [x] 3.4 Unit tests pass — 150c24e
+- [x] 3.5 Integration tests pass — 150c24e
+- [x] 3.6 Linting passes — 150c24e
+- [x] 3.7 Type checking passes — 150c24e
+- [x] 3.8 Build succeeds — 150c24e
 
 #### Manual
 
-- [ ] 3.9 Local signed-upload URL TTL measured and recorded
-- [ ] 3.10 Uploaded file downloadable byte-for-byte
-- [ ] 3.11 Backdated CV returns 410 and is purged, setting object_deleted_at
-- [ ] 3.12 Second purge run is harmless
+- [x] 3.9 Local signed-upload URL TTL measured and recorded — 150c24e
+- [x] 3.10 Uploaded file downloadable byte-for-byte — 150c24e
+- [x] 3.11 Backdated CV returns 410 and is purged, setting object_deleted_at — 150c24e
+- [x] 3.12 Second purge run is harmless — 150c24e
 
 ### Phase 4: Profile page UI
 
 #### Automated
 
-- [ ] 4.1 Unit tests pass
-- [ ] 4.2 Linting passes
-- [ ] 4.3 Type checking passes
-- [ ] 4.4 Build succeeds
+- [x] 4.1 Unit tests pass
+- [x] 4.2 Linting passes
+- [x] 4.3 Type checking passes
+- [x] 4.4 Build succeeds
 
 #### Manual
 
