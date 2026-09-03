@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 1
 status: draft
 created: 2026-08-27
-updated: 2026-09-02
+updated: 2026-09-03
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -47,7 +47,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 | S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji                                         | F-01, S-01    | FR-004                                                              | in-progress |
 | S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu)           | S-01, S-02    | FR-006, FR-008, FR-009, FR-013, Business Logic                      | in-progress |
 | S-05 | candidate-profile-and-cv-upload    | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach               | S-04          | FR-011, FR-012, FR-013a, NFR-retencja                               | in-progress |
-| S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01    | US-02, FR-014, FR-015, FR-016                                       | proposed    |
+| S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01    | US-02, FR-014, FR-015, FR-016                                       | in-progress |
 | S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | F-01          | FR-017, FR-018                                                      | proposed    |
 
 ## Streams
@@ -160,7 +160,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** To drugi filar Kryterium sukcesu (Primary) obok north star — udowadnia wartość współdzielonego profilu kandydata (FR-007); sekwencjonowany zaraz po tym, jak S-04 zacznie generować realną historię statusów do przeszukania.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-07: Administrator zarządza grupami bezpieczeństwa i użytkownikami
 

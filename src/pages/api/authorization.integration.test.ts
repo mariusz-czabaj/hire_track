@@ -251,6 +251,37 @@ describe("#4 shared candidate profile: the positive half (org-wide identity)", (
   });
 });
 
+// The candidates list endpoint (S-06 plan.md Phase 3) is org-wide, gated
+// only on the blanket candidate.read operation -- unlike every scoped
+// recruitment/candidate-detail row above, there is no per-recruitment
+// membership check here at all. That asymmetry is intentional (plan.md's
+// "Key Discoveries") and belongs in this file's #4 grouping alongside the
+// other shared-candidate-profile rows.
+describe("#4 shared candidate profile: the candidates list endpoint", () => {
+  it("a principal holding candidate.read finds the cross-tenant candidate by name regardless of group", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const response = await hr.fetch("/api/candidates?q=Wojcik");
+
+    expect(response.status).toBe(200);
+    const list = (await response.json()) as { items: { fullName: string }[] };
+    expect(list.items.some((item) => item.fullName === "Julia Wojcik")).toBe(true);
+  });
+
+  it("a principal without candidate.read receives no rows, while a legitimate principal still finds the candidate", async () => {
+    const noGroup = await signInIntegrationClient("noGroup");
+    const response = await noGroup.fetch("/api/candidates?q=Wojcik");
+
+    expect(response.status).toBe(200);
+    const list = (await response.json()) as { items: { fullName: string }[] };
+    expect(list.items).toEqual([]);
+
+    const hr = await signInIntegrationClient("hr");
+    const readBack = await hr.fetch("/api/candidates?q=Wojcik");
+    const readBackList = (await readBack.json()) as { items: { fullName: string }[] };
+    expect(readBackList.items.some((item) => item.fullName === "Julia Wojcik")).toBe(true);
+  });
+});
+
 describe("the unfiltered group list, pinned", () => {
   // security_groups_select is `using (true)` -- any authenticated
   // principal, including one in no group at all, sees the full list.

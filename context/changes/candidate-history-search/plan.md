@@ -694,32 +694,32 @@ slice needs. The only database-side change is seed data, which is recreated by
 
 #### Automated
 
-- [x] 2.1 Types check
-- [x] 2.2 Unit tests pass, including the new history cases
-- [x] 2.3 Integration tests pass, including both truncation directions
-- [x] 2.4 Generated database types are still in sync
-- [x] 2.5 Linting passes
+- [x] 2.1 Types check — 5fb6263
+- [x] 2.2 Unit tests pass, including the new history cases — 5fb6263
+- [x] 2.3 Integration tests pass, including both truncation directions — 5fb6263
+- [x] 2.4 Generated database types are still in sync — 5fb6263
+- [x] 2.5 Linting passes — 5fb6263
 
 #### Manual
 
-- [x] 2.6 Profile GET as HR returns both recruitments with ordered history
-- [x] 2.7 Profile GET as Tenant B returns only the Data Analyst recruitment
-- [x] 2.8 History query plan inspected; stage-index question settled with evidence
+- [x] 2.6 Profile GET as HR returns both recruitments with ordered history — 5fb6263
+- [x] 2.7 Profile GET as Tenant B returns only the Data Analyst recruitment — 5fb6263
+- [x] 2.8 History query plan inspected; stage-index question settled with evidence — 5fb6263
 
 ### Phase 3: Candidates list and search API
 
 #### Automated
 
-- [ ] 3.1 Types check
-- [ ] 3.2 Unit tests pass, including the new service cases
-- [ ] 3.3 Integration tests pass, including search and the authorization rows
-- [ ] 3.4 Linting passes
+- [x] 3.1 Types check
+- [x] 3.2 Unit tests pass, including the new service cases
+- [x] 3.3 Integration tests pass, including search and the authorization rows
+- [x] 3.4 Linting passes
 
 #### Manual
 
-- [ ] 3.5 List returns alphabetically; `?q=` narrows; one-character query behaves as unfiltered
-- [ ] 3.6 A query containing `%` returns no spurious matches
-- [ ] 3.7 List responds within the 2-second budget against the seeded database
+- [x] 3.5 List returns alphabetically; `?q=` narrows; one-character query behaves as unfiltered
+- [x] 3.6 A query containing `%` returns no spurious matches
+- [x] 3.7 List responds within the 2-second budget against the seeded database
 
 ### Phase 4: Candidates UI
 

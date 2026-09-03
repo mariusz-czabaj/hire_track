@@ -193,6 +193,20 @@ export interface CvPurgeSummaryDto {
   results: CvPurgeResultDto[];
 }
 
+export const CANDIDATE_LIST_RESULT_CAP = 50;
+
+export interface CandidateListItemDto {
+  id: number;
+  fullName: string;
+  email: string;
+  recruitmentCount: number;
+}
+
+export interface CandidateListDto {
+  items: CandidateListItemDto[];
+  truncated: boolean;
+}
+
 export interface ApiErrorBody {
   error: {
     code: string;
