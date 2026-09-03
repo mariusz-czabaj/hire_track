@@ -802,11 +802,11 @@ commit message.
 
 #### Automated
 
-- [ ] 3.1 The full suite passes
-- [ ] 3.2 Unit tests pass
-- [ ] 3.3 E2E tests pass
-- [ ] 3.4 Linting passes
-- [ ] 3.5 Type checking passes
+- [x] 3.1 The full suite passes
+- [x] 3.2 Unit tests pass
+- [x] 3.3 E2E tests pass
+- [x] 3.4 Linting passes
+- [x] 3.5 Type checking passes
 
 #### Manual
 

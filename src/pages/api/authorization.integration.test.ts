@@ -20,7 +20,14 @@
  */
 import { describe, expect, it } from "vitest";
 import { signInIntegrationClient, type IntegrationClient } from "@/lib/test-support/integration-client";
-import type { ApiErrorBody, KanbanBoardDto, RecruitmentListItemDto, SecurityGroupDto } from "@/types";
+import type {
+  ApiErrorBody,
+  CandidateDetailDto,
+  KanbanBoardDto,
+  RecruitmentListItemDto,
+  RecruitmentStagesDto,
+  SecurityGroupDto,
+} from "@/types";
 
 // The seeded recruitments' ids are resolved by title rather than assumed
 // as ordinals -- seed.sql only guarantees the titles exist, and this suite
@@ -51,6 +58,26 @@ async function candidateRecruitmentIdByName(
     }
   }
   throw new Error(`candidateRecruitmentIdByName: "${fullName}" not found on recruitment ${recruitmentId}'s board`);
+}
+
+async function stageIdByName(client: IntegrationClient, recruitmentId: number, name: string): Promise<number> {
+  const response = await client.fetch(`/api/recruitments/${recruitmentId}/stages`);
+  const stages = (await response.json()) as RecruitmentStagesDto;
+  const match = stages.stages.find((stage) => stage.name === name);
+  if (!match) {
+    throw new Error(`stageIdByName: "${name}" not found on recruitment ${recruitmentId}'s stage set`);
+  }
+  return match.id;
+}
+
+async function securityGroupIdByName(client: IntegrationClient, name: string): Promise<number> {
+  const response = await client.fetch("/api/security-groups");
+  const groups = (await response.json()) as SecurityGroupDto[];
+  const match = groups.find((group) => group.name === name);
+  if (!match) {
+    throw new Error(`securityGroupIdByName: no seeded security group named "${name}"`);
+  }
+  return match.id;
 }
 
 describe("#1 cross-group read: symmetrical invisibility", () => {
@@ -236,5 +263,554 @@ describe("the unfiltered group list, pinned", () => {
     expect(names).toEqual(
       ["Administrator", "HR/Rekruter", "Hiring Manager", "Test Fixture -- Tenant B (HR-equivalent)"].sort(),
     );
+  });
+});
+
+// #5 write surface -- refutes risk #5's named anti-pattern ("testing one
+// write endpoint and generalising") by enumerating all seven write verbs
+// as distinct table rows, each asserting a non-2xx response *and* a
+// state read-back by the HR principal proving no write effect. The
+// expected status varies by row -- 404 for the scoped-no-op routes
+// (a null from a maybeSingle()-guarded lookup, or the RPC's own P0002
+// "recruitment invisible" check firing before any write-privilege
+// check), and 403 for the one row (POST /api/recruitments) that is
+// gated purely on a blanket has_operation() check with no per-resource
+// scoping to 404 against. This is mechanism-dependent, not an
+// inconsistency to normalise away (plan.md Phase 3, Changes Required #1).
+describe("#5 write surface: non-member denial across all seven write verbs", () => {
+  interface WriteVerbCase {
+    name: string;
+    expectedStatus: number;
+    principal: "tenantPeer" | "noGroup";
+    request: (ctx: {
+      backendEngineerId: number;
+      annaId: number;
+      newStageId: number;
+      hrGroupId: number;
+      probeMarker: string;
+    }) => { path: string; init: RequestInit };
+    readBack: (
+      hr: IntegrationClient,
+      ctx: { backendEngineerId: number; annaId: number; probeMarker: string },
+    ) => Promise<void>;
+  }
+
+  // POST /api/recruitments is the one row where the tenant-peer
+  // principal legitimately succeeds -- it holds blanket
+  // recruitment.write via the Tenant B fixture group. The no-group
+  // principal is asserted here instead, since it is the row's true
+  // non-member analogue: lacking recruitment.write entirely, denied at
+  // create_recruitment's blanket has_operation() check (42501), not at
+  // a per-resource RLS boundary -- hence 403, not 404.
+  const WRITE_VERB_CASES: WriteVerbCase[] = [
+    {
+      name: "POST /api/recruitments (no-group principal, no blanket recruitment.write)",
+      expectedStatus: 403,
+      principal: "noGroup",
+      request: ({ hrGroupId, probeMarker }) => ({
+        path: "/api/recruitments",
+        init: {
+          method: "POST",
+          body: JSON.stringify({
+            title: probeMarker,
+            department: "Engineering",
+            location: "Remote",
+            employmentType: "full-time",
+            openedAt: "2026-01-01",
+            groupIds: [hrGroupId],
+          }),
+        },
+      }),
+      readBack: async (hr, { probeMarker }) => {
+        const response = await hr.fetch("/api/recruitments?status=all");
+        const list = (await response.json()) as RecruitmentListItemDto[];
+        expect(list.some((item) => item.title === probeMarker)).toBe(false);
+      },
+    },
+    {
+      name: "PATCH /api/recruitments/[id]",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId }) => ({
+        path: `/api/recruitments/${backendEngineerId}`,
+        init: { method: "PATCH", body: JSON.stringify({ status: "closed" }) },
+      }),
+      readBack: async (hr, { backendEngineerId }) => {
+        const response = await hr.fetch("/api/recruitments?status=all");
+        const list = (await response.json()) as RecruitmentListItemDto[];
+        const match = list.find((item) => item.id === backendEngineerId);
+        expect(match?.status).toBe("live");
+      },
+    },
+    {
+      name: "PUT /api/recruitments/[id]/stages",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId }) => ({
+        path: `/api/recruitments/${backendEngineerId}/stages`,
+        init: { method: "PUT", body: JSON.stringify({ stages: [{ name: "Injected Stage" }] }) },
+      }),
+      readBack: async (hr, { backendEngineerId }) => {
+        const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/stages`);
+        const stages = (await response.json()) as RecruitmentStagesDto;
+        expect(stages.stagesSource).toBe("default");
+        expect(stages.stages.some((stage) => stage.name === "Injected Stage")).toBe(false);
+      },
+    },
+    {
+      name: "DELETE /api/recruitments/[id]/stages",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId }) => ({
+        path: `/api/recruitments/${backendEngineerId}/stages`,
+        init: { method: "DELETE" },
+      }),
+      readBack: async (hr, { backendEngineerId }) => {
+        const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/stages`);
+        const stages = (await response.json()) as RecruitmentStagesDto;
+        expect(stages.stagesSource).toBe("default");
+      },
+    },
+    {
+      name: "POST /api/recruitments/[id]/candidates",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId, probeMarker }) => ({
+        path: `/api/recruitments/${backendEngineerId}/candidates`,
+        init: {
+          method: "POST",
+          body: JSON.stringify({ fullName: "Write Denial Probe", email: `${probeMarker}@example.com` }),
+        },
+      }),
+      readBack: async (hr, { backendEngineerId }) => {
+        const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/board`);
+        const board = (await response.json()) as KanbanBoardDto;
+        const allCandidates = board.stages.flatMap((stage) => stage.candidates);
+        expect(allCandidates.some((candidate) => candidate.fullName === "Write Denial Probe")).toBe(false);
+      },
+    },
+    {
+      name: "PATCH /api/recruitments/[id]/candidates/[candidateId]",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId, annaId, newStageId }) => ({
+        path: `/api/recruitments/${backendEngineerId}/candidates/${annaId}`,
+        init: { method: "PATCH", body: JSON.stringify({ toStageId: newStageId, note: "Write denial probe" }) },
+      }),
+      readBack: async (hr, { backendEngineerId, annaId }) => {
+        const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}`);
+        const detail = (await response.json()) as CandidateDetailDto;
+        expect(detail.fullName).toBe("Anna Kowalska");
+        const newStageNote = detail.notes.find((note) => note.stageName === "New");
+        expect(newStageNote?.body).toBeNull();
+      },
+    },
+    {
+      name: "PUT /api/recruitments/[id]/candidates/[candidateId]/notes",
+      expectedStatus: 404,
+      principal: "tenantPeer",
+      request: ({ backendEngineerId, annaId, newStageId }) => ({
+        path: `/api/recruitments/${backendEngineerId}/candidates/${annaId}/notes`,
+        init: { method: "PUT", body: JSON.stringify({ stageId: newStageId, body: "Write denial probe" }) },
+      }),
+      readBack: async (hr, { backendEngineerId, annaId }) => {
+        const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}`);
+        const detail = (await response.json()) as CandidateDetailDto;
+        const newStageNote = detail.notes.find((note) => note.stageName === "New");
+        expect(newStageNote?.body).toBeNull();
+      },
+    },
+  ];
+
+  it.each(WRITE_VERB_CASES)("$name denies the non-member and leaves state unchanged", async (testCase) => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const annaId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Anna Kowalska");
+    const newStageId = await stageIdByName(hr, backendEngineerId, "New");
+    const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+    const probeMarker = `write-denial-probe-${Math.random().toString(36).slice(2)}`;
+
+    const principal = await signInIntegrationClient(testCase.principal);
+    const { path, init } = testCase.request({ backendEngineerId, annaId, newStageId, hrGroupId, probeMarker });
+    const response = await principal.fetch(path, init);
+
+    expect(response.status).toBe(testCase.expectedStatus);
+    await testCase.readBack(hr, { backendEngineerId, annaId, probeMarker });
+  });
+});
+
+// The second denial axis: sufficient tenancy, insufficient operation.
+// The hiring-manager principal is a genuine member of Backend Engineer
+// (recruitment.read + candidate.read), so a denial here can never be
+// conflated with non-membership -- it is explicable only by the missing
+// write operation. The recruitments-write rows for this axis already
+// exist in index.integration.test.ts and are cross-referenced rather
+// than duplicated here.
+describe("#5 write surface: read-only principal denial (sufficient tenancy, insufficient operation)", () => {
+  it("the hiring manager is denied PUT stages on its own recruitment", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const response = await hiringManager.fetch(`/api/recruitments/${backendEngineerId}/stages`, {
+      method: "PUT",
+      body: JSON.stringify({ stages: [{ name: "Injected Stage" }] }),
+    });
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+
+    const stagesResponse = await hr.fetch(`/api/recruitments/${backendEngineerId}/stages`);
+    const stages = (await stagesResponse.json()) as RecruitmentStagesDto;
+    expect(stages.stagesSource).toBe("default");
+  });
+
+  it("the hiring manager is denied DELETE stages on its own recruitment", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const response = await hiringManager.fetch(`/api/recruitments/${backendEngineerId}/stages`, { method: "DELETE" });
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+  });
+
+  it("the hiring manager is denied POST candidates on its own recruitment", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const probeEmail = `hm-write-denial-probe-${Math.random().toString(36).slice(2)}@example.com`;
+    const response = await hiringManager.fetch(`/api/recruitments/${backendEngineerId}/candidates`, {
+      method: "POST",
+      body: JSON.stringify({ fullName: "HM Write Denial Probe", email: probeEmail }),
+    });
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+
+    const boardResponse = await hr.fetch(`/api/recruitments/${backendEngineerId}/board`);
+    const board = (await boardResponse.json()) as KanbanBoardDto;
+    const allCandidates = board.stages.flatMap((stage) => stage.candidates);
+    expect(allCandidates.some((candidate) => candidate.fullName === "HM Write Denial Probe")).toBe(false);
+  });
+
+  it("the hiring manager is denied PATCH (move stage) on a candidate in its own recruitment", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const annaId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Anna Kowalska");
+    const screeningStageId = await stageIdByName(hr, backendEngineerId, "Screening");
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const response = await hiringManager.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ toStageId: screeningStageId, note: "HM write denial probe" }),
+    });
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+
+    const detailResponse = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}`);
+    const detail = (await detailResponse.json()) as CandidateDetailDto;
+    expect(detail.currentStageId).not.toBe(screeningStageId);
+  });
+
+  it("the hiring manager is denied PUT notes on a candidate in its own recruitment", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const annaId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Anna Kowalska");
+    const newStageId = await stageIdByName(hr, backendEngineerId, "New");
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const response = await hiringManager.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}/notes`, {
+      method: "PUT",
+      body: JSON.stringify({ stageId: newStageId, body: "HM write denial probe" }),
+    });
+
+    expect(response.status).toBe(403);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+
+    const detailResponse = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}`);
+    const detail = (await detailResponse.json()) as CandidateDetailDto;
+    const newStageNote = detail.notes.find((note) => note.stageName === "New");
+    expect(newStageNote?.body).toBeNull();
+  });
+});
+
+// Service-layer pre-checks that exist only in TypeScript and are
+// therefore invisible to the SQL harness (supabase/tests/rls_verification.sql
+// impersonates a role and runs SQL directly -- it cannot exercise a
+// mismatched URL path segment, since that mismatch is a property of how
+// the HTTP handler wires two path params together, not of the database
+// state). These are the highest-value HTTP-only assertions in the
+// phase: the two `[id]`/`[candidateId]` scoping pre-checks
+// (candidates.ts:54-67, candidates.ts:187-199), the stageId
+// cross-recruitment guard (candidates.ts:216-222), the session-derived
+// note author invariant, and a characterization of the known
+// to_stage_id gap.
+describe("#5 write surface: service-layer pre-checks (HTTP-only, invisible to SQL impersonation)", () => {
+  it("PATCH candidate 404s when [id] and [candidateId] belong to different recruitments", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    // hr does not hold recruitment.write -- or even read -- on Data
+    // Analyst, so the tenant-peer client (a genuine member) resolves
+    // the candidate id here; the assertion below is issued by hr, whose
+    // real write is on Backend Engineer only. The mismatched
+    // [id]=backendEngineerId segment must 404 before any RPC or RLS
+    // check on Data Analyst is even reached, because moveCandidateStage's
+    // own recruitment_id scoping (candidates.ts:54-67) finds no row
+    // matching *both* candidateRecruitmentId and the URL's recruitment id.
+    const tenantPeer = await signInIntegrationClient("tenantPeer");
+    const dataAnalystId = await recruitmentIdByTitle(tenantPeer, "Data Analyst");
+    const boardResponse = await tenantPeer.fetch(`/api/recruitments/${dataAnalystId}/board`);
+    const board = (await boardResponse.json()) as KanbanBoardDto;
+    const tomaszId = board.stages
+      .flatMap((stage) => stage.candidates)
+      .find((candidate) => candidate.fullName === "Tomasz Kaminski")?.candidateRecruitmentId;
+    if (!tomaszId) {
+      throw new Error("fixture gap: Tomasz Kaminski not found on Data Analyst's board");
+    }
+    const newStageId = await stageIdByName(hr, backendEngineerId, "New");
+
+    const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${tomaszId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ toStageId: newStageId, note: "mismatch probe" }),
+    });
+
+    expect(response.status).toBe(404);
+  });
+
+  it("PUT notes 404s when [id] and [candidateId] belong to different recruitments", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const tenantPeer = await signInIntegrationClient("tenantPeer");
+    const dataAnalystId = await recruitmentIdByTitle(tenantPeer, "Data Analyst");
+    const boardResponse = await tenantPeer.fetch(`/api/recruitments/${dataAnalystId}/board`);
+    const board = (await boardResponse.json()) as KanbanBoardDto;
+    const tomaszId = board.stages
+      .flatMap((stage) => stage.candidates)
+      .find((candidate) => candidate.fullName === "Tomasz Kaminski")?.candidateRecruitmentId;
+    if (!tomaszId) {
+      throw new Error("fixture gap: Tomasz Kaminski not found on Data Analyst's board");
+    }
+    const newStageId = await stageIdByName(hr, backendEngineerId, "New");
+
+    const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${tomaszId}/notes`, {
+      method: "PUT",
+      body: JSON.stringify({ stageId: newStageId, body: "mismatch probe" }),
+    });
+
+    expect(response.status).toBe(404);
+  });
+
+  it("PUT notes 422s with a stageId from another recruitment's resolved stage set", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+
+    // A throwaway, test-created recruitment (never a seeded one -- see
+    // plan.md Phase 4's discipline, applied here too since it also
+    // mutates stage state). No candidates on it yet, so its stage set
+    // can still be replaced with an override.
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify({
+        title: `stage-cross-recruitment-probe-${Math.random().toString(36).slice(2)}`,
+        department: "Engineering",
+        location: "Remote",
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+        groupIds: [hrGroupId],
+      }),
+    });
+    const created = (await createResponse.json()) as { id: number };
+    // Off "draft" immediately -- tests/e2e/recruitments.spec.ts's status
+    // filter assertion depends on the draft count, the same discipline
+    // that spec's own beforeAll follows for recruitments it creates.
+    await hr.fetch(`/api/recruitments/${created.id}`, { method: "PATCH", body: JSON.stringify({ status: "closed" }) });
+
+    const stagesResponse = await hr.fetch(`/api/recruitments/${created.id}/stages`, {
+      method: "PUT",
+      body: JSON.stringify({ stages: [{ name: "Foreign Override Stage" }] }),
+    });
+    const stages = (await stagesResponse.json()) as RecruitmentStagesDto;
+    const foreignStageId = stages.stages[0].id;
+
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const annaId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Anna Kowalska");
+
+    const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${annaId}/notes`, {
+      method: "PUT",
+      body: JSON.stringify({ stageId: foreignStageId, body: "cross-recruitment stage probe" }),
+    });
+
+    expect(response.status).toBe(422);
+    const body = (await response.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("invalid_request");
+  });
+
+  it("a note's stored authorEmail is the caller's session identity, never a request-body value", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+    const piotrId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Piotr Nowak");
+    const screeningStageId = await stageIdByName(hr, backendEngineerId, "Screening");
+
+    // UpsertCandidateNoteCommand carries no author field (types.ts:99),
+    // so this extra key has no schema slot to land in -- created_by is
+    // derived from the session (candidates.ts:202-208). Sending it
+    // anyway pins that a future careless schema addition can't
+    // accidentally start trusting it.
+    const response = await hr.fetch(`/api/recruitments/${backendEngineerId}/candidates/${piotrId}/notes`, {
+      method: "PUT",
+      body: JSON.stringify({
+        stageId: screeningStageId,
+        body: "author invariant probe",
+        authorEmail: "attacker@example.com",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    const note = (await response.json()) as { authorEmail: string | null };
+    expect(note.authorEmail).toBe("hr.test@example.com");
+  });
+
+  // Characterization, not a fix: move_candidate_stage does not verify
+  // that to_stage_id belongs to the target recruitment's own resolved
+  // stage set. A *foreign override* stage is caught incidentally by the
+  // BEFORE UPDATE consistency trigger (kanban_stage_customization
+  // migration, :54-74) because its recruitment_id doesn't match the
+  // candidate's own -- but a *global default* stage id is accepted
+  // unconditionally, because default rows have recruitment_id null and
+  // the trigger only compares when it's non-null. Both rows pin
+  // whichever behaviour is current; neither endorses it as sufficient.
+  describe("known gap: move_candidate_stage's to_stage_id is not scoped to the recruitment's own stage set", () => {
+    it("moving to a foreign recruitment's override stage is rejected by the consistency trigger", async () => {
+      const hr = await signInIntegrationClient("hr");
+      const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+
+      const createA = await hr.fetch("/api/recruitments", {
+        method: "POST",
+        body: JSON.stringify({
+          title: `stage-gap-probe-a-${Math.random().toString(36).slice(2)}`,
+          department: "Engineering",
+          location: "Remote",
+          employmentType: "full-time",
+          openedAt: "2026-01-01",
+          groupIds: [hrGroupId],
+        }),
+      });
+      const recruitmentA = (await createA.json()) as { id: number };
+      await hr.fetch(`/api/recruitments/${recruitmentA.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "closed" }),
+      });
+
+      const createB = await hr.fetch("/api/recruitments", {
+        method: "POST",
+        body: JSON.stringify({
+          title: `stage-gap-probe-b-${Math.random().toString(36).slice(2)}`,
+          department: "Engineering",
+          location: "Remote",
+          employmentType: "full-time",
+          openedAt: "2026-01-01",
+          groupIds: [hrGroupId],
+        }),
+      });
+      const recruitmentB = (await createB.json()) as { id: number };
+      await hr.fetch(`/api/recruitments/${recruitmentB.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "closed" }),
+      });
+
+      await hr.fetch(`/api/recruitments/${recruitmentA.id}/stages`, {
+        method: "PUT",
+        body: JSON.stringify({ stages: [{ name: "A Stage One" }, { name: "A Stage Two" }] }),
+      });
+      const stagesBResponse = await hr.fetch(`/api/recruitments/${recruitmentB.id}/stages`, {
+        method: "PUT",
+        body: JSON.stringify({ stages: [{ name: "B Stage One" }] }),
+      });
+      const stagesB = (await stagesBResponse.json()) as RecruitmentStagesDto;
+      const foreignOverrideStageId = stagesB.stages[0].id;
+
+      const addResponse = await hr.fetch(`/api/recruitments/${recruitmentA.id}/candidates`, {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: "Stage Gap Probe",
+          email: `stage-gap-probe-${Math.random().toString(36).slice(2)}@example.com`,
+        }),
+      });
+      const added = (await addResponse.json()) as { candidateRecruitmentId: number };
+
+      const moveResponse = await hr.fetch(
+        `/api/recruitments/${recruitmentA.id}/candidates/${added.candidateRecruitmentId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ toStageId: foreignOverrideStageId, note: "stage gap probe" }),
+        },
+      );
+
+      expect(moveResponse.status).toBe(422);
+      const body = (await moveResponse.json()) as ApiErrorBody;
+      expect(body.error.code).toBe("invalid_request");
+    });
+
+    it("moving to a global default stage id is accepted unconditionally, regardless of the recruitment's own override set", async () => {
+      const hr = await signInIntegrationClient("hr");
+      const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+
+      const createResponse = await hr.fetch("/api/recruitments", {
+        method: "POST",
+        body: JSON.stringify({
+          title: `stage-gap-probe-default-${Math.random().toString(36).slice(2)}`,
+          department: "Engineering",
+          location: "Remote",
+          employmentType: "full-time",
+          openedAt: "2026-01-01",
+          groupIds: [hrGroupId],
+        }),
+      });
+      const recruitment = (await createResponse.json()) as { id: number };
+      await hr.fetch(`/api/recruitments/${recruitment.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "closed" }),
+      });
+
+      await hr.fetch(`/api/recruitments/${recruitment.id}/stages`, {
+        method: "PUT",
+        body: JSON.stringify({ stages: [{ name: "Only Override Stage" }] }),
+      });
+
+      const addResponse = await hr.fetch(`/api/recruitments/${recruitment.id}/candidates`, {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: "Stage Gap Default Probe",
+          email: `stage-gap-default-probe-${Math.random().toString(36).slice(2)}@example.com`,
+        }),
+      });
+      const added = (await addResponse.json()) as { candidateRecruitmentId: number };
+
+      // A global default stage's recruitment_id is null -- the
+      // consistency trigger only compares when the stage's
+      // recruitment_id is non-null, so this succeeds even though
+      // "New" is not part of this recruitment's own override set.
+      const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
+      const defaultNewStageId = await stageIdByName(hr, backendEngineerId, "New");
+
+      const moveResponse = await hr.fetch(
+        `/api/recruitments/${recruitment.id}/candidates/${added.candidateRecruitmentId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ toStageId: defaultNewStageId, note: "stage gap default probe" }),
+        },
+      );
+
+      expect(moveResponse.status).toBe(200);
+    });
   });
 });
