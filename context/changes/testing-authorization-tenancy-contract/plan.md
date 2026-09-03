@@ -10,7 +10,7 @@ per-recruitment PII), and **#5** (a principal lacking the write operation
 succeeding at a write).
 
 The suite cannot be written until a fixture gap is closed first: today's
-non-member fixture is *also* unprivileged, so every denial it produces is
+non-member fixture is _also_ unprivileged, so every denial it produces is
 ambiguous. Phase 1 therefore opens with a seed change, and only then writes
 assertions.
 
@@ -44,11 +44,11 @@ named anti-pattern ("testing one write endpoint and generalising").
 **The blocking fixture gap.** `supabase/seed.sql:31-105` seeds three principals,
 each in exactly one group, and exactly one recruitment:
 
-| Principal | Group | Operations |
-|---|---|---|
-| `hr.test@example.com` | HR/Rekruter | `recruitment.read/write`, `candidate.read/write` |
-| `hiring-manager.test@example.com` | Hiring Manager | `recruitment.read`, `candidate.read` |
-| `admin.test@example.com` | Administrator | `group.manage` **only** |
+| Principal                         | Group          | Operations                                       |
+| --------------------------------- | -------------- | ------------------------------------------------ |
+| `hr.test@example.com`             | HR/Rekruter    | `recruitment.read/write`, `candidate.read/write` |
+| `hiring-manager.test@example.com` | Hiring Manager | `recruitment.read`, `candidate.read`             |
+| `admin.test@example.com`          | Administrator  | `group.manage` **only**                          |
 
 The seed comment designates the Administrator as the cross-group-isolation
 fixture, but it conflates two axes: holding no `recruitment.*` operation at all,
@@ -86,19 +86,19 @@ test plus the recipe for constructing an out-of-group principal.
   named anti-pattern.
 - **`getCandidateDetail` is already recruitment-scoped**
   (`src/lib/services/candidates.ts:107` — `.eq("recruitment_id", recruitmentId)`),
-  so per-recruitment fields are unreachable to a non-member *by construction*.
+  so per-recruitment fields are unreachable to a non-member _by construction_.
   The only HTTP-observable **shared**-profile surface is the `PA003`
   `candidate_name_mismatch` path in `add_candidate_to_recruitment`
   (`20260901210500_candidate_write_rpcs.sql:64-71`), which fires **after** the
   three authorization checks at `:37-46`. That is the positive half of the split.
 - **Two grant tiers by design.** `private.has_operation(op)` is
   recruitment-independent; `private.has_recruitment_operation(id, op)` requires
-  membership **and** the operation on the *same* group
+  membership **and** the operation on the _same_ group
   (`go.group_id = rsg.group_id`, `20260831195143_mark_rls_helpers_stable.sql:5-36`).
   No seed fixture is in two groups, so that conjunct has never been exercised.
 - **"No policy" is the deny mechanism.** Table grants
   (`20260831183457_rls_policies.sql:234-244`) are narrowed to verbs that have
-  policies, so e.g. `DELETE` on `recruitments` fails at the *grant* layer as
+  policies, so e.g. `DELETE` on `recruitments` fails at the _grant_ layer as
   `42501`, not via RLS. Assert the **effect** (no row change), never a specific
   SQLSTATE origin.
 - **Harness constraints are non-obvious.** `integration-client.ts` needs
@@ -108,7 +108,7 @@ test plus the recipe for constructing an out-of-group principal.
   never assert on global counts.
 - **CI has three readiness gates**, each added after a real flake
   (`.github/workflows/ci.yml:51-99`): poll `/api/security-groups`, poll a second
-  *distinct* route because Astro dev's Vite optimizer reloads dep bundles per
+  _distinct_ route because Astro dev's Vite optimizer reloads dep bundles per
   route module graph, then a real curl sign-in retried until 200 because
   GoTrue/PostgREST clock skew yields `PGRST303`. **A new suite touching new
   route module graphs inherits this hazard.**
@@ -135,7 +135,7 @@ test plus the recipe for constructing an out-of-group principal.
   (`recruiter-customizes-kanban-stages/reviews/impl-review.md:29`). Follow-up,
   noted in the epilogue.
 - **Not resolving the Hiring Manager vs Recruiter scope question**
-  (`roadmap.md:100`). Tests pin *today's* coarse split and must not be read as
+  (`roadmap.md:100`). Tests pin _today's_ coarse split and must not be read as
   settling the product question.
 - **No unit tests and no e2e specs.** Every assertion here needs a live database
   and a real session cookie; the browser crossing adds nothing.
@@ -174,8 +174,8 @@ suite's first test will race the optimizer exactly as three prior flakes did.
 
 ### Overview
 
-Close the fixture gap: add a principal with the *same powers as HR but in a
-different tenant*, a recruitment only that principal can see, a principal in no
+Close the fixture gap: add a principal with the _same powers as HR but in a
+different tenant_, a recruitment only that principal can see, a principal in no
 group at all, and a principal in two groups. This is the only phase that changes
 the baseline every other test runs against, so it ships alone.
 
@@ -192,6 +192,7 @@ merely coincident with lack of privilege. Update the stale block comment at
 claim is what misled the existing assertions.
 
 **Contract**:
+
 - A fourth group with operations **identical** to `HR/Rekruter`
   (`recruitment.read`, `recruitment.write`, `candidate.read`, `candidate.write`)
   — the "same powers, wrong tenant" tier. Name it distinctly from the three PRD
@@ -202,7 +203,7 @@ claim is what misled the existing assertions.
   fourth group; one in **no** group; one in **both** `HR/Rekruter` and the
   fourth group (the multi-group principal); and — for the
   `go.group_id = rsg.group_id` conjunct specifically — a principal whose
-  write-holding group is *not* attached to the recruitment while its
+  write-holding group is _not_ attached to the recruitment while its
   read-holding group is.
 - A second `recruitments` row linked via `recruitment_security_groups` to the
   fourth group **only**. Its `status` must not perturb
@@ -212,11 +213,11 @@ claim is what misled the existing assertions.
   `candidate_recruitment_status_history` row, mirroring the existing pattern at
   `:107-141`. Needed for the risk #4 split.
 - **All group and stage lookups by name** (`select id from security_groups where
-  name = …`), never by literal id.
+name = …`), never by literal id.
 
 **Note on the multi-group requirement**: exercising the same-group conjunct
 requires a principal holding the operation in group A and membership of
-attached group B where A is *not* attached. Satisfying both (c) and (d) may need
+attached group B where A is _not_ attached. Satisfying both (c) and (d) may need
 the two users listed above rather than one; resolve during implementation and
 keep the group→operation→attachment mapping in a comment, because the predicate
 is not readable from the seed rows alone.
@@ -230,7 +231,7 @@ harness, so no test forges a cookie or invents a second harness.
 
 **Contract**: Extend the `SEEDED_CREDENTIALS` map (`:18-22`) with one key per new
 principal; `SeededRole` widens automatically via `keyof typeof`. Keys should name
-the *authorization role in the contract* (the tenant-peer principal, the
+the _authorization role in the contract_ (the tenant-peer principal, the
 no-group principal, the multi-group principal), not the person — the test bodies
 read as propositions about principals. No other change: the sign-in flow,
 `Origin` header, and `redirect: "manual"` behaviour stay as they are.
@@ -329,16 +330,16 @@ on a global count.
   no stage or `added_at` from R. Because `getCandidateDetail` is already scoped
   by `recruitment_id` (`candidates.ts:107`), the observable form is a 404 on the
   candidate-detail and board routes for R — assert that, and state in a comment
-  *why* it is a 404 rather than a filtered payload, so a future reader does not
+  _why_ it is a 404 rather than a filtered payload, so a future reader does not
   mistake it for a missing-row bug.
 - **Risk #4, the positive half.** The tenant-peer principal — a member of its
   own recruitment, holding `candidate.write`, and **not** a member of
   `Backend Engineer` — POSTs a candidate whose email already exists under a
   different name on `Backend Engineer`, and receives `422
-  candidate_name_mismatch` (`PA003`). This is the **intended** shared-profile
+candidate_name_mismatch` (`PA003`). This is the **intended** shared-profile
   behaviour and the only HTTP-observable proof that identity is org-wide while
   per-recruitment fields are not. The comment must record that `PA003` fires
-  *after* the three authorization checks
+  _after_ the three authorization checks
   (`20260901210500_candidate_write_rpcs.sql:37-46,64-71`), so the leak is bounded
   to callers who already hold write on some recruitment — and that this is
   PRD-sourced (`prd.md:91` FR-007), not a defect.
@@ -348,7 +349,7 @@ on a global count.
   creation time (`core-recruitment-data-foundation/plan.md:163`). Assert the
   expected group names explicitly rather than leaving it implicit — group names
   are organisational metadata, and an intentional exposure deserves a visible
-  pin so an *unintentional* widening elsewhere is caught.
+  pin so an _unintentional_ widening elsewhere is caught.
 
 #### 2. CI readiness probe
 
@@ -361,7 +362,7 @@ optimizer flakes.
 **Contract**: Add a poll loop in the same shape as the two at `:57-73`, for a
 route in a graph none of the current probes touch (the board or notes route).
 Keep the existing no-`-f` convention — any HTTP response, including 401/404,
-means ready. Add a comment naming *which* graph it covers and why, matching the
+means ready. Add a comment naming _which_ graph it covers and why, matching the
 density of the comments already there.
 
 ### Success Criteria:
@@ -401,22 +402,22 @@ impersonation structurally cannot reach.
 
 **File**: `src/pages/api/authorization.integration.test.ts`
 
-**Intent**: Prove that every write endpoint denies a non-member *and* leaves
+**Intent**: Prove that every write endpoint denies a non-member _and_ leaves
 persisted state unchanged, enumerated per verb so a newly added endpoint's
 absence is visible.
 
 **Contract**: A table-driven block covering exactly these seven verbs, so the
 enumeration itself is reviewable:
 
-| Verb | Route |
-|---|---|
-| `POST` | `/api/recruitments` |
-| `PATCH` | `/api/recruitments/[id]` |
-| `PUT` | `/api/recruitments/[id]/stages` |
-| `DELETE` | `/api/recruitments/[id]/stages` |
-| `POST` | `/api/recruitments/[id]/candidates` |
-| `PATCH` | `/api/recruitments/[id]/candidates/[candidateId]` |
-| `PUT` | `/api/recruitments/[id]/candidates/[candidateId]/notes` |
+| Verb     | Route                                                   |
+| -------- | ------------------------------------------------------- |
+| `POST`   | `/api/recruitments`                                     |
+| `PATCH`  | `/api/recruitments/[id]`                                |
+| `PUT`    | `/api/recruitments/[id]/stages`                         |
+| `DELETE` | `/api/recruitments/[id]/stages`                         |
+| `POST`   | `/api/recruitments/[id]/candidates`                     |
+| `PATCH`  | `/api/recruitments/[id]/candidates/[candidateId]`       |
+| `PUT`    | `/api/recruitments/[id]/candidates/[candidateId]/notes` |
 
 Each row asserts, as the tenant-peer principal against `Backend Engineer`:
 a non-2xx response, **and** a read-back by the HR principal showing the target
@@ -460,8 +461,9 @@ with legitimate write on recruitment X addressing a candidate row belonging to
 recruitment Y.
 
 **Contract**: As the HR principal, holding real write on its own recruitment,
-issue requests whose `[id]` and `[candidateId]` belong to *different*
+issue requests whose `[id]` and `[candidateId]` belong to _different_
 recruitments, and assert the pre-check rejects them:
+
 - `PATCH .../candidates/[candidateId]` — `moveCandidateStage`'s `id` +
   `recruitment_id` scoping (`candidates.ts:54-67`), which exists because the RPC
   resolves its own recruitment from `candidateRecruitmentId`.
@@ -631,8 +633,8 @@ the deliberate departure from §6.2's convention.
 reason), **Naming**, **Reference test**
 (`src/pages/api/authorization.integration.test.ts`), **Run locally**
 (`npm run test:integration`, plus `npm run test:rls` for the database layer), and
-the pattern itself: *how to construct a principal outside the assigned security
-group* — name the tenant-peer principal, state that it holds HR-equivalent
+the pattern itself: _how to construct a principal outside the assigned security
+group_ — name the tenant-peer principal, state that it holds HR-equivalent
 operations so a denial is attributable to tenancy rather than privilege, and
 state the paired-read-back rule (a status code alone is not evidence of a data
 boundary). §6.2 gains one line noting that cross-cutting authorization
@@ -672,7 +674,7 @@ passes, pause for manual confirmation, then the change is ready for
 
 ## Testing Strategy
 
-This change *is* tests, so the strategy is about how the new assertions are
+This change _is_ tests, so the strategy is about how the new assertions are
 themselves trustworthy.
 
 ### Unit Tests:
@@ -768,7 +770,7 @@ commit message.
   verified-safe behaviour instead of the originally planned permissive one.
 - **Follow-up, out of scope**: audit the 33 existing SQL assertions for the
   tautology class (`recruiter-customizes-kanban-stages/reviews/impl-review.md:29`).
-  If an *isolation* assertion is tautological, the isolation proof is illusory —
+  If an _isolation_ assertion is tautological, the isolation proof is illusory —
   which would undercut the confidence this phase claims to establish.
 - **`test:rls` is not blocking in CI** and its `docker exec` container name is
   environment-specific. Test-plan §3 Phase 4 owns hardening it.
@@ -835,30 +837,30 @@ commit message.
 
 #### Automated
 
-- [x] 4.1 The full suite passes
-- [x] 4.2 E2E tests still pass, proving seeded scoping was not disturbed
-- [x] 4.3 Linting passes
-- [x] 4.4 Type checking passes
+- [x] 4.1 The full suite passes — 5ee192e
+- [x] 4.2 E2E tests still pass, proving seeded scoping was not disturbed — 5ee192e
+- [x] 4.3 Linting passes — 5ee192e
+- [x] 4.4 Type checking passes — 5ee192e
 
 #### Manual
 
-- [x] 4.5 Characterization block makes clear a passing test documents a weakness, not an endorsement
-- [x] 4.6 Both halves cite the prior SKIPPED decision by path and line
-- [x] 4.7 The DELETE half records that it lacks the INSERT half's justification and is open for decision
-- [x] 4.8 Mutations touch only test-created recruitments
+- [x] 4.5 Characterization block makes clear a passing test documents a weakness, not an endorsement — 5ee192e
+- [x] 4.6 Both halves cite the prior SKIPPED decision by path and line — 5ee192e
+- [x] 4.7 The DELETE half records that it lacks the INSERT half's justification and is open for decision — 5ee192e
+- [x] 4.8 Mutations touch only test-created recruitments — 5ee192e
 
 ### Phase 5: Runnability and Cookbook
 
 #### Automated
 
-- [ ] 5.1 `npm run test:rls` runs the harness and all 33 assertions pass
-- [ ] 5.2 The full test suite passes
-- [ ] 5.3 Linting passes
-- [ ] 5.4 Formatting is clean
+- [x] 5.1 `npm run test:rls` runs the harness and all 33 assertions pass
+- [x] 5.2 The full test suite passes
+- [x] 5.3 Linting passes
+- [x] 5.4 Formatting is clean
 
 #### Manual
 
-- [ ] 5.5 §6.4 answers "how do I add an authorization test for a new endpoint?" standalone
-- [ ] 5.6 §6.4 names the out-of-group principal recipe and the paired-read-back rule
-- [ ] 5.7 The SQL file's header no longer recommends a command that cannot work
-- [ ] 5.8 §3 Phase 1 reads `complete`
+- [x] 5.5 §6.4 answers "how do I add an authorization test for a new endpoint?" standalone
+- [x] 5.6 §6.4 names the out-of-group principal recipe and the paired-read-back rule
+- [x] 5.7 The SQL file's header no longer recommends a command that cannot work
+- [x] 5.8 §3 Phase 1 reads `complete`

@@ -6,7 +6,10 @@
 -- persists. Any failed assertion raises an exception, making this
 -- script exit non-zero.
 --
--- Run with: npx supabase db query --local -f supabase/tests/rls_verification.sql
+-- Run with: npm run test:rls
+-- (not `npx supabase db query --local -f …`: that form cannot insert
+-- multiple commands into a prepared statement, so it cannot run this
+-- multi-statement script.)
 
 -- (1) The seeded HR user can SELECT the seeded recruitment and candidates.
 begin;

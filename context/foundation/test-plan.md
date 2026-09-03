@@ -19,9 +19,9 @@ Tests follow three non-negotiable principles for this project:
 2. **User concerns are first-class evidence.** Risks anchored in "the team
    is worried about X, and the failure would surface somewhere in `<area>`"
    carry the same weight as PRD lines or hot-spot data.
-3. **Risks are scenarios, not code locations.** This plan documents *what
-   could fail* and *why we believe it's likely* — drawn from documents,
-   interview, and codebase *signal* (churn, structure, test base). It does
+3. **Risks are scenarios, not code locations.** This plan documents _what
+   could fail_ and _why we believe it's likely_ — drawn from documents,
+   interview, and codebase _signal_ (churn, structure, test base). It does
    NOT claim to know which line owns the failure. That knowledge is
    produced by `/10x-research` during each rollout phase. If the plan and
    research disagree about where the failure lives, research is the
@@ -39,34 +39,34 @@ should re-open the interview.
 
 The top failure scenarios this project must protect against, ordered by
 risk = impact × likelihood. Risks are failure scenarios in user / business
-terms, not test names. The Source column cites the *evidence that surfaced
-this risk* — never a specific file as "where the failure lives" (that is
+terms, not test names. The Source column cites the _evidence that surfaced
+this risk_ — never a specific file as "where the failure lives" (that is
 research's job, see §1 principle #3).
 
-| # | Risk (failure scenario) | Impact | Likelihood | Source (evidence — not anchor) |
-|---|---|---|---|---|
-| 1 | A user reads or edits a recruitment belonging to a security group they are not a member of | High | High | PRD FR-001a `prd.md:81`; must-not `prd.md:46,117`; roadmap F-01 RLS `roadmap.md:44,78,80`; hot-spot dirs `src/pages/api` (19 commits/30d), `src/lib/services` (18), `supabase/tests/` (9) |
-| 2 | A CV upload reports success but the file is unretrievable, or a disallowed type/size is accepted | High | High | PRD FR-012 and "file loss unacceptable" `prd.md:47,97`; Worker-proxy upload failure class `infrastructure.md:65,84,102`; slice `candidate-profile-and-cv-upload` at 9/43 with all upload verification unchecked |
-| 3 | An expired CV is still downloadable, or retention silently never runs | High | High | PRD FR-013a `prd.md:100,119`; byte deletion is manual with no scheduler by explicit decision `candidate-profile-and-cv-upload/change.md:24-27`; `has_background_jobs: false` `tech-stack.md:19` |
-| 4 | A shared candidate profile exposes PII from a recruitment the viewer cannot see | High | Medium | PRD shared-entity model `prd.md:90-92`; hot-spot dir `src/lib/services` (18 commits/30d) |
-| 5 | A principal lacking the write operation succeeds at a write (read-only Hiring Manager) | High | Medium | PRD roles `prd.md:26-32,136-139`; unresolved authz boundary `roadmap.md:100`; admin UI deferred and groups hand-seeded `roadmap.md:51,174` |
-| 6 | A stage move persists without the required per-stage interview note | High | Medium | PRD hard gate `prd.md:123-125`; business rule revised mid-flight, Reading A superseded by Reading B `recruiter-manages-candidate-status/change.md:14-28` |
+| #   | Risk (failure scenario)                                                                          | Impact | Likelihood | Source (evidence — not anchor)                                                                                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------ | ------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | A user reads or edits a recruitment belonging to a security group they are not a member of       | High   | High       | PRD FR-001a `prd.md:81`; must-not `prd.md:46,117`; roadmap F-01 RLS `roadmap.md:44,78,80`; hot-spot dirs `src/pages/api` (19 commits/30d), `src/lib/services` (18), `supabase/tests/` (9)                       |
+| 2   | A CV upload reports success but the file is unretrievable, or a disallowed type/size is accepted | High   | High       | PRD FR-012 and "file loss unacceptable" `prd.md:47,97`; Worker-proxy upload failure class `infrastructure.md:65,84,102`; slice `candidate-profile-and-cv-upload` at 9/43 with all upload verification unchecked |
+| 3   | An expired CV is still downloadable, or retention silently never runs                            | High   | High       | PRD FR-013a `prd.md:100,119`; byte deletion is manual with no scheduler by explicit decision `candidate-profile-and-cv-upload/change.md:24-27`; `has_background_jobs: false` `tech-stack.md:19`                 |
+| 4   | A shared candidate profile exposes PII from a recruitment the viewer cannot see                  | High   | Medium     | PRD shared-entity model `prd.md:90-92`; hot-spot dir `src/lib/services` (18 commits/30d)                                                                                                                        |
+| 5   | A principal lacking the write operation succeeds at a write (read-only Hiring Manager)           | High   | Medium     | PRD roles `prd.md:26-32,136-139`; unresolved authz boundary `roadmap.md:100`; admin UI deferred and groups hand-seeded `roadmap.md:51,174`                                                                      |
+| 6   | A stage move persists without the required per-stage interview note                              | High   | Medium     | PRD hard gate `prd.md:123-125`; business rule revised mid-flight, Reading A superseded by Reading B `recruiter-manages-candidate-status/change.md:14-28`                                                        |
 
 Risks #1, #4, #5 are the abuse lens (authorization / IDOR — does the request
-check *membership and operation*, not merely *authentication*?). Risk #2
+check _membership and operation_, not merely _authentication_?). Risk #2
 carries the untrusted-input and resource-abuse lens (server-side MIME and
 size parity). Risk #3 is PII retention, GDPR-adjacent.
 
 ### Risk Response Guidance
 
-| Risk | What would prove protection | Must challenge | Context `/10x-research` must ground | Likely cheapest layer | Anti-pattern to avoid |
-|---|---|---|---|---|---|
-| #1 | A request authenticated as a non-member receives no rows and produces no write effect — not merely a redirect or a 403 page | "The middleware redirects unauthenticated users, therefore the API is protected" | Where group membership is resolved on a request; whether any code path uses a privileged client that bypasses row-level scoping | Integration (HTTP against live database) | Asserting the redirect or status code instead of the data boundary and the absence of a write |
-| #2 | An upload the API reported successful is afterwards retrievable byte-for-byte; oversize and wrong-MIME uploads are refused server-side, not only in the form | "The signed URL returned 200, therefore the object exists"; "the client validated the type" | The two-phase signed-upload contract and where MIME and size are actually enforced; what state a half-completed upload leaves behind | Integration, plus one e2e over the real upload flow | Mocking storage — the failure this risk describes lives precisely at that boundary |
-| #3 | A CV past its expiry is refused at read time, and the purge operation is idempotent and leaves the tombstone row intact | "The trigger sets the expiry column, therefore access stops"; "purge ran once, so it is correct" | Where the read-time expiry check happens; tombstone semantics after byte deletion; how time is controlled in a test | Integration with controlled clock | Asserting the stored expiry value instead of the access decision it is supposed to drive |
-| #4 | A candidate visible through one recruitment does not leak notes, status, or CV belonging to another recruitment the viewer cannot see | "The candidate profile is a shared entity, so full visibility of it is correct" | Which fields are per-recruitment versus shared; the join shape used to assemble a profile | Integration | Exercising only the shared fields, where by construction no leak is possible |
-| #5 | A principal holding read-only grants is denied every write operation, checked per operation rather than per role | "Roles are coarse today, so this is future work" | The operation enum and how a grant is resolved for a request | Integration | Testing one write endpoint and generalising the result to the rest |
-| #6 | A move out of a stage without a non-blank note on *that* stage is rejected and leaves persisted state unchanged | "A 422 was returned, therefore nothing was written"; "one note per candidate suffices" (the superseded Reading A) | That the RPC is the sole stage-write path; the note uniqueness key under Reading B | Integration, plus unit on the guard | Copying the expected error identifier out of the implementation under test — the oracle must come from the PRD rule, not the code |
+| Risk | What would prove protection                                                                                                                                  | Must challenge                                                                                                    | Context `/10x-research` must ground                                                                                                  | Likely cheapest layer                               | Anti-pattern to avoid                                                                                                             |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| #1   | A request authenticated as a non-member receives no rows and produces no write effect — not merely a redirect or a 403 page                                  | "The middleware redirects unauthenticated users, therefore the API is protected"                                  | Where group membership is resolved on a request; whether any code path uses a privileged client that bypasses row-level scoping      | Integration (HTTP against live database)            | Asserting the redirect or status code instead of the data boundary and the absence of a write                                     |
+| #2   | An upload the API reported successful is afterwards retrievable byte-for-byte; oversize and wrong-MIME uploads are refused server-side, not only in the form | "The signed URL returned 200, therefore the object exists"; "the client validated the type"                       | The two-phase signed-upload contract and where MIME and size are actually enforced; what state a half-completed upload leaves behind | Integration, plus one e2e over the real upload flow | Mocking storage — the failure this risk describes lives precisely at that boundary                                                |
+| #3   | A CV past its expiry is refused at read time, and the purge operation is idempotent and leaves the tombstone row intact                                      | "The trigger sets the expiry column, therefore access stops"; "purge ran once, so it is correct"                  | Where the read-time expiry check happens; tombstone semantics after byte deletion; how time is controlled in a test                  | Integration with controlled clock                   | Asserting the stored expiry value instead of the access decision it is supposed to drive                                          |
+| #4   | A candidate visible through one recruitment does not leak notes, status, or CV belonging to another recruitment the viewer cannot see                        | "The candidate profile is a shared entity, so full visibility of it is correct"                                   | Which fields are per-recruitment versus shared; the join shape used to assemble a profile                                            | Integration                                         | Exercising only the shared fields, where by construction no leak is possible                                                      |
+| #5   | A principal holding read-only grants is denied every write operation, checked per operation rather than per role                                             | "Roles are coarse today, so this is future work"                                                                  | The operation enum and how a grant is resolved for a request                                                                         | Integration                                         | Testing one write endpoint and generalising the result to the rest                                                                |
+| #6   | A move out of a stage without a non-blank note on _that_ stage is rejected and leaves persisted state unchanged                                              | "A 422 was returned, therefore nothing was written"; "one note per candidate suffices" (the superseded Reading A) | That the RPC is the sole stage-write path; the note uniqueness key under Reading B                                                   | Integration, plus unit on the guard                 | Copying the expected error identifier out of the implementation under test — the oracle must come from the PRD rule, not the code |
 
 ## 3. Phased Rollout
 
@@ -74,12 +74,12 @@ Each row is a discrete rollout phase that will open its own change folder
 via `/10x-new`. Status moves left-to-right through the values below; the
 orchestrator updates Status as artifacts appear on disk.
 
-| # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
-|---|---|---|---|---|---|---|
-| 1 | Authorization and tenancy contract | Prove a non-member gets no data and no write effect across every domain endpoint | #1, #4, #5 | integration (HTTP against live database) | change opened | `context/changes/testing-authorization-tenancy-contract/` |
-| 2 | Business-rule gates | Prove the per-stage note gate holds server-side and a blocked move writes nothing | #6 | integration + unit | not started | — |
-| 3 | CV lifecycle and retention | Prove uploads are retrievable, bad input is refused, expired CVs are unreachable, and purge is idempotent | #2, #3 | integration + one e2e | not started | — |
-| 4 | Gate hardening | Make the new suites required gates rather than optional, and consolidate §6 | cross-cutting | gates | not started | — |
+| #   | Phase name                         | Goal (one line)                                                                                           | Risks covered | Test types                               | Status      | Change folder                                             |
+| --- | ---------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------- | ----------- | --------------------------------------------------------- |
+| 1   | Authorization and tenancy contract | Prove a non-member gets no data and no write effect across every domain endpoint                          | #1, #4, #5    | integration (HTTP against live database) | complete    | `context/changes/testing-authorization-tenancy-contract/` |
+| 2   | Business-rule gates                | Prove the per-stage note gate holds server-side and a blocked move writes nothing                         | #6            | integration + unit                       | not started | —                                                         |
+| 3   | CV lifecycle and retention         | Prove uploads are retrievable, bad input is refused, expired CVs are unreachable, and purge is idempotent | #2, #3        | integration + one e2e                    | not started | —                                                         |
+| 4   | Gate hardening                     | Make the new suites required gates rather than optional, and consolidate §6                               | cross-cutting | gates                                    | not started | —                                                         |
 
 Ordering note: Phase 3 must not open until the `candidate-profile-and-cv-upload`
 slice reaches full Progress. Testing its unbuilt phases would be
@@ -96,17 +96,18 @@ into CI, but the 13 existing test files cluster on the recruitments,
 stages, and candidates feature. Auth, middleware, authorization through the
 running application, and the CV lifecycle are bare.
 
-| Layer | Tool | Version | Notes |
-|---|---|---|---|
-| unit | Vitest | ^3 | jsdom + Testing Library; `npm run test` |
-| integration | Vitest (separate config) | ^3 | Runs HTTP against a live local Supabase; `npm run test:integration` |
-| e2e | Playwright | ^1 | Chromium, database reset to pristine seed before the run; `npm run test:e2e` |
-| database policy checks | SQL verification script under `supabase/tests/` | n/a | Exercises row-level policies directly, outside the application |
-| API mocking | none | n/a | Deliberate — integration tests run against the real database, not a mock |
-| accessibility | none yet | n/a | `eslint-plugin-jsx-a11y` covers static rules only; no runtime axe check |
-| (optional) AI-native | Playwright MCP — checked: 2026-09-02 | n/a | When NOT to use: any assertion a deterministic integration test can already make. Reserved for exploratory checks on surfaces without a stable selector. |
+| Layer                  | Tool                                            | Version | Notes                                                                                                                                                    |
+| ---------------------- | ----------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unit                   | Vitest                                          | ^3      | jsdom + Testing Library; `npm run test`                                                                                                                  |
+| integration            | Vitest (separate config)                        | ^3      | Runs HTTP against a live local Supabase; `npm run test:integration`                                                                                      |
+| e2e                    | Playwright                                      | ^1      | Chromium, database reset to pristine seed before the run; `npm run test:e2e`                                                                             |
+| database policy checks | SQL verification script under `supabase/tests/` | n/a     | Exercises row-level policies directly, outside the application                                                                                           |
+| API mocking            | none                                            | n/a     | Deliberate — integration tests run against the real database, not a mock                                                                                 |
+| accessibility          | none yet                                        | n/a     | `eslint-plugin-jsx-a11y` covers static rules only; no runtime axe check                                                                                  |
+| (optional) AI-native   | Playwright MCP — checked: 2026-09-02            | n/a     | When NOT to use: any assertion a deterministic integration test can already make. Reserved for exploratory checks on surfaces without a stable selector. |
 
 **Stack grounding tools (current session):**
+
 - Docs: none — no Context7 or framework docs MCP exposed in this session; stack facts came from local manifests and configs; checked: 2026-09-02
 - Search: none — no Exa.ai or web-search MCP exposed in this session; checked: 2026-09-02
 - Runtime/browser: Playwright MCP available, plus an in-app browser tool — possible exploratory layer, not used for this plan; checked: 2026-09-02
@@ -123,17 +124,17 @@ The full set of gates that must pass before a change reaches production.
 "Required after §3 Phase N" means the gate is enforced once that rollout
 phase lands; before that, the gate is planned.
 
-| Gate | Where | Required? | Catches |
-|---|---|---|---|
-| lint + typecheck | local + CI | required | syntactic and type drift |
-| unit | local + CI | required | logic regressions |
-| build | CI | required | packaging and adapter breakage |
-| database type drift check | CI | required | schema and generated-type divergence |
-| HTTP integration against live database | CI | required | authorization and persistence regressions |
-| e2e on critical flows | CI on PR | required | broken critical user paths |
-| authorization suite green | CI on PR | required after §3 Phase 1 | cross-group data exposure and write-grant bypass |
-| CV lifecycle suite green | CI on PR | required after §3 Phase 3 | unretrievable uploads, reachable expired files |
-| pre-prod smoke | between merge and production | optional | environment-specific failures, notably the Workers deploy shape |
+| Gate                                   | Where                        | Required?                 | Catches                                                         |
+| -------------------------------------- | ---------------------------- | ------------------------- | --------------------------------------------------------------- |
+| lint + typecheck                       | local + CI                   | required                  | syntactic and type drift                                        |
+| unit                                   | local + CI                   | required                  | logic regressions                                               |
+| build                                  | CI                           | required                  | packaging and adapter breakage                                  |
+| database type drift check              | CI                           | required                  | schema and generated-type divergence                            |
+| HTTP integration against live database | CI                           | required                  | authorization and persistence regressions                       |
+| e2e on critical flows                  | CI on PR                     | required                  | broken critical user paths                                      |
+| authorization suite green              | CI on PR                     | required after §3 Phase 1 | cross-group data exposure and write-grant bypass                |
+| CV lifecycle suite green               | CI on PR                     | required after §3 Phase 3 | unretrievable uploads, reachable expired files                  |
+| pre-prod smoke                         | between merge and production | optional                  | environment-specific failures, notably the Workers deploy shape |
 
 The first six gates are already wired. Phases 1 and 3 add suites; Phase 4
 makes those suites blocking rather than advisory.
@@ -160,6 +161,11 @@ it will carry.
   signal these tests exist to give.
 - **Reference test**: `src/pages/api/recruitments/index.integration.test.ts`.
 - **Run locally**: `npm run test:integration`.
+- **Carve-out**: cross-cutting authorization assertions (denial by tenancy or
+  by operation, checked across many routes at once) do not live beside their
+  route. They live in the single dedicated suite named in §6.4, so the
+  tenancy contract reads as one document and a missing endpoint is visible
+  by inspection rather than by absence.
 
 ### 6.3 Adding an e2e test
 
@@ -171,9 +177,45 @@ it will carry.
 
 ### 6.4 Adding an authorization test for a new endpoint
 
-- TBD — see §3 Phase 1, for the "non-member receives no rows and produces no
-  write effect" pattern, including how to construct a principal outside the
-  assigned security group.
+- **Location**: the single dedicated cross-cutting suite, not beside the
+  route — `src/pages/api/authorization.integration.test.ts`. Every
+  authorization boundary lives here so the tenancy contract reads as one
+  document and a missing endpoint is visible by inspection. See the §6.2
+  carve-out.
+- **Naming**: a top-level `describe` per risk, containing named `it` blocks
+  whose titles state the proposition in user terms (a claim about a
+  principal, not a route) — e.g. "the tenant-peer principal cannot read a
+  recruitment it is not a member of."
+- **Reference test**: `src/pages/api/authorization.integration.test.ts`.
+- **Run locally**: `npm run test:integration` for the HTTP layer,
+  `npm run test:rls` for the underlying database policy assertions.
+- **The pattern — constructing a principal outside the assigned security
+  group**: a fixture that merely lacks any group cannot distinguish "denied
+  for lack of tenancy" from "denied for lack of the operation." Use (or add,
+  following the same shape in `supabase/seed.sql`) a principal that holds
+  the **same operations** as a legitimate member but is scoped to a
+  **different** security group — see `tenantPeer` in
+  `src/lib/test-support/integration-client.ts` and its seed fixture. Sign in
+  via `signInIntegrationClient(role)`; never forge a cookie or invent a
+  second harness.
+- **The paired-read-back rule**: a status code alone is not evidence of a
+  data boundary. 404 is the deliberate tenancy signal for scoped reads and
+  no-op updates (`maybeSingle()` returning `null`), and the same shape
+  covers both "resource doesn't exist" and "resource exists but you can't
+  see it" — so every denial assertion must be paired, in the same test or
+  block, with a read-back by a legitimate member proving the resource is
+  unchanged and still exists. Assert the **effect** (no row change), never a
+  specific SQLSTATE origin — denial arrives variously from RLS, from a
+  narrowed table grant, or from an RPC's explicit `raise`, and which
+  mechanism fired is an implementation detail.
+- **Symmetry**: isolation assertions must check both directions — principal
+  A cannot see B's data, and principal B cannot see A's data. A
+  one-directional test passes when a bug hides everything from everyone;
+  this exact tautology already surfaced in this repo once
+  (`recruiter-customizes-kanban-stages/reviews/impl-review.md:29`).
+- **No global-count assertions and no `beforeEach` truncation**: the
+  integration harness has no reset between tests by design. Create your own
+  fixtures; never assert on how many rows exist in total.
 
 ### 6.5 Adding a test for a server-enforced business rule
 
@@ -219,6 +261,7 @@ interview answer would be. Re-open them at the first `--refresh`.
 - Strategy (§1–§5) last reviewed: 2026-09-02
 - Stack versions last verified: 2026-09-02
 - AI-native tool references last verified: 2026-09-02
+- Cookbook §6.2/§6.4 last updated: 2026-09-03 (§3 Phase 1 landed)
 
 Refresh (`/10x-test-plan --refresh`) when:
 
