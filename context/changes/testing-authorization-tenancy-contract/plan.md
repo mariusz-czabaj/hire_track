@@ -853,14 +853,14 @@ commit message.
 
 #### Automated
 
-- [x] 5.1 `npm run test:rls` runs the harness and all 33 assertions pass
-- [x] 5.2 The full test suite passes
-- [x] 5.3 Linting passes
-- [x] 5.4 Formatting is clean
+- [x] 5.1 `npm run test:rls` runs the harness and all 33 assertions pass — 7fef97c
+- [x] 5.2 The full test suite passes — 7fef97c
+- [x] 5.3 Linting passes — 7fef97c
+- [x] 5.4 Formatting is clean — 7fef97c
 
 #### Manual
 
-- [x] 5.5 §6.4 answers "how do I add an authorization test for a new endpoint?" standalone
-- [x] 5.6 §6.4 names the out-of-group principal recipe and the paired-read-back rule
-- [x] 5.7 The SQL file's header no longer recommends a command that cannot work
-- [x] 5.8 §3 Phase 1 reads `complete`
+- [x] 5.5 §6.4 answers "how do I add an authorization test for a new endpoint?" standalone — 7fef97c
+- [x] 5.6 §6.4 names the out-of-group principal recipe and the paired-read-back rule — 7fef97c
+- [x] 5.7 The SQL file's header no longer recommends a command that cannot work — 7fef97c
+- [x] 5.8 §3 Phase 1 reads `complete` — 7fef97c
