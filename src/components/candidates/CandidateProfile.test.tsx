@@ -133,6 +133,45 @@ describe("CandidateProfile", () => {
     expect(screen.getByText(/200 KB/i)).toBeInTheDocument();
     const downloadLink = screen.getByRole("link", { name: /download/i });
     expect(downloadLink).toHaveAttribute("href", `${PROFILE_URL}/cv`);
+    expect(screen.getByRole("button", { name: /replace/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/upload cv/i)).not.toBeInTheDocument();
+  });
+
+  it("clicking Replace reveals the upload control, which replaces the active CV via the same intent -> PUT -> confirm sequence", async () => {
+    const user = userEvent.setup();
+    const fetchMock = mockFetch({
+      profileResponse: {
+        status: 200,
+        body: buildProfile({
+          cv: {
+            id: 7,
+            originalFilename: "cv.pdf",
+            mimeType: "application/pdf",
+            sizeBytes: 204800,
+            uploadedAt: "2026-01-05T10:00:00Z",
+            expiresAt: "2027-01-05T10:00:00Z",
+            state: "available",
+          },
+        }),
+      },
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<CandidateProfile candidateId="42" />);
+    await screen.findByText("cv.pdf");
+
+    expect(screen.queryByLabelText(/upload cv/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /replace/i }));
+    expect(screen.getByLabelText(/upload cv/i)).toBeInTheDocument();
+
+    const file = new File(["%PDF-1.4"], "cv-v2.pdf", { type: "application/pdf" });
+    await user.upload(screen.getByLabelText(/upload cv/i), file);
+
+    await waitFor(() => {
+      const calls = fetchMock.mock.calls.map(callUrl);
+      expect(calls).toContain(`${PROFILE_URL}/cv/upload-intent`);
+      expect(calls).toContain(`${PROFILE_URL}/cv/confirm`);
+    });
   });
 
   it("renders a tombstone with the original upload date for an expired CV", async () => {

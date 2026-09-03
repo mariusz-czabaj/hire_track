@@ -37,7 +37,7 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
-    const cv = await confirmCvUpload(supabase, parsed.data.cvId);
+    const cv = await confirmCvUpload(supabase, parsedId.data, parsed.data.cvId);
     return jsonOk(cv);
   } catch (error) {
     return handleCandidateCvError(error);

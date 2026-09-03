@@ -49,6 +49,12 @@ function toCvDto(row: CandidateCvRow): CandidateCvDto {
   };
 }
 
+// A pending row is only reaped once it's old enough that it can't still be
+// a genuinely in-flight upload -- reaping every pending row unconditionally
+// would let a second concurrent attempt (double-click, two tabs) delete the
+// first attempt's not-yet-confirmed row out from under it.
+const STALE_PENDING_THRESHOLD_MS = 5 * 60 * 1000;
+
 // Mint a signed upload URL for a new CV. Reaps stale pending rows for
 // this candidate first -- a caller that abandons an upload (network
 // failure, closed tab) would otherwise accumulate orphaned pending rows
@@ -58,15 +64,25 @@ export async function createCvUploadIntent(
   candidateId: number,
   command: CreateCvUploadIntentCommand,
 ): Promise<CvUploadIntentDto> {
+  const staleCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS).toISOString();
   const { error: reapError } = await client
     .from("candidate_cvs")
     .delete()
     .eq("candidate_id", candidateId)
-    .eq("status", "pending");
+    .eq("status", "pending")
+    .lt("created_at", staleCutoff);
 
   if (reapError) {
     throw reapError;
   }
+
+  // created_by is derived from the caller's own session, matching
+  // upsertCandidateNote's convention in candidates.ts -- kept for the
+  // upload audit trail; the column is nullable so a lookup failure here
+  // is not fatal to the upload itself.
+  const {
+    data: { user },
+  } = await client.auth.getUser();
 
   const { data: inserted, error: insertError } = await client
     .from("candidate_cvs")
@@ -79,6 +95,7 @@ export async function createCvUploadIntent(
       original_filename: command.filename,
       mime_type: command.mimeType,
       size_bytes: command.sizeBytes,
+      created_by: user?.id ?? null,
       // Overwritten by the set_expires_at trigger from the row's own
       // uploaded_at -- the column has no default, so the insert type
       // requires a value here, but it is never actually used.
@@ -116,7 +133,27 @@ export async function createCvUploadIntent(
   };
 }
 
-export async function confirmCvUpload(client: Client, cvId: number): Promise<CandidateCvDto> {
+export async function confirmCvUpload(client: Client, candidateId: number, cvId: number): Promise<CandidateCvDto> {
+  // The RPC resolves candidate_id purely from cvId and never sees the
+  // caller's URL, and its promotion is already committed by the time it
+  // returns -- so this check must happen *before* the RPC call, not after
+  // it, or a mismatched cvId would still confirm (and demote the real
+  // active row) before the mismatch is caught. Every other function in
+  // this file scopes by candidate_id; this closes the same gap here.
+  const { data: owner, error: ownerError } = await client
+    .from("candidate_cvs")
+    .select("candidate_id")
+    .eq("id", cvId)
+    .maybeSingle();
+
+  if (ownerError) {
+    throw ownerError;
+  }
+
+  if (owner?.candidate_id !== candidateId) {
+    throw Object.assign(new Error(`Candidate CV ${cvId} not found`), { code: "P0002" });
+  }
+
   const { data, error } = await client.rpc("confirm_candidate_cv", { target_cv_id: cvId });
 
   if (error) {
@@ -184,14 +221,19 @@ export async function purgeCvObjects(client: Client): Promise<CvPurgeSummaryDto>
     const { error: removeError } = await client.storage.from(BUCKET).remove([row.storage_path]);
 
     if (removeError) {
-      results.push({ cvId: row.id, storagePath: row.storage_path, removed: false, error: removeError.message });
+      // Logged server-side rather than returned verbatim: this endpoint's
+      // response is visible to any candidate.write/group.manage caller,
+      // and the raw Storage/Postgres error can carry internal detail.
+      console.error(`purgeCvObjects: failed to remove object for CV ${row.id}`, removeError);
+      results.push({ cvId: row.id, storagePath: row.storage_path, removed: false, error: "Failed to remove file" });
       continue;
     }
 
     const { error: markError } = await client.rpc("mark_candidate_cv_object_deleted", { target_cv_id: row.id });
 
     if (markError) {
-      results.push({ cvId: row.id, storagePath: row.storage_path, removed: false, error: markError.message });
+      console.error(`purgeCvObjects: failed to mark CV ${row.id} deleted after object removal`, markError);
+      results.push({ cvId: row.id, storagePath: row.storage_path, removed: false, error: "Failed to record deletion" });
       continue;
     }
 

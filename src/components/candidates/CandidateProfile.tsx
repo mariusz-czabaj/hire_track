@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Download, Mail, Pencil, Phone } from "lucide-react";
+import { Download, Mail, Pencil, Phone, Repeat } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { useCvUpload } from "@/components/hooks/useCvUpload";
@@ -51,15 +51,17 @@ interface CvPanelProps {
 
 function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
   const cvUpload = useCvUpload(candidateId);
+  const [replacing, setReplacing] = useState(false);
 
   async function handleFileSelected(file: File) {
     const uploaded = await cvUpload.upload(file);
     if (uploaded) {
+      setReplacing(false);
       await onUploaded();
     }
   }
 
-  const showUploadControl = cv === null || cv.state === "expired";
+  const showUploadControl = cv === null || cv.state === "expired" || replacing;
 
   return (
     <Card className="flex flex-col gap-3 border-white/10 bg-white/5 p-4 text-white">
@@ -73,13 +75,29 @@ function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
               {formatSize(cv.sizeBytes)} &middot; uploaded {formatDate(cv.uploadedAt)}
             </p>
           </div>
-          <a
-            href={`/api/candidates/${candidateId}/cv`}
-            className="inline-flex items-center gap-1 text-sm text-purple-300 hover:underline"
-          >
-            <Download className="size-4" />
-            Download
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href={`/api/candidates/${candidateId}/cv`}
+              className="inline-flex items-center gap-1 text-sm text-purple-300 hover:underline"
+            >
+              <Download className="size-4" />
+              Download
+            </a>
+            {!replacing && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setReplacing(true);
+                }}
+                className="gap-1"
+              >
+                <Repeat className="size-4" />
+                Replace
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
@@ -104,6 +122,19 @@ function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
               void handleFileSelected(file);
             }}
           />
+          {replacing && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setReplacing(false);
+              }}
+              className="self-start"
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       )}
     </Card>

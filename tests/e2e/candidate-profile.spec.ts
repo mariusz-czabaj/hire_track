@@ -1,5 +1,4 @@
 import path from "node:path";
-import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { test, expect } from "@playwright/test";
 import { signInAs } from "./support/auth";
@@ -108,23 +107,13 @@ test.describe("HR recruiter manages the candidate profile", () => {
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toBe("sample-cv.pdf");
 
-    // Replace it with a second file via the API -- the panel has no
-    // dedicated "replace" control once a CV is available (only Download),
-    // so exercise the same three-step sequence useCvUpload drives
-    // (upload-intent -> PUT -> confirm) directly, then confirm the panel
-    // still shows exactly one CV after a reload.
-    const fileBytes = await readFile(SAMPLE_CV_PATH);
-    const intentResponse = await page.request.post(`/api/candidates/${candidateId}/cv/upload-intent`, {
-      data: { filename: "sample-cv.pdf", mimeType: "application/pdf", sizeBytes: fileBytes.byteLength },
-    });
-    const intent = (await intentResponse.json()) as { cvId: number; uploadUrl: string };
-    await page.request.put(intent.uploadUrl, {
-      headers: { "Content-Type": "application/pdf" },
-      data: fileBytes,
-    });
-    await page.request.post(`/api/candidates/${candidateId}/cv/confirm`, {
-      data: { cvId: intent.cvId },
-    });
+    // Replace it through the panel's own Replace control -- confirm the
+    // panel still shows exactly one CV afterward.
+    await page.getByRole("button", { name: "Replace" }).click();
+    await page.getByLabel(/Upload CV/).setInputFiles(SAMPLE_CV_PATH);
+
+    await expect(page.getByRole("button", { name: "Replace" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("link", { name: "Download" })).toHaveCount(1);
 
     await page.reload();
     await expect(page.getByText("sample-cv.pdf")).toBeVisible();

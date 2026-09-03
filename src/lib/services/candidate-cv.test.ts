@@ -82,7 +82,7 @@ describe("purgeCvObjects", () => {
       processed: 1,
       removed: 0,
       failed: 1,
-      results: [{ cvId: 1, storagePath: "1/a.pdf", removed: false, error: "network error" }],
+      results: [{ cvId: 1, storagePath: "1/a.pdf", removed: false, error: "Failed to remove file" }],
     });
   });
 
@@ -119,7 +119,7 @@ describe("purgeCvObjects", () => {
       cvId: 1,
       storagePath: "1/a.pdf",
       removed: false,
-      error: "row vanished",
+      error: "Failed to record deletion",
     });
   });
 });

@@ -180,6 +180,44 @@ describe("POST /api/candidates/[candidateId]/cv/upload-intent, /confirm, GET /cv
     expect(response.status).toBe(422);
   });
 
+  it("confirming a cvId under a different candidate's URL is refused with 404", async () => {
+    const recruitment = await createRecruitment();
+    const ownerCandidateId = await addCandidate(recruitment.id);
+    const otherCandidateId = await addCandidate(recruitment.id, {
+      fullName: "Grace Hopper",
+      email: `cv-other-${recruitment.id}-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
+    });
+
+    const hr = await signInIntegrationClient("hr");
+    const intentResponse = await hr.fetch(`/api/candidates/${ownerCandidateId}/cv/upload-intent`, {
+      method: "POST",
+      body: JSON.stringify({ filename: "cv.pdf", mimeType: "application/pdf", sizeBytes: PDF_BYTES.byteLength }),
+    });
+    const intent = (await intentResponse.json()) as CvUploadIntentDto;
+    await fetch(intent.uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/pdf" },
+      body: PDF_BYTES,
+    });
+
+    // Confirm the owner's pending cvId, but under a different candidate's URL.
+    const confirmResponse = await hr.fetch(`/api/candidates/${otherCandidateId}/cv/confirm`, {
+      method: "POST",
+      body: JSON.stringify({ cvId: intent.cvId }),
+    });
+
+    expect(confirmResponse.status).toBe(404);
+    const body = (await confirmResponse.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("not_found");
+
+    // The CV must still confirm cleanly under its true owner's URL.
+    const retryResponse = await hr.fetch(`/api/candidates/${ownerCandidateId}/cv/confirm`, {
+      method: "POST",
+      body: JSON.stringify({ cvId: intent.cvId }),
+    });
+    expect(retryResponse.status).toBe(200);
+  });
+
   it("a backdated CV returns 410 cv_expired on download", async () => {
     const recruitment = await createRecruitment();
     const candidateId = await addCandidate(recruitment.id);
