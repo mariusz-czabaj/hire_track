@@ -787,16 +787,16 @@ commit message.
 
 #### Automated
 
-- [ ] 2.1 The new suite passes
-- [ ] 2.2 Every pre-existing suite still passes
-- [ ] 2.3 Linting passes
-- [ ] 2.4 Type checking passes
+- [x] 2.1 The new suite passes
+- [x] 2.2 Every pre-existing suite still passes
+- [x] 2.3 Linting passes
+- [x] 2.4 Type checking passes
 
 #### Manual
 
-- [ ] 2.5 Each `it` title states a proposition about a principal, not a route
-- [ ] 2.6 Every 404 assertion has a paired positive-case assertion by a legitimate member
-- [ ] 2.7 The risk #4 positive case cites FR-007 so it cannot be mistaken for enshrining a bug
+- [x] 2.5 Each `it` title states a proposition about a principal, not a route
+- [x] 2.6 Every 404 assertion has a paired positive-case assertion by a legitimate member
+- [x] 2.7 The risk #4 positive case cites FR-007 so it cannot be mistaken for enshrining a bug
 
 ### Phase 3: Write Surface
 
