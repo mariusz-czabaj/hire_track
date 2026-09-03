@@ -725,18 +725,18 @@ slice needs. The only database-side change is seed data, which is recreated by
 
 #### Automated
 
-- [ ] 4.1 Types check
-- [ ] 4.2 Unit and component tests pass
-- [ ] 4.3 Linting passes, including the jsx-a11y rules
-- [ ] 4.4 Formatting is clean
+- [x] 4.1 Types check
+- [x] 4.2 Unit and component tests pass
+- [x] 4.3 Linting passes, including the jsx-a11y rules
+- [x] 4.4 Formatting is clean
 
 #### Manual
 
-- [ ] 4.5 Candidates reachable from app navigation; alphabetical list renders
-- [ ] 4.6 Search narrows, address bar updates, reload restores the filtered view
-- [ ] 4.7 Fast typing issues roughly one request, not one per keystroke
-- [ ] 4.8 Candidate profile shows ordered transitions with a leading "Added to …" entry
-- [ ] 4.9 Renders correctly at mobile width and in the dark theme
+- [x] 4.5 Candidates reachable from app navigation; alphabetical list renders
+- [x] 4.6 Search narrows, address bar updates, reload restores the filtered view
+- [x] 4.7 Fast typing issues roughly one request, not one per keystroke
+- [x] 4.8 Candidate profile shows ordered transitions with a leading "Added to …" entry
+- [x] 4.9 Renders correctly at mobile width and in the dark theme
 
 ### Phase 5: Gate closure and documentation
 

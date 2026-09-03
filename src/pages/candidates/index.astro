@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { CandidateList } from "@/components/candidates/CandidateList";
+
+const initialQuery = Astro.url.searchParams.get("q") ?? undefined;
+---
+
+<Layout title="Candidates">
+  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
+    <div class="mx-auto max-w-4xl">
+      <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+        Candidates
+      </h1>
+      <CandidateList initialQuery={initialQuery} client:load />
+    </div>
+  </div>
+</Layout>

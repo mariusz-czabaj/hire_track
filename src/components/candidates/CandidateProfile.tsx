@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileInput } from "@/components/ui/file-input";
-import type { CandidateProfileDto, UpdateCandidateProfileCommand } from "@/types";
+import type { CandidateProfileDto, CandidateStatusHistoryEntryDto, UpdateCandidateProfileCommand } from "@/types";
 
 interface CandidateProfileProps {
   candidateId: string | undefined;
@@ -40,6 +40,19 @@ function NotFoundState() {
     <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-blue-100/70">
       <p>This candidate could not be found.</p>
     </div>
+  );
+}
+
+function HistoryEntry({ entry }: { entry: CandidateStatusHistoryEntryDto }) {
+  return (
+    <li className="flex items-center justify-between gap-2 text-xs text-blue-100/60">
+      <span>
+        {entry.fromStageName === null
+          ? `Added to ${entry.toStageName}`
+          : `${entry.fromStageName} → ${entry.toStageName}`}
+      </span>
+      <span>{formatDate(entry.changedAt)}</span>
+    </li>
   );
 }
 
@@ -272,6 +285,15 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
                 >
                   {r.title} &mdash; {r.stageName}
                 </a>
+                {r.history.length === 0 ? (
+                  <p className="mt-1 text-xs text-blue-100/40 italic">No status history yet</p>
+                ) : (
+                  <ul className="mt-1 flex flex-col gap-0.5 border-l border-white/10 pl-3">
+                    {r.history.map((entry) => (
+                      <HistoryEntry key={entry.id} entry={entry} />
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

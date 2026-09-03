@@ -18,9 +18,12 @@ function buildProfile(overrides: Partial<CandidateProfileDto> = {}): CandidatePr
         recruitmentId: 1,
         candidateRecruitmentId: 5,
         title: "Backend Engineer",
-        stageName: "New",
+        stageName: "Interview",
         addedAt: "2026-01-02",
-        history: [],
+        history: [
+          { id: 1, fromStageName: null, toStageName: "New", changedAt: "2026-01-02T10:00:00Z" },
+          { id: 2, fromStageName: "New", toStageName: "Interview", changedAt: "2026-01-05T10:00:00Z" },
+        ],
       },
     ],
     cv: null,
@@ -292,5 +295,44 @@ describe("CandidateProfile", () => {
     await user.upload(input, file);
 
     expect(await screen.findByText(/you do not have permission to upload a cv/i)).toBeInTheDocument();
+  });
+
+  it("renders a recruitment's transitions in order, with a null source stage as an 'added' entry", async () => {
+    vi.stubGlobal("fetch", mockFetch({}));
+
+    render(<CandidateProfile candidateId="42" />);
+    await screen.findByText("Ada Lovelace");
+
+    expect(screen.getByText("Added to New")).toBeInTheDocument();
+    expect(screen.getByText("New → Interview")).toBeInTheDocument();
+  });
+
+  it("renders a recruitment with an empty log without hiding the recruitment", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        profileResponse: {
+          status: 200,
+          body: buildProfile({
+            recruitments: [
+              {
+                recruitmentId: 1,
+                candidateRecruitmentId: 5,
+                title: "Backend Engineer",
+                stageName: "New",
+                addedAt: "2026-01-02",
+                history: [],
+              },
+            ],
+          }),
+        },
+      }),
+    );
+
+    render(<CandidateProfile candidateId="42" />);
+    await screen.findByText("Ada Lovelace");
+
+    expect(screen.getByText(/Backend Engineer/)).toBeInTheDocument();
+    expect(screen.getByText(/no status history yet/i)).toBeInTheDocument();
   });
 });
