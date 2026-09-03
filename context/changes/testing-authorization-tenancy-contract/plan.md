@@ -769,19 +769,19 @@ commit message.
 
 #### Automated
 
-- [x] 1.1 Local database reset applies the new seed cleanly
-- [x] 1.2 Unit tests pass
-- [x] 1.3 Integration tests pass unchanged in meaning
-- [x] 1.4 E2E tests pass
-- [x] 1.5 Existing SQL assertions still pass against the expanded seed
-- [x] 1.6 Linting passes
-- [x] 1.7 Type checking passes
+- [x] 1.1 Local database reset applies the new seed cleanly — 7b70363
+- [x] 1.2 Unit tests pass — 7b70363
+- [x] 1.3 Integration tests pass unchanged in meaning — 7b70363
+- [x] 1.4 E2E tests pass — 7b70363
+- [x] 1.5 Existing SQL assertions still pass against the expanded seed — 7b70363
+- [x] 1.6 Linting passes — 7b70363
+- [x] 1.7 Type checking passes — 7b70363
 
 #### Manual
 
-- [x] 1.8 Tenant-peer principal sees exactly one recruitment, and it is not Backend Engineer
-- [x] 1.9 No-group principal reaches /dashboard but sees no recruitments and no candidates
-- [x] 1.10 Seed block comment no longer claims the Administrator is the isolation fixture
+- [x] 1.8 Tenant-peer principal sees exactly one recruitment, and it is not Backend Engineer — 7b70363
+- [x] 1.9 No-group principal reaches /dashboard but sees no recruitments and no candidates — 7b70363
+- [x] 1.10 Seed block comment no longer claims the Administrator is the isolation fixture — 7b70363
 
 ### Phase 2: Read Boundary Suite
 
