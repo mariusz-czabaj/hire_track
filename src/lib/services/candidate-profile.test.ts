@@ -25,6 +25,18 @@ class FakeQueryBuilder<T> implements PromiseLike<QueryResult<T>> {
     return this;
   }
 
+  neq(): this {
+    return this;
+  }
+
+  order(): this {
+    return this;
+  }
+
+  limit(): this {
+    return this;
+  }
+
   update(): this {
     return this;
   }
@@ -65,6 +77,7 @@ function makeProfileClient(config: {
   candidate: QueryResult<CandidateRow>;
   recruitments?: QueryResult<RecruitmentSummaryRow[]>;
   update?: QueryResult<{ id: number }>;
+  cv?: QueryResult<unknown>;
 }): Client {
   // updateCandidateProfile issues an UPDATE against "candidates" first, then
   // (on success) calls getCandidateProfile, which issues a plain SELECT
@@ -83,6 +96,12 @@ function makeProfileClient(config: {
       if (table === "candidate_recruitments") {
         return new FakeQueryBuilder<RecruitmentSummaryRow[]>(config.recruitments ?? { data: [], error: null });
       }
+      if (table === "candidate_cvs") {
+        // getLatestCvForProfile's own query chain (.order/.limit before
+        // .maybeSingle) -- the FakeQueryBuilder's chain methods are all
+        // pass-through, so no separate stub is needed for them.
+        return new FakeQueryBuilder<unknown>(config.cv ?? { data: null, error: null });
+      }
       throw new Error(`Unexpected table: ${table}`);
     },
   } as unknown as Client;
@@ -100,7 +119,7 @@ describe("getCandidateProfile", () => {
     await expect(getCandidateProfile(client, 5)).rejects.toEqual({ message: "boom" });
   });
 
-  it("maps the candidate row and its recruitments into a CandidateProfileDto with cv always null", async () => {
+  it("maps the candidate row and its recruitments into a CandidateProfileDto, cv null when no CV row exists", async () => {
     const client = makeProfileClient({
       candidate: {
         data: {

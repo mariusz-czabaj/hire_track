@@ -742,11 +742,11 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass
-- [x] 2.2 Integration tests pass
-- [x] 2.3 Linting passes
-- [x] 2.4 Type checking passes
-- [x] 2.5 Build succeeds
+- [x] 2.1 Unit tests pass — 656b484
+- [x] 2.2 Integration tests pass — 656b484
+- [x] 2.3 Linting passes — 656b484
+- [x] 2.4 Type checking passes — 656b484
+- [x] 2.5 Build succeeds — 656b484
 
 #### Manual
 
@@ -758,14 +758,14 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [ ] 3.1 Migrations apply cleanly
-- [ ] 3.2 RLS/RPC assertions pass
-- [ ] 3.3 Types are in sync
-- [ ] 3.4 Unit tests pass
-- [ ] 3.5 Integration tests pass
-- [ ] 3.6 Linting passes
-- [ ] 3.7 Type checking passes
-- [ ] 3.8 Build succeeds
+- [x] 3.1 Migrations apply cleanly
+- [x] 3.2 RLS/RPC assertions pass
+- [x] 3.3 Types are in sync
+- [x] 3.4 Unit tests pass
+- [x] 3.5 Integration tests pass
+- [x] 3.6 Linting passes
+- [x] 3.7 Type checking passes
+- [x] 3.8 Build succeeds
 
 #### Manual
 

@@ -134,7 +134,16 @@ export interface CandidateRecruitmentSummaryDto {
   addedAt: string;
 }
 
-// `cv` is always null until Phase 3 (CV upload) adds `CandidateCvDto`.
+export interface CandidateCvDto {
+  id: number;
+  originalFilename: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  expiresAt: string;
+  state: "available" | "expired";
+}
+
 export interface CandidateProfileDto {
   id: number;
   fullName: string;
@@ -142,7 +151,38 @@ export interface CandidateProfileDto {
   phone: string | null;
   createdAt: string;
   recruitments: CandidateRecruitmentSummaryDto[];
-  cv: null;
+  cv: CandidateCvDto | null;
+}
+
+export interface CreateCvUploadIntentCommand {
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
+export interface CvUploadIntentDto {
+  cvId: number;
+  uploadUrl: string;
+  token: string;
+  path: string;
+}
+
+export interface ConfirmCvUploadCommand {
+  cvId: number;
+}
+
+export interface CvPurgeResultDto {
+  cvId: number;
+  storagePath: string;
+  removed: boolean;
+  error?: string;
+}
+
+export interface CvPurgeSummaryDto {
+  processed: number;
+  removed: number;
+  failed: number;
+  results: CvPurgeResultDto[];
 }
 
 export interface ApiErrorBody {

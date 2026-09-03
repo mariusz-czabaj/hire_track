@@ -49,3 +49,34 @@ export function handleCandidateProfileError(error: unknown): Response {
   console.error(error);
   return jsonError(500, "internal", "Failed to process the candidate request");
 }
+
+// Shared by the CV lifecycle routes (upload-intent, confirm, download,
+// purge). 410 is used for PA005 rather than 404 so the UI can
+// distinguish "expired" from "never existed" and render the tombstone.
+// 23505 is a defensive branch for the partial unique index -- it should
+// never surface in practice since confirm_candidate_cv demotes the prior
+// active row in the same statement, but every code these RPCs can raise
+// gets an explicit branch per house convention (unmapped codes have
+// fallen through to 500s three times in prior slices).
+export function handleCandidateCvError(error: unknown): Response {
+  const code = (error as { code?: string }).code;
+  if (code === "P0002") {
+    return jsonError(404, "not_found", "Candidate CV not found");
+  }
+  if (code === "42501") {
+    return jsonError(403, "forbidden", "You are not allowed to perform this action");
+  }
+  if (code === "22023") {
+    const message = (error as { message?: string }).message ?? "Invalid CV data";
+    return jsonError(422, "invalid_request", message);
+  }
+  if (code === "PA005") {
+    const message = (error as { message?: string }).message ?? "This CV has expired and its file has been removed";
+    return jsonError(410, "cv_expired", message);
+  }
+  if (code === "23505") {
+    return jsonError(422, "invalid_request", "A CV upload is already in progress for this candidate");
+  }
+  console.error(error);
+  return jsonError(500, "internal", "Failed to process the candidate CV request");
+}

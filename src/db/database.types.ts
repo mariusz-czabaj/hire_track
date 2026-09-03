@@ -457,6 +457,30 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      confirm_candidate_cv: {
+        Args: { target_cv_id: number };
+        Returns: {
+          candidate_id: number;
+          created_at: string;
+          created_by: string | null;
+          expires_at: string;
+          id: number;
+          mime_type: string;
+          object_deleted_at: string | null;
+          original_filename: string;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          updated_at: string;
+          uploaded_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "candidate_cvs";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       create_recruitment: {
         Args: {
           p_department: string;
@@ -490,6 +514,54 @@ export type Database = {
           email: string;
           id: string;
         }[];
+      };
+      list_purgeable_candidate_cvs: {
+        Args: never;
+        Returns: {
+          candidate_id: number;
+          created_at: string;
+          created_by: string | null;
+          expires_at: string;
+          id: number;
+          mime_type: string;
+          object_deleted_at: string | null;
+          original_filename: string;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          updated_at: string;
+          uploaded_at: string;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "candidate_cvs";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
+      mark_candidate_cv_object_deleted: {
+        Args: { target_cv_id: number };
+        Returns: {
+          candidate_id: number;
+          created_at: string;
+          created_by: string | null;
+          expires_at: string;
+          id: number;
+          mime_type: string;
+          object_deleted_at: string | null;
+          original_filename: string;
+          size_bytes: number;
+          status: string;
+          storage_path: string;
+          updated_at: string;
+          uploaded_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "candidate_cvs";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       move_candidate_stage: {
         Args: {

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
 import type { CandidateProfileDto, CandidateRecruitmentSummaryDto, UpdateCandidateProfileCommand } from "@/types";
+import { getLatestCvForProfile } from "@/lib/services/candidate-cv";
 
 type Client = SupabaseClient<Database>;
 
@@ -53,6 +54,8 @@ export async function getCandidateProfile(client: Client, candidateId: number): 
     addedAt: row.added_at,
   }));
 
+  const cv = await getLatestCvForProfile(client, candidateId);
+
   return {
     id: candidate.id,
     fullName: candidate.full_name,
@@ -60,9 +63,7 @@ export async function getCandidateProfile(client: Client, candidateId: number): 
     phone: candidate.phone,
     createdAt: candidate.created_at,
     recruitments,
-    // CandidateCvDto arrives in Phase 3; the CV panel renders the no-CV
-    // state until this service populates it from the latest non-pending row.
-    cv: null,
+    cv,
   };
 }
 

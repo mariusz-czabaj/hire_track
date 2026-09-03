@@ -3,7 +3,7 @@ change_id: candidate-profile-and-cv-upload
 title: Candidate profile page and CV upload with 12-month retention
 status: implementing
 created: 2026-09-01
-updated: 2026-09-02
+updated: 2026-09-03
 archived_at: null
 ---
 
@@ -65,3 +65,28 @@ the SQL layer, so both surface as `404 not_found`. This mirrors the existing `up
 `PATCH /api/recruitments/[id]` pattern (`recruitments/index.integration.test.ts`'s "denied with 404 (scoped-write,
 not authorized)" case), not a new gap. Still a clean denial — no crash, no silently-applied write — so it satisfies
 the plan's Phase 2 manual item as written; the integration test asserts 404 rather than 403 accordingly.
+
+### 2026-09-03 — Phase 3 implementation notes
+
+**Local signed-upload-URL TTL was already measured in Phase 1** (7200s / 2 hours) and recorded above; Phase 3's own
+manual item (3.9) is satisfied by that earlier measurement and was not re-run.
+
+**`candidate_cvs.storage_path` is written twice on insert.** The column is `not null unique`, and the path is
+derived from the row's own `id` (`{candidateId}/{cvId}-{random}.{ext}`) per plan.md's Critical Implementation
+Details — so `createCvUploadIntent` inserts a placeholder path first, reads back the generated `id`, then updates
+`storage_path` to the real derived value before minting the signed URL. This is two round-trips rather than one, a
+consequence of the id-in-path design; no cross-row invariant depends on the intermediate placeholder ever being
+visible to another caller.
+
+**Stale `pending` rows are reaped by `candidate_id`, not by age.** `createCvUploadIntent` deletes every existing
+`pending` row for the candidate before inserting a new one, rather than only rows past some staleness threshold —
+simpler than a TTL check, and safe because a `pending` row that never gets confirmed carries no `active`-CV
+consequence (the partial unique index only constrains `status = 'active'`).
+
+**Integration coverage exercises the real signed-URL HTTP contract**, not the supabase-js storage client: the test
+PUTs raw bytes directly to the minted `uploadUrl` with `fetch`, mirroring what a browser does. All 9 CV-lifecycle
+cases and the existing 8 profile cases pass together against a live local stack (`npm run dev` + `supabase start`).
+
+**`getCandidateProfile` now issues one additional query** (`getLatestCvForProfile`) to populate `cv`, replacing the
+Phase 2 placeholder that always returned `null`. `candidate-profile.test.ts`'s `FakeQueryBuilder` gained `neq`,
+`order`, and `limit` pass-through methods to support this query's chain.
