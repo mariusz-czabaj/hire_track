@@ -778,17 +778,17 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [x] 4.1 Unit tests pass
-- [x] 4.2 Linting passes
-- [x] 4.3 Type checking passes
-- [x] 4.4 Build succeeds
+- [x] 4.1 Unit tests pass — b27c5cb
+- [x] 4.2 Linting passes — b27c5cb
+- [x] 4.3 Type checking passes — b27c5cb
+- [x] 4.4 Build succeeds — b27c5cb
 
 #### Manual
 
-- [ ] 4.5 Upload shows the panel without reload; download matches
-- [ ] 4.6 Replacing a CV leaves exactly one downloadable CV
-- [ ] 4.7 Oversized and wrong-type files refused with a clear message
-- [ ] 4.8 Hiring manager gets a clean denial on upload
+- [x] 4.5 Upload shows the panel without reload; download matches — b27c5cb
+- [x] 4.6 Replacing a CV leaves exactly one downloadable CV — b27c5cb
+- [x] 4.7 Oversized and wrong-type files refused with a clear message — b27c5cb
+- [x] 4.8 Hiring manager gets a clean denial on upload — b27c5cb
 
 ### Phase 5: End-to-end coverage
 
