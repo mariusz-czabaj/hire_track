@@ -20,6 +20,7 @@ function buildProfile(overrides: Partial<CandidateProfileDto> = {}): CandidatePr
         title: "Backend Engineer",
         stageName: "New",
         addedAt: "2026-01-02",
+        history: [],
       },
     ],
     cv: null,

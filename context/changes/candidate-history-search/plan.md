@@ -694,17 +694,17 @@ slice needs. The only database-side change is seed data, which is recreated by
 
 #### Automated
 
-- [ ] 2.1 Types check
-- [ ] 2.2 Unit tests pass, including the new history cases
-- [ ] 2.3 Integration tests pass, including both truncation directions
-- [ ] 2.4 Generated database types are still in sync
-- [ ] 2.5 Linting passes
+- [x] 2.1 Types check
+- [x] 2.2 Unit tests pass, including the new history cases
+- [x] 2.3 Integration tests pass, including both truncation directions
+- [x] 2.4 Generated database types are still in sync
+- [x] 2.5 Linting passes
 
 #### Manual
 
-- [ ] 2.6 Profile GET as HR returns both recruitments with ordered history
-- [ ] 2.7 Profile GET as Tenant B returns only the Data Analyst recruitment
-- [ ] 2.8 History query plan inspected; stage-index question settled with evidence
+- [x] 2.6 Profile GET as HR returns both recruitments with ordered history
+- [x] 2.7 Profile GET as Tenant B returns only the Data Analyst recruitment
+- [x] 2.8 History query plan inspected; stage-index question settled with evidence
 
 ### Phase 3: Candidates list and search API
 

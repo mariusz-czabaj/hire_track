@@ -1,6 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
-import type { CandidateProfileDto, CandidateRecruitmentSummaryDto, UpdateCandidateProfileCommand } from "@/types";
+import type {
+  CandidateProfileDto,
+  CandidateRecruitmentSummaryDto,
+  CandidateStatusHistoryEntryDto,
+  UpdateCandidateProfileCommand,
+} from "@/types";
 import { getLatestCvForProfile } from "@/lib/services/candidate-cv";
 
 type Client = SupabaseClient<Database>;
@@ -19,6 +24,58 @@ interface RecruitmentSummaryRow {
   recruitment_id: number;
   recruitments: { title: string };
   kanban_stages: { name: string };
+}
+
+interface StatusHistoryRow {
+  id: number;
+  candidate_recruitment_id: number;
+  changed_at: string;
+  from_stage: { name: string } | null;
+  to_stage: { name: string };
+}
+
+async function getStatusHistoryByRecruitment(
+  client: Client,
+  candidateRecruitmentIds: number[],
+): Promise<Map<number, CandidateStatusHistoryEntryDto[]>> {
+  const byRecruitment = new Map<number, CandidateStatusHistoryEntryDto[]>();
+
+  if (candidateRecruitmentIds.length === 0) {
+    return byRecruitment;
+  }
+
+  const { data: historyRows, error: historyError } = await client
+    .from("candidate_recruitment_status_history")
+    .select(
+      "id, candidate_recruitment_id, changed_at, " +
+        "from_stage:kanban_stages!candidate_recruitment_status_history_from_stage_id_fkey(name), " +
+        "to_stage:kanban_stages!candidate_recruitment_status_history_to_stage_id_fkey(name)",
+    )
+    .in("candidate_recruitment_id", candidateRecruitmentIds)
+    .order("changed_at", { ascending: true })
+    .order("id", { ascending: true })
+    .overrideTypes<StatusHistoryRow[], { merge: false }>();
+
+  if (historyError) {
+    throw historyError;
+  }
+
+  for (const row of historyRows) {
+    const entry: CandidateStatusHistoryEntryDto = {
+      id: row.id,
+      fromStageName: row.from_stage?.name ?? null,
+      toStageName: row.to_stage.name,
+      changedAt: row.changed_at,
+    };
+    const existing = byRecruitment.get(row.candidate_recruitment_id);
+    if (existing) {
+      existing.push(entry);
+    } else {
+      byRecruitment.set(row.candidate_recruitment_id, [entry]);
+    }
+  }
+
+  return byRecruitment;
 }
 
 export async function getCandidateProfile(client: Client, candidateId: number): Promise<CandidateProfileDto | null> {
@@ -46,12 +103,16 @@ export async function getCandidateProfile(client: Client, candidateId: number): 
     throw recruitmentsError;
   }
 
+  const candidateRecruitmentIds = recruitmentRows.map((row) => row.id);
+  const historyByRecruitment = await getStatusHistoryByRecruitment(client, candidateRecruitmentIds);
+
   const recruitments: CandidateRecruitmentSummaryDto[] = recruitmentRows.map((row) => ({
     recruitmentId: row.recruitment_id,
     candidateRecruitmentId: row.id,
     title: row.recruitments.title,
     stageName: row.kanban_stages.name,
     addedAt: row.added_at,
+    history: historyByRecruitment.get(row.id) ?? [],
   }));
 
   const cv = await getLatestCvForProfile(client, candidateId);

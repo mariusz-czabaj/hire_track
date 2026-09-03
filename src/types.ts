@@ -126,12 +126,20 @@ export interface UpdateCandidateProfileCommand {
   phone?: string;
 }
 
+export interface CandidateStatusHistoryEntryDto {
+  id: number;
+  fromStageName: string | null;
+  toStageName: string;
+  changedAt: string;
+}
+
 export interface CandidateRecruitmentSummaryDto {
   recruitmentId: number;
   candidateRecruitmentId: number;
   title: string;
   stageName: string;
   addedAt: string;
+  history: CandidateStatusHistoryEntryDto[];
 }
 
 export interface CandidateCvDto {
