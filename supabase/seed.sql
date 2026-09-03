@@ -221,7 +221,13 @@ insert into candidates (full_name, email, phone) values
   -- Belongs to Data Analyst (Tenant B), not Backend Engineer -- the
   -- risk #1/#4 read-boundary fixture on the other side of the tenancy
   -- split.
-  ('Tomasz Kaminski', 'tomasz.kaminski@example.com', '+48 600 100 205');
+  ('Tomasz Kaminski', 'tomasz.kaminski@example.com', '+48 600 100 205'),
+  -- Cross-tenant candidate (S-06, plan.md Phase 1): the same person
+  -- participates in both Backend Engineer (Tenant A) and Data Analyst
+  -- (Tenant B), each with several stage transitions recorded, so
+  -- FR-016's multi-recruitment log and the truncation boundary are both
+  -- demonstrable against a real database.
+  ('Julia Wojcik', 'julia.wojcik@example.com', '+48 600 100 206');
 
 insert into candidate_recruitments (candidate_id, recruitment_id, current_stage_id, added_at) values
   (
@@ -259,6 +265,21 @@ insert into candidate_recruitments (candidate_id, recruitment_id, current_stage_
     (select id from recruitments where title = 'Data Analyst'),
     (select id from kanban_stages where recruitment_id is null and name = 'New'),
     now()
+  ),
+  -- Julia Wojcik's two memberships (S-06 cross-tenant fixture). Each
+  -- ends on the stage its own transition chain below arrives at:
+  -- Backend Engineer -> Interview, Data Analyst -> Offer.
+  (
+    (select id from candidates where email = 'julia.wojcik@example.com'),
+    (select id from recruitments where title = 'Backend Engineer'),
+    (select id from kanban_stages where recruitment_id is null and name = 'Interview'),
+    now() - interval '3 days'
+  ),
+  (
+    (select id from candidates where email = 'julia.wojcik@example.com'),
+    (select id from recruitments where title = 'Data Analyst'),
+    (select id from kanban_stages where recruitment_id is null and name = 'Offer'),
+    now() - interval '2 days'
   );
 
 -- One status-history row per candidate recording the initial add
@@ -276,3 +297,84 @@ select cr.id, null, cr.current_stage_id, '44444444-4444-4444-4444-444444444444',
 from candidate_recruitments cr
 join recruitments r on r.id = cr.recruitment_id
 where r.title = 'Data Analyst';
+
+-- Julia Wojcik's multi-step transition chains (S-06, plan.md Phase 1).
+-- Written directly rather than through `move_candidate_stage`, same
+-- precedent as the rows above: the RPC's note gate is not being
+-- exercised here. `changed_by` uses each recruitment's own tenant
+-- principal, matching the existing convention.
+--
+-- Backend Engineer (Tenant A): added on New, then New -> Screening ->
+-- Interview.
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  null,
+  (select id from kanban_stages where recruitment_id is null and name = 'New'),
+  '11111111-1111-1111-1111-111111111111',
+  cr.added_at
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Backend Engineer' and c.email = 'julia.wojcik@example.com';
+
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  (select id from kanban_stages where recruitment_id is null and name = 'New'),
+  (select id from kanban_stages where recruitment_id is null and name = 'Screening'),
+  '11111111-1111-1111-1111-111111111111',
+  cr.added_at + interval '1 day'
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Backend Engineer' and c.email = 'julia.wojcik@example.com';
+
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  (select id from kanban_stages where recruitment_id is null and name = 'Screening'),
+  (select id from kanban_stages where recruitment_id is null and name = 'Interview'),
+  '11111111-1111-1111-1111-111111111111',
+  cr.added_at + interval '2 days'
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Backend Engineer' and c.email = 'julia.wojcik@example.com';
+
+-- Data Analyst (Tenant B): added on New, then New -> Screening -> Offer.
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  null,
+  (select id from kanban_stages where recruitment_id is null and name = 'New'),
+  '44444444-4444-4444-4444-444444444444',
+  cr.added_at
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Data Analyst' and c.email = 'julia.wojcik@example.com';
+
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  (select id from kanban_stages where recruitment_id is null and name = 'New'),
+  (select id from kanban_stages where recruitment_id is null and name = 'Screening'),
+  '44444444-4444-4444-4444-444444444444',
+  cr.added_at + interval '1 day'
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Data Analyst' and c.email = 'julia.wojcik@example.com';
+
+insert into candidate_recruitment_status_history (candidate_recruitment_id, from_stage_id, to_stage_id, changed_by, changed_at)
+select
+  cr.id,
+  (select id from kanban_stages where recruitment_id is null and name = 'Screening'),
+  (select id from kanban_stages where recruitment_id is null and name = 'Offer'),
+  '44444444-4444-4444-4444-444444444444',
+  cr.added_at + interval '2 days'
+from candidate_recruitments cr
+join recruitments r on r.id = cr.recruitment_id
+join candidates c on c.id = cr.candidate_id
+where r.title = 'Data Analyst' and c.email = 'julia.wojcik@example.com';

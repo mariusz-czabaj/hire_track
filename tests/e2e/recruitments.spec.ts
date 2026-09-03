@@ -38,8 +38,10 @@ test.describe("HR recruiter", () => {
     await expect(page.getByText("Rejected")).toBeVisible();
     await expect(page.getByText("No candidates")).toBeVisible();
 
+    // 6, not 5: the S-06 cross-tenant seed fixture (Julia Wojcik) also
+    // belongs to this recruitment (supabase/seed.sql).
     const addedDates = page.getByText(/^Added \d{4}-\d{2}-\d{2}$/);
-    await expect(addedDates).toHaveCount(5);
+    await expect(addedDates).toHaveCount(6);
   });
 
   test("status filter narrows results and persists across reload", async ({ page }) => {
