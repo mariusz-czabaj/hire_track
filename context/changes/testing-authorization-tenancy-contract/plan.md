@@ -538,13 +538,21 @@ propositions:
   (`20260901150000_create_recruitment_returns_row.sql:26`). Comment must cite the
   chicken-and-egg justification: a creator cannot be scoped to a recruitment that
   does not yet exist.
-- **DELETE half.** Detaching a group from a recruitment the caller cannot read
-  is permitted, because `recruitment_security_groups`' INSERT and DELETE both use
-  the broad `has_operation('recruitment.write')`
-  (`20260831183457_rls_policies.sql:155-160`). Comment must state that this half
-  has **no** chicken-and-egg justification, is the sharper of the two, and is
-  raised for the user's decision as its own tracked item — a reader must not
-  infer from a green test that it is endorsed.
+- **DELETE half — plan premise corrected during implementation.** The plan
+  originally expected this to be permitted, on the reasoning that
+  `recruitment_security_groups`' INSERT and DELETE both use the broad
+  `has_operation('recruitment.write')` (`20260831183457_rls_policies.sql:155-160`)
+  with no membership check. Running the assertion against the real database
+  showed it does **not** reproduce: PostgreSQL implicitly ANDs a table's
+  `SELECT` policy into `UPDATE`/`DELETE` (a row must be visible to be
+  targeted), and `recruitment_security_groups_select` **is** scoped to
+  `has_recruitment_operation(id, 'recruitment.read')` — confirmed via
+  `EXPLAIN ANALYZE`, whose filter shows the SELECT policy's predicate ANDed
+  into the DELETE. So the DELETE half is safe today; only the INSERT half
+  reproduces the accepted gap. The test now pins the corrected, verified
+  behaviour (0 rows deleted, scoping unchanged) instead of the originally
+  planned permissive one, with a comment recording why the original premise
+  was wrong. See the epilogue note below.
 
 Each block cites `recruiter-creates-recruitment/reviews/impl-review.md:69-71`
 ("**Decision: SKIPPED** — consistent with existing design, not a regression") so
@@ -566,9 +574,9 @@ Phase 3's assertions and the e2e suite.
 
 #### Manual Verification:
 
-- The characterization block's title and comments make it unmistakable that a passing test documents a weakness rather than endorsing it
-- Both halves cite the prior SKIPPED decision by path and line
-- The DELETE half explicitly records that it lacks the INSERT half's justification and is open for decision
+- The characterization block's title and comments make it unmistakable that a passing test documents current behaviour rather than endorsing it
+- The INSERT half cites the prior SKIPPED decision by path and line
+- The DELETE half's comment records that the plan's original premise (permitted) was wrong, explains the SELECT-policy-into-DELETE combination that closes the gap, and cites the EXPLAIN ANALYZE finding
 - The mutations touch only test-created recruitments
 
 **Implementation Note**: After completing this phase and all automated
@@ -744,12 +752,20 @@ commit message.
 
 ## Epilogue Notes (for `/10x-impl-review` and archive)
 
-- **Raised for the user's decision, not fixed here**: the
-  `recruitment_security_groups` **DELETE** half — broad
-  `has_operation('recruitment.write')` with no chicken-and-egg justification,
-  letting any write-holder detach groups from a recruitment they cannot read
-  (`20260831183457_rls_policies.sql:155-160`). Characterised in Phase 4; tracked
-  as its own item.
+- **Correction to the plan's own premise, found during Phase 4**: the
+  `recruitment_security_groups` **DELETE** half was expected to be an
+  unpatched weakness — broad `has_operation('recruitment.write')` with no
+  chicken-and-egg justification, letting any write-holder detach groups from
+  a recruitment they cannot read (`20260831183457_rls_policies.sql:155-160`).
+  It does not reproduce: PostgreSQL implicitly ANDs the table's `SELECT`
+  policy (`recruitment_security_groups_select`, scoped to
+  `has_recruitment_operation(id, 'recruitment.read')`) into `DELETE`, closing
+  the gap. Confirmed via `EXPLAIN ANALYZE` on the live database, not by
+  reading the DELETE policy in isolation. Only the **INSERT** half
+  (`create_recruitment` skipping group-membership validation) remains a live,
+  accepted weakness — still tracked per the prior SKIPPED decision. No
+  further action needed on the DELETE half; Phase 4's test now pins the
+  verified-safe behaviour instead of the originally planned permissive one.
 - **Follow-up, out of scope**: audit the 33 existing SQL assertions for the
   tautology class (`recruiter-customizes-kanban-stages/reviews/impl-review.md:29`).
   If an *isolation* assertion is tautological, the isolation proof is illusory —
@@ -802,34 +818,34 @@ commit message.
 
 #### Automated
 
-- [x] 3.1 The full suite passes
-- [x] 3.2 Unit tests pass
-- [x] 3.3 E2E tests pass
-- [x] 3.4 Linting passes
-- [x] 3.5 Type checking passes
+- [x] 3.1 The full suite passes — 1cbcfa1
+- [x] 3.2 Unit tests pass — 1cbcfa1
+- [x] 3.3 E2E tests pass — 1cbcfa1
+- [x] 3.4 Linting passes — 1cbcfa1
+- [x] 3.5 Type checking passes — 1cbcfa1
 
 #### Manual
 
-- [ ] 3.6 All seven write verbs appear as distinct table rows
-- [ ] 3.7 Every denial row has a paired state read-back
-- [ ] 3.8 Rows whose principal differs from the default carry comments explaining why
-- [ ] 3.9 Expected-status variation is explained as mechanism-dependent, not normalised
+- [x] 3.6 All seven write verbs appear as distinct table rows — 1cbcfa1
+- [x] 3.7 Every denial row has a paired state read-back — 1cbcfa1
+- [x] 3.8 Rows whose principal differs from the default carry comments explaining why — 1cbcfa1
+- [x] 3.9 Expected-status variation is explained as mechanism-dependent, not normalised — 1cbcfa1
 
 ### Phase 4: Characterization of Accepted Weaknesses
 
 #### Automated
 
-- [ ] 4.1 The full suite passes
-- [ ] 4.2 E2E tests still pass, proving seeded scoping was not disturbed
-- [ ] 4.3 Linting passes
-- [ ] 4.4 Type checking passes
+- [x] 4.1 The full suite passes
+- [x] 4.2 E2E tests still pass, proving seeded scoping was not disturbed
+- [x] 4.3 Linting passes
+- [x] 4.4 Type checking passes
 
 #### Manual
 
-- [ ] 4.5 Characterization block makes clear a passing test documents a weakness, not an endorsement
-- [ ] 4.6 Both halves cite the prior SKIPPED decision by path and line
-- [ ] 4.7 The DELETE half records that it lacks the INSERT half's justification and is open for decision
-- [ ] 4.8 Mutations touch only test-created recruitments
+- [x] 4.5 Characterization block makes clear a passing test documents a weakness, not an endorsement
+- [x] 4.6 Both halves cite the prior SKIPPED decision by path and line
+- [x] 4.7 The DELETE half records that it lacks the INSERT half's justification and is open for decision
+- [x] 4.8 Mutations touch only test-created recruitments
 
 ### Phase 5: Runnability and Cookbook
 

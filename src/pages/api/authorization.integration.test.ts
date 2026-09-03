@@ -19,7 +19,13 @@
  * -- see test-plan.md §6.2's carve-out, added in Phase 5.
  */
 import { describe, expect, it } from "vitest";
-import { signInIntegrationClient, type IntegrationClient } from "@/lib/test-support/integration-client";
+import {
+  getAccessTokenForRole,
+  signInIntegrationClient,
+  supabaseRestUrl,
+  SUPABASE_ANON_KEY,
+  type IntegrationClient,
+} from "@/lib/test-support/integration-client";
 import type {
   ApiErrorBody,
   CandidateDetailDto,
@@ -812,5 +818,137 @@ describe("#5 write surface: service-layer pre-checks (HTTP-only, invisible to SQ
 
       expect(moveResponse.status).toBe(200);
     });
+  });
+});
+
+// Phase 4: characterization, not repair -- and, for the DELETE half, a
+// correction of the plan's own premise, found by actually running the
+// assertion rather than reasoning about the policy in isolation.
+//
+// recruitment_security_groups' INSERT and DELETE policies both check only
+// the blanket has_operation('recruitment.write')
+// (recruitment_security_groups_insert/_delete,
+// 20260831183457_rls_policies.sql:155-160), with no membership check on the
+// group being attached/detached. Read on their own, both rows look like the
+// same accepted gap documented as "Decision: SKIPPED -- consistent with
+// existing design, not a regression"
+// (recruiter-creates-recruitment/reviews/impl-review.md:69-71).
+//
+// The INSERT half genuinely reproduces that gap. The DELETE half does not:
+// PostgreSQL implicitly ANDs a table's SELECT policy into UPDATE/DELETE,
+// because the row must be visible to be targeted in the first place. Since
+// recruitment_security_groups_select IS scoped
+// (has_recruitment_operation(id, 'recruitment.read')), it silently closes
+// the gap the DELETE policy's blanket check would otherwise leave open --
+// confirmed via EXPLAIN ANALYZE, which shows the SELECT policy's predicate
+// ANDed into the DELETE's row filter. The plan and research.md both
+// predicted this row would succeed; it does not, and the second test below
+// pins the corrected, verified behaviour instead. A future change that
+// removes recruitment_security_groups_select, or narrows it, should make
+// that test fail -- it is the one guarding this now-confirmed-safe boundary.
+describe("characterization (not a specification): unscoped recruitment_security_groups assignment", () => {
+  it("INSERT half: a recruitment.write holder can scope a new recruitment to a group it does not belong to", async () => {
+    // create_recruitment checks only the blanket recruitment.write
+    // operation, never that the caller is a member of p_group_ids
+    // (20260901150000_create_recruitment_returns_row.sql:26). This half has
+    // a real chicken-and-egg justification: at the moment of creation the
+    // recruitment doesn't exist yet, so the caller cannot already be scoped
+    // to it.
+    const tenantPeer = await signInIntegrationClient("tenantPeer");
+    const hrGroupId = await securityGroupIdByName(tenantPeer, "HR/Rekruter");
+
+    const response = await tenantPeer.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify({
+        title: `characterization-insert-${Math.random().toString(36).slice(2)}`,
+        department: "Engineering",
+        location: "Remote",
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+        groupIds: [hrGroupId],
+      }),
+    });
+
+    expect(response.status).toBe(201);
+  });
+
+  it("DELETE half: a recruitment.write holder CANNOT detach a group from a recruitment it cannot read -- the SELECT policy silently closes the gap", async () => {
+    // Verified finding, not a prediction from reading the policy in
+    // isolation: recruitment_security_groups_delete's USING clause is the
+    // same blanket has_operation('recruitment.write') check as INSERT, with
+    // no membership check on the group being detached. Read alone, that
+    // looks exploitable exactly like the INSERT half. It is not, because
+    // PostgreSQL implicitly ANDs a table's SELECT policy into UPDATE/DELETE
+    // -- a row must be visible before it can be targeted for either -- and
+    // recruitment_security_groups_select IS scoped to
+    // has_recruitment_operation(id, 'recruitment.read'). For hr (not a
+    // member of the Tenant B fixture group), that conjunct is false, so the
+    // DELETE removes zero rows even though the DELETE policy's own
+    // predicate is true. Confirmed with EXPLAIN ANALYZE against this exact
+    // query: the plan's Filter is
+    // "(has_operation(...)) AND (has_recruitment_operation(..., 'recruitment.read'))",
+    // the second conjunct coming from the SELECT policy, not the DELETE
+    // policy shown in the migration file.
+    //
+    // No Astro route ever issues this DELETE -- the app has no
+    // group-detach endpoint at all -- so this is the one assertion in the
+    // suite that calls PostgREST directly instead of through the Astro
+    // app, using a raw GoTrue access token
+    // (integration-client.ts#getAccessTokenForRole). This is the "direct
+    // PostgREST write path" research.md flagged for this row -- research.md
+    // and plan.md both predicted this call would succeed; it does not, and
+    // this test pins the corrected, empirically verified behaviour.
+    //
+    // Mutates seeded scoping, so it operates on a recruitment this test
+    // creates itself -- never on Backend Engineer or Data Analyst --
+    // per the plan's discipline for this phase.
+    const tenantPeer = await signInIntegrationClient("tenantPeer");
+    const tenantBGroupId = await securityGroupIdByName(tenantPeer, "Test Fixture -- Tenant B (HR-equivalent)");
+
+    const createResponse = await tenantPeer.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify({
+        title: `characterization-delete-${Math.random().toString(36).slice(2)}`,
+        department: "Engineering",
+        location: "Remote",
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+        groupIds: [tenantBGroupId],
+      }),
+    });
+    const created = (await createResponse.json()) as { id: number; title: string };
+
+    // hr holds recruitment.write blanket but is not a member of the
+    // Tenant B fixture group, so it cannot read the recruitment just
+    // created -- confirming the "cannot read" half of the proposition
+    // before the DELETE is even attempted.
+    const hr = await signInIntegrationClient("hr");
+    const hrListResponse = await hr.fetch("/api/recruitments?status=all");
+    const hrList = (await hrListResponse.json()) as RecruitmentListItemDto[];
+    expect(hrList.some((item) => item.id === created.id)).toBe(false);
+
+    const hrToken = await getAccessTokenForRole("hr");
+    const deleteResponse = await fetch(
+      supabaseRestUrl(`/recruitment_security_groups?recruitment_id=eq.${created.id}&group_id=eq.${tenantBGroupId}`),
+      {
+        method: "DELETE",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${hrToken}`,
+          Prefer: "return=representation",
+        },
+      },
+    );
+
+    expect(deleteResponse.status).toBe(200);
+    const deletedRows = (await deleteResponse.json()) as { recruitment_id: number; group_id: number }[];
+    expect(deletedRows).toHaveLength(0);
+
+    // Effect, not just a status code: the tenant-peer principal who
+    // created it is still its only member, and the recruitment is still
+    // fully scoped -- the attempted detach left no trace.
+    const tenantPeerListResponse = await tenantPeer.fetch("/api/recruitments?status=all");
+    const tenantPeerList = (await tenantPeerListResponse.json()) as RecruitmentListItemDto[];
+    expect(tenantPeerList.some((item) => item.id === created.id)).toBe(true);
   });
 });

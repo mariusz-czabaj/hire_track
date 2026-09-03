@@ -77,3 +77,36 @@ export async function signInIntegrationClient(role: SeededRole): Promise<Integra
     },
   };
 }
+
+const SUPABASE_URL = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
+export const SUPABASE_ANON_KEY = process.env.SUPABASE_KEY ?? "";
+
+/**
+ * Signs in as the given seeded role directly against GoTrue (bypassing the
+ * Astro app entirely) and returns the raw access token. For the rare
+ * assertion that must call PostgREST directly rather than through an Astro
+ * route -- e.g. `recruitment_security_groups` DELETE, which the app never
+ * exercises because no route detaches a group (test-plan.md §2 risk #5,
+ * Phase 4's accepted-weakness characterization).
+ */
+export async function getAccessTokenForRole(role: SeededRole): Promise<string> {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify({ email: SEEDED_CREDENTIALS[role], password: PASSWORD }),
+  });
+
+  const body = (await response.json()) as { access_token?: string };
+  if (!body.access_token) {
+    throw new Error(
+      `getAccessTokenForRole: sign-in as "${role}" against GoTrue returned no access_token (status ${response.status}). ` +
+        `Is the local Supabase stack running and SUPABASE_URL (${SUPABASE_URL}) reachable?`,
+    );
+  }
+  return body.access_token;
+}
+
+/** Builds a PostgREST URL for direct table access, bypassing the Astro app. */
+export function supabaseRestUrl(path: string): string {
+  return `${SUPABASE_URL}/rest/v1${path}`;
+}
