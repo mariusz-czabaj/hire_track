@@ -794,10 +794,10 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [ ] 5.1 Full suite passes from a clean database
-- [ ] 5.2 Linting passes
-- [ ] 5.3 Type checking passes
-- [ ] 5.4 Build succeeds
+- [x] 5.1 Full suite passes from a clean database
+- [x] 5.2 Linting passes
+- [x] 5.3 Type checking passes
+- [x] 5.4 Build succeeds
 
 #### Manual
 

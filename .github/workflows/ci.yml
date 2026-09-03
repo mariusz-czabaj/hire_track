@@ -83,6 +83,15 @@ jobs:
             curl -s -o /dev/null http://localhost:4321/api/recruitments/1/board && break
             sleep 2
           done
+          # candidate-profile-and-cv-upload (S-05) adds a distinct
+          # /api/candidates/... module graph (profile + CV service, RPC
+          # error mapping) that none of the probes above ever touch. Poll
+          # it too, or its first integration test races the optimizer
+          # exactly as the prior probes were added to fix.
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null http://localhost:4321/api/candidates/1 && break
+            sleep 2
+          done
           # The dev server responding isn't enough: right after `supabase
           # start`, the GoTrue and PostgREST containers' clocks can be
           # briefly out of sync, so PostgREST rejects a freshly-issued JWT
