@@ -41,7 +41,7 @@ Four findings dominate, in descending order of impact on the plan:
    the upload feature" and it has not yet been actioned. See [Detailed Findings §3](#3-file-storage-capability--absent-but-pre-decided).
 
 2. **Every candidate route today is recruitment-nested, but the profile is org-wide by design.** `candidates` RLS is
-   gated by org-wide `candidate.read` / `candidate.write` — *not* per-recruitment — yet no route addresses a
+   gated by org-wide `candidate.read` / `candidate.write` — _not_ per-recruitment — yet no route addresses a
    candidate by `candidates.id`. FR-007 ("profile and CV are shared; notes and status are per-recruitment") and
    FR-011 both point at a candidate-scoped profile resource that does not exist. S-06 will need the same resource.
    This is the slice's main architectural fork. See [§2](#2-the-candidate-profile-surface-today).
@@ -65,15 +65,15 @@ identity fields editable needs app code only, no migration), the shared-profile 
 
 ### 1. What S-05 must deliver (requirements, translated from the Polish PRD)
 
-| Ref | Requirement | Note |
-|---|---|---|
-| FR-007 | One candidate participates in many recruitments; **profile (data, CV) is shared**, notes and status are per-recruitment | `context/foundation/prd.md:91` |
-| FR-011 | **A user** can open a candidate profile with personal data | `prd.md:96` — "user", broader than recruiter |
-| FR-012 | **A recruiter** can upload a CV file (PDF/DOCX) to the candidate profile | `prd.md:97` — narrower actor than FR-011 |
-| FR-013a | The CV file is **automatically deleted 12 months after it was added** to the profile | `prd.md:100` |
-| NFR | CV files are **permanently** deleted after 12 months; **profile and status history remain intact** | `prd.md:119` |
-| NFR | **No candidate data is accessible to an unauthorised or unauthenticated user** | `prd.md:117` |
-| Guardrail | "Upload CV musi być niezawodny — utrata pliku jest niedopuszczalna" (upload must be reliable — file loss unacceptable) | `prd.md:47` |
+| Ref       | Requirement                                                                                                             | Note                                         |
+| --------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| FR-007    | One candidate participates in many recruitments; **profile (data, CV) is shared**, notes and status are per-recruitment | `context/foundation/prd.md:91`               |
+| FR-011    | **A user** can open a candidate profile with personal data                                                              | `prd.md:96` — "user", broader than recruiter |
+| FR-012    | **A recruiter** can upload a CV file (PDF/DOCX) to the candidate profile                                                | `prd.md:97` — narrower actor than FR-011     |
+| FR-013a   | The CV file is **automatically deleted 12 months after it was added** to the profile                                    | `prd.md:100`                                 |
+| NFR       | CV files are **permanently** deleted after 12 months; **profile and status history remain intact**                      | `prd.md:119`                                 |
+| NFR       | **No candidate data is accessible to an unauthorised or unauthenticated user**                                          | `prd.md:117`                                 |
+| Guardrail | "Upload CV musi być niezawodny — utrata pliku jest niedopuszczalna" (upload must be reliable — file loss unacceptable)  | `prd.md:47`                                  |
 
 Two requirement details that shape the design and are easy to miss:
 
@@ -107,10 +107,10 @@ updated_at timestamptz not null default now()
 
 **RLS on `candidates` is org-wide, not recruitment-scoped** — `20260831183457_rls_policies.sql:175-190`:
 
-| Policy | Operation | Guard |
-|---|---|---|
-| `candidates_select` | SELECT | `private.has_operation('candidate.read')` |
-| `candidates_insert` | INSERT | `private.has_operation('candidate.write')` |
+| Policy              | Operation                   | Guard                                      |
+| ------------------- | --------------------------- | ------------------------------------------ |
+| `candidates_select` | SELECT                      | `private.has_operation('candidate.read')`  |
+| `candidates_insert` | INSERT                      | `private.has_operation('candidate.write')` |
 | `candidates_update` | UPDATE (using + with check) | `private.has_operation('candidate.write')` |
 
 No DELETE policy (explicitly noted at `:177-178`). Grant at `:242` is `select, insert, update` only.
@@ -120,12 +120,12 @@ No DELETE policy (explicitly noted at `:177-178`). Grant at `:242` is `select, i
 
 **Every route is recruitment-nested.** The four candidate surfaces are:
 
-| File | Verbs | Addressed by |
-|---|---|---|
-| `src/pages/recruitments/[id]/candidates/[candidateId].astro` | page shell | `candidate_recruitments.id` |
-| `src/pages/api/recruitments/[id]/candidates/index.ts` | POST | — |
+| File                                                                | Verbs      | Addressed by                |
+| ------------------------------------------------------------------- | ---------- | --------------------------- |
+| `src/pages/recruitments/[id]/candidates/[candidateId].astro`        | page shell | `candidate_recruitments.id` |
+| `src/pages/api/recruitments/[id]/candidates/index.ts`               | POST       | —                           |
 | `src/pages/api/recruitments/[id]/candidates/[candidateId]/index.ts` | GET, PATCH | `candidate_recruitments.id` |
-| `src/pages/api/recruitments/[id]/candidates/[candidateId]/notes.ts` | PUT | `candidate_recruitments.id` |
+| `src/pages/api/recruitments/[id]/candidates/[candidateId]/notes.ts` | PUT        | `candidate_recruitments.id` |
 
 **No route anywhere addresses a candidate by `candidates.id`.** Nothing exists under `src/pages/candidates/` or
 `src/pages/api/candidates/`. `candidates.id` appears only as an output field (`CandidateDetailDto.candidateId`,
@@ -233,12 +233,12 @@ retention job has none.**
 
 **Net position: all four scheduling mechanisms need something that does not exist yet.**
 
-| Mechanism | What it needs that is missing |
-|---|---|
-| Cloudflare Cron Trigger | A project-owned worker entry exporting `scheduled` (adapter entry exports only `fetch`) |
-| `pg_cron` in Postgres | The extension enabled; plus a way to delete the *object* (not just the row) — the `storage` schema is not PostgREST-exposed and SQL deletion of `storage.objects` does not reliably remove the underlying S3 object |
-| Supabase Edge Function | The `supabase/functions/` tree, a deploy path (CI runs neither `supabase functions deploy` nor `wrangler`), and a scheduler to invoke it |
-| GitHub Actions `schedule:` | A `schedule:` trigger and a service-role secret (neither exists) |
+| Mechanism                  | What it needs that is missing                                                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cloudflare Cron Trigger    | A project-owned worker entry exporting `scheduled` (adapter entry exports only `fetch`)                                                                                                                             |
+| `pg_cron` in Postgres      | The extension enabled; plus a way to delete the _object_ (not just the row) — the `storage` schema is not PostgREST-exposed and SQL deletion of `storage.objects` does not reliably remove the underlying S3 object |
+| Supabase Edge Function     | The `supabase/functions/` tree, a deploy path (CI runs neither `supabase functions deploy` nor `wrangler`), and a scheduler to invoke it                                                                            |
+| GitHub Actions `schedule:` | A `schedule:` trigger and a service-role secret (neither exists)                                                                                                                                                    |
 
 **CI constraints that bear on this slice** (`.github/workflows/ci.yml`, 107 lines, two jobs):
 
@@ -258,15 +258,15 @@ retention job has none.**
 **Errcode codebook** — the complete set in use across all migrations, documented at
 `20260901162000_kanban_stage_rpcs.sql:5-11`:
 
-| Code | Meaning |
-|---|---|
-| `42501` | `insufficient_privilege` — caller lacks the required operation |
-| `P0002` | `not_found` — caller cannot even read the parent resource |
-| `22023` | `invalid_request` — malformed input |
-| `PA001` | `stages_locked` — recruitment already has candidates |
-| `PA002` | `stage_referenced` — a default stage removal is still referenced |
+| Code    | Meaning                                                                                |
+| ------- | -------------------------------------------------------------------------------------- |
+| `42501` | `insufficient_privilege` — caller lacks the required operation                         |
+| `P0002` | `not_found` — caller cannot even read the parent resource                              |
+| `22023` | `invalid_request` — malformed input                                                    |
+| `PA001` | `stages_locked` — recruitment already has candidates                                   |
+| `PA002` | `stage_referenced` — a default stage removal is still referenced                       |
 | `PA003` | `candidate_name_mismatch` — email matches an existing candidate under a different name |
-| `PA004` | `note_required` — no note exists for the stage being left |
+| `PA004` | `note_required` — no note exists for the stage being left                              |
 
 **`PA005` is the next free code.** Note `23503` (FK violation) is used ad-hoc at the recruitments route to mean
 "nonexistent group" and is not part of the formal codebook.
@@ -330,7 +330,7 @@ covered, but a new top-level `/candidates` family would not be. Authentication o
 **Six recurring failure themes across the five prior reviews** — the plan should pre-empt each:
 
 1. **A new RPC ships without an authorization re-check, or without any RLS assertion.** S-04 F1 (critical) plus F6;
-   the review noted an assertion would have caught it. Every RPC needs authz as its first statement *and* a numbered
+   the review noted an assertion would have caught it. Every RPC needs authz as its first statement _and_ a numbered
    `rls_verification.sql` block including a denial case.
 2. **Unmapped Postgres errcodes falling through to 500.** S-02 F2 (`23503`), S-03 F4 (`PA002`), S-04 F5 (`23503`).
    Every code an RPC or FK can raise needs an explicit branch or a pre-check that prevents it.
@@ -344,20 +344,20 @@ covered, but a new top-level `/candidates` family would not be. Authentication o
 
 **Known open debt this slice would build on** (findings deliberately SKIPPED in prior reviews, still live):
 
-| Debt | Source | Relevance to S-05 |
-|---|---|---|
-| **No DELETE policy or grant on any domain table**, and no precedent anywhere for a "deleting actor" | F-01 / S-04 plans | **Highest.** The retention job deletes data; there is no policy path and no precedent for an unattended deleter |
-| No CSRF token scheme on the JSON API (Astro's built-in origin check covers form POSTs only) | S-02, re-affirmed S-04 | Moderate — S-05 adds a new write surface |
-| `getKanbanBoard` has no upper bound on candidates fetched (no board pagination) | S-01 F3 | Low — S-05 does not touch the board read path |
-| `useApiResource.refetch()` duplicates the mount-effect fetch logic | S-02 F6 | Low, but the profile page uses this hook, and a new status branch must be added in **both** copies |
-| Hardcoded `password123` in the integration harness and Playwright helper | S-02 F5 | Low — S-05 tests reuse the harness |
-| `p_group_ids` not scoped to the caller's own groups | S-02 F4 | None directly |
-| `PA002` unmapped in the stages endpoint (dead until S-07) | S-03 F4 | Precedent: map every errcode a new RPC can raise |
-| Timestamp column naming varies (`added_at`, `changed_at` vs `created_at`) | F-01 F7 | Minor — pick a name consistent with the neighbouring table |
-| S-04's integration + e2e suites were not re-run after its triage fixes | S-04 review `:26-28` | Worth a confirmation pass before S-05 builds on top |
+| Debt                                                                                                | Source                 | Relevance to S-05                                                                                               |
+| --------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **No DELETE policy or grant on any domain table**, and no precedent anywhere for a "deleting actor" | F-01 / S-04 plans      | **Highest.** The retention job deletes data; there is no policy path and no precedent for an unattended deleter |
+| No CSRF token scheme on the JSON API (Astro's built-in origin check covers form POSTs only)         | S-02, re-affirmed S-04 | Moderate — S-05 adds a new write surface                                                                        |
+| `getKanbanBoard` has no upper bound on candidates fetched (no board pagination)                     | S-01 F3                | Low — S-05 does not touch the board read path                                                                   |
+| `useApiResource.refetch()` duplicates the mount-effect fetch logic                                  | S-02 F6                | Low, but the profile page uses this hook, and a new status branch must be added in **both** copies              |
+| Hardcoded `password123` in the integration harness and Playwright helper                            | S-02 F5                | Low — S-05 tests reuse the harness                                                                              |
+| `p_group_ids` not scoped to the caller's own groups                                                 | S-02 F4                | None directly                                                                                                   |
+| `PA002` unmapped in the stages endpoint (dead until S-07)                                           | S-03 F4                | Precedent: map every errcode a new RPC can raise                                                                |
+| Timestamp column naming varies (`added_at`, `changed_at` vs `created_at`)                           | F-01 F7                | Minor — pick a name consistent with the neighbouring table                                                      |
+| S-04's integration + e2e suites were not re-run after its triage fixes                              | S-04 review `:26-28`   | Worth a confirmation pass before S-05 builds on top                                                             |
 
 The `lessons.md` register currently holds one accepted rule: **all code and artifacts in English**, even when the
-conversation is in Polish, and Polish source documents (PRD, roadmap) must be *translated* into the artifact rather
+conversation is in Polish, and Polish source documents (PRD, roadmap) must be _translated_ into the artifact rather
 than copied through (`context/foundation/lessons.md:5-10`). Note the rule binds new artifacts only — the existing
 Polish PRD, roadmap, and F-01 documents were left untranslated.
 
@@ -404,7 +404,7 @@ data, this implies: a private bucket, short TTLs, and no long-lived URL ever per
 
 **The profile is already org-wide at the database layer; only the application is recruitment-scoped.** This is the
 cleanest finding of the research. `candidates` RLS answers to `candidate.read`/`candidate.write` with no recruitment
-predicate, so a query addressed purely by `candidates.id` is *already permitted today* — nothing in the schema forces
+predicate, so a query addressed purely by `candidates.id` is _already permitted today_ — nothing in the schema forces
 the profile through `candidate_recruitments`. The nesting is an application-layer artifact of S-01…S-04, which had no
 reason to address a candidate directly. FR-007 and FR-011 both describe a candidate-scoped resource, and S-06
 (candidate history search) will require one. Building `/candidates/:candidateId` in S-05 costs a route family and a
@@ -414,7 +414,7 @@ DTO split now; deferring it means S-06 reworks whatever S-05 bolts onto the nest
 RPCs, routes, and components — all request-scoped, all authorised by a logged-in user. FR-013a needs unattended
 execution with elevated privilege, and the project has neither an execution surface (the adapter's worker entry has
 no `scheduled` export; no functions tree; no scheduled CI) nor a privileged identity (no service-role key; every RPC
-gates on `auth.uid()`). It also has no *deletion* precedent at all: there is no DELETE policy or grant on any domain
+gates on `auth.uid()`). It also has no _deletion_ precedent at all: there is no DELETE policy or grant on any domain
 table in the schema — deletion has been refused by omission everywhere, deliberately, since F-01. FR-013a is the
 first requirement in the project that genuinely needs something removed. Whichever mechanism is chosen, it is net-new
 infrastructure with a new deploy path and, per `infrastructure.md:96`, service-role key handling is a human-only

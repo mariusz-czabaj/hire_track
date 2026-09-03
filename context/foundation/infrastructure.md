@@ -19,14 +19,14 @@ The project's `@astrojs/cloudflare` adapter already targets the `workerd` runtim
 
 ## Platform Comparison
 
-| Platform | CLI-first | Managed/Serverless | Agent docs | Stable deploy API | MCP / Integration | Total |
-|---|---|---|---|---|---|---|
-| **Cloudflare Workers** | Pass | Pass | Pass | Pass | Pass | **5 / 5** |
-| **Vercel** | Pass | Pass | Pass | Pass | Pass | **5 / 5** |
-| **Render** | Pass | Partial | Pass | Pass | Pass | **4.5 / 5** |
-| **Railway** | Pass | Partial | Pass | Pass | Partial | **4 / 5** |
-| **Netlify** | Partial | Pass | Pass | Partial | Pass | **4 / 5** |
-| **Fly.io** | Pass | Partial | Pass | Pass | Partial | **4 / 5** |
+| Platform               | CLI-first | Managed/Serverless | Agent docs | Stable deploy API | MCP / Integration | Total       |
+| ---------------------- | --------- | ------------------ | ---------- | ----------------- | ----------------- | ----------- |
+| **Cloudflare Workers** | Pass      | Pass               | Pass       | Pass              | Pass              | **5 / 5**   |
+| **Vercel**             | Pass      | Pass               | Pass       | Pass              | Pass              | **5 / 5**   |
+| **Render**             | Pass      | Partial            | Pass       | Pass              | Pass              | **4.5 / 5** |
+| **Railway**            | Pass      | Partial            | Pass       | Pass              | Partial           | **4 / 5**   |
+| **Netlify**            | Partial   | Pass               | Pass       | Partial           | Pass              | **4 / 5**   |
+| **Fly.io**             | Pass      | Partial            | Pass       | Pass              | Partial           | **4 / 5**   |
 
 **Scoring notes**:
 
@@ -96,16 +96,16 @@ A month after launch, a surprise line item appeared on the Cloudflare bill: the 
 
 ## Risk Register
 
-| Risk | Source | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
-| `wrangler pages deploy` fails on first deploy due to Pages deprecation | Research finding | High | Medium | Audit `wrangler.toml` before deploying; switch to `wrangler deploy` + Workers-style config. Document in deploy-plan.md. |
-| CV upload silently drops files >5MB proxied through Worker | Devil's advocate | High | High | Implement direct-to-Supabase presigned URL upload from the browser. Do not proxy file bytes through the Worker. Decide before building the upload feature. |
-| workerd runtime breaks npm dependency at runtime (not build time) | Devil's advocate | Medium | Medium | Test each new npm package with `wrangler dev` before merging. Pin `nodejs_compat` in `compatibility_flags`. Add integration smoke test for critical dependencies. |
-| Per-Worker-per-day billing adds unexpected cost across environments | Unknown unknowns | Medium | Low | Check current pricing page before creating staging/preview environments. Consider a single "preview" Worker environment instead of per-branch Workers. |
-| `.dev.vars` vs `.env` confusion blocks new developer setup | Unknown unknowns | High | Low | Document the difference in CLAUDE.md and onboarding. Confirm `.dev.vars.example` exists alongside `.env.example`. |
-| Supabase cold start adds 200–500ms TTFB; PRD requires <2s loads | Unknown unknowns | Medium | Medium | Validate under realistic traffic early. Consider connection reuse patterns with `@supabase/ssr`. Monitor with `wrangler tail`. |
-| Scoped API token not configured; agent has overly broad Cloudflare access | Unknown unknowns | Low | High | Create a project-scoped Cloudflare API token limited to Workers. Store in Claude Code MCP config, not in repo. |
-| Compatibility date outdated; runtime APIs silently disabled | Unknown unknowns | Low | Medium | Set `compatibility_date` to a recent date (2024-09-23 or later for full nodejs_compat). Review on each major dependency upgrade. |
+| Risk                                                                      | Source           | Likelihood | Impact | Mitigation                                                                                                                                                        |
+| ------------------------------------------------------------------------- | ---------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wrangler pages deploy` fails on first deploy due to Pages deprecation    | Research finding | High       | Medium | Audit `wrangler.toml` before deploying; switch to `wrangler deploy` + Workers-style config. Document in deploy-plan.md.                                           |
+| CV upload silently drops files >5MB proxied through Worker                | Devil's advocate | High       | High   | Implement direct-to-Supabase presigned URL upload from the browser. Do not proxy file bytes through the Worker. Decide before building the upload feature.        |
+| workerd runtime breaks npm dependency at runtime (not build time)         | Devil's advocate | Medium     | Medium | Test each new npm package with `wrangler dev` before merging. Pin `nodejs_compat` in `compatibility_flags`. Add integration smoke test for critical dependencies. |
+| Per-Worker-per-day billing adds unexpected cost across environments       | Unknown unknowns | Medium     | Low    | Check current pricing page before creating staging/preview environments. Consider a single "preview" Worker environment instead of per-branch Workers.            |
+| `.dev.vars` vs `.env` confusion blocks new developer setup                | Unknown unknowns | High       | Low    | Document the difference in CLAUDE.md and onboarding. Confirm `.dev.vars.example` exists alongside `.env.example`.                                                 |
+| Supabase cold start adds 200–500ms TTFB; PRD requires <2s loads           | Unknown unknowns | Medium     | Medium | Validate under realistic traffic early. Consider connection reuse patterns with `@supabase/ssr`. Monitor with `wrangler tail`.                                    |
+| Scoped API token not configured; agent has overly broad Cloudflare access | Unknown unknowns | Low        | High   | Create a project-scoped Cloudflare API token limited to Workers. Store in Claude Code MCP config, not in repo.                                                    |
+| Compatibility date outdated; runtime APIs silently disabled               | Unknown unknowns | Low        | Medium | Set `compatibility_date` to a recent date (2024-09-23 or later for full nodejs_compat). Review on each major dependency upgrade.                                  |
 
 ## Getting Started
 
@@ -122,6 +122,7 @@ A month after launch, a surprise line item appeared on the Cloudflare bill: the 
 ## Out of Scope
 
 The following were not evaluated in this research:
+
 - Docker image configuration
 - CI/CD pipeline setup (GitHub Actions / Bitbucket Pipelines wiring)
 - Production-scale architecture (multi-region, HA, DR)

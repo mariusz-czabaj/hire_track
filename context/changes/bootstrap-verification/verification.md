@@ -40,10 +40,10 @@ The 10x Astro Starter (Astro 6 + React 19 + TypeScript + Tailwind CSS 4 + Supaba
 
 ## Pre-scaffold verification
 
-| Signal      | Value    | Severity | Notes                                                |
-| ----------- | -------- | -------- | ---------------------------------------------------- |
-| npm package | not run  | —        | cmd_template starts with `git clone`; npm step skipped |
-| GitHub repo | not run  | —        | `gh` CLI not installed; network check unavailable    |
+| Signal      | Value   | Severity | Notes                                                  |
+| ----------- | ------- | -------- | ------------------------------------------------------ |
+| npm package | not run | —        | cmd_template starts with `git clone`; npm step skipped |
+| GitHub repo | not run | —        | `gh` CLI not installed; network check unavailable      |
 
 ## Scaffold log
 
@@ -69,6 +69,7 @@ None.
 #### HIGH findings
 
 **devalue** — range `5.6.3 – 5.8.0` (transitive)
+
 - Advisory: GHSA-77vg-94rm-hx3p — Svelte devalue: DoS via sparse array deserialization
 - CVSS 7.5 (AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H)
 - CWE-770 (Allocation of Resources Without Limits)
@@ -92,27 +93,28 @@ None.
 
 ## Hints recorded but not acted on
 
-| Hint                    | Value                  |
-| ----------------------- | ---------------------- |
-| bootstrapper_confidence | first-class            |
-| quality_override        | false                  |
-| path_taken              | standard               |
-| self_check_answers      | null                   |
-| team_size               | solo                   |
-| deployment_target       | cloudflare-pages       |
-| ci_provider             | bitbucket-pipelines    |
-| ci_default_flow         | manual-promotion       |
-| has_auth                | true                   |
-| has_payments            | false                  |
-| has_realtime            | false                  |
-| has_ai                  | false                  |
-| has_background_jobs     | false                  |
+| Hint                    | Value               |
+| ----------------------- | ------------------- |
+| bootstrapper_confidence | first-class         |
+| quality_override        | false               |
+| path_taken              | standard            |
+| self_check_answers      | null                |
+| team_size               | solo                |
+| deployment_target       | cloudflare-pages    |
+| ci_provider             | bitbucket-pipelines |
+| ci_default_flow         | manual-promotion    |
+| has_auth                | true                |
+| has_payments            | false               |
+| has_realtime            | false               |
+| has_ai                  | false               |
+| has_background_jobs     | false               |
 
 ## Next steps
 
 Next: a future skill will set up agent context (CLAUDE.md, AGENTS.md). For now, your project is scaffolded and verified — happy hacking.
 
 Useful manual steps in the meantime:
+
 - `git init` (if you have not already) to start your own repo history.
 - Review `CLAUDE.md.scaffold` — the starter shipped its own CLAUDE.md; diff it against the existing one to see what to merge.
 - Address audit findings per your project's risk tolerance — the full breakdown is in this log. Run `npm audit fix` to resolve automatically-fixable items.

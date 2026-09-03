@@ -27,8 +27,8 @@ every domain endpoint. Covers risks **#1** (cross-group read/edit), **#4**
 (shared candidate profile leaks PII from an invisible recruitment), and **#5**
 (a principal lacking the write operation succeeds at a write).
 
-Per test-plan §1 principle #3, this document is the ground truth for *where*
-the failures live; §2 of the plan only says *what* could fail.
+Per test-plan §1 principle #3, this document is the ground truth for _where_
+the failures live; §2 of the plan only says _what_ could fail.
 
 ## Summary
 
@@ -42,17 +42,17 @@ Six findings drive the plan:
 2. **The database layer is already well covered — the HTTP layer is not.**
    `supabase/tests/rls_verification.sql` is 1032 lines / 33 assertions and
    already includes cross-group isolation. The test plan's "test base:
-   sparse" judgement is accurate for the *application* surface but
+   sparse" judgement is accurate for the _application_ surface but
    understates the DB surface. Phase 1 must not re-test RLS in SQL; it must
    cover what SQL impersonation structurally cannot reach.
 3. **The decisive fixture gap: there is no "same powers, wrong tenant"
    principal.** The seeded non-member (`admin.test@example.com`) is a
-   *privileged* non-member holding only `group.manage`, so every denial it
+   _privileged_ non-member holding only `group.manage`, so every denial it
    produces is ambiguous — denied for non-membership, or denied for lacking
    `recruitment.*`? Phase 1 cannot prove isolation until this is fixed.
 4. **Risk #4 must be re-framed, not tested as written.** Org-wide candidate
-   visibility is *intentional and PRD-sourced* (FR-007, FR-015, FR-016). The
-   leak to test is the *per-recruitment* fields, not the shared profile.
+   visibility is _intentional and PRD-sourced_ (FR-007, FR-015, FR-016). The
+   leak to test is the _per-recruitment_ fields, not the shared profile.
 5. **Two live authorization weaknesses are in scope for risk #5**, both
    accepted-by-decision rather than accidental: unscoped group assignment on
    `recruitment_security_groups`, and a direct PostgREST write path on
@@ -77,24 +77,24 @@ Prior decisions state this posture explicitly:
 
 ### The tenancy model and its two grant tiers
 
-`private.has_operation(op)` is **recruitment-independent**: membership in *any*
+`private.has_operation(op)` is **recruitment-independent**: membership in _any_
 group holding the operation. `private.has_recruitment_operation(id, op)` is
-correctly scoped — it requires membership **and** the operation on the *same*
+correctly scoped — it requires membership **and** the operation on the _same_
 group attached to that recruitment (`go.group_id = rsg.group_id`). Both at
 `supabase/migrations/20260831195143_mark_rls_helpers_stable.sql:5-36`.
 
 The tenancy edge is the only chain that matters:
 `recruitment_security_groups → group_memberships → group_operations`.
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|---|---|---|---|---|
-| `recruitments` | `HRO(id,read)` | **`HO(write)`** | `HRO(id,write)` | none |
-| `recruitment_security_groups` | `HRO(rid,read)` | **`HO(write)`** | none | **`HO(write)`** |
-| `candidates` | **`HO(candidate.read)`** | `HO(candidate.write)` | `HO(candidate.write)` | none |
-| `candidate_recruitments` | `HRO(rid,read)` | `HRO(rid,write)` | `HRO(rid,write)` | none |
-| `candidate_recruitment_status_history` | EXISTS→parent read | EXISTS→parent write | none | none |
-| `candidate_stage_notes` | EXISTS→parent read | EXISTS→parent write | EXISTS→parent write | none |
-| `security_groups` | **`using (true)`** | `HO(group.manage)` | `HO(group.manage)` | `HO(group.manage)` |
+| Table                                  | SELECT                   | INSERT                | UPDATE                | DELETE             |
+| -------------------------------------- | ------------------------ | --------------------- | --------------------- | ------------------ |
+| `recruitments`                         | `HRO(id,read)`           | **`HO(write)`**       | `HRO(id,write)`       | none               |
+| `recruitment_security_groups`          | `HRO(rid,read)`          | **`HO(write)`**       | none                  | **`HO(write)`**    |
+| `candidates`                           | **`HO(candidate.read)`** | `HO(candidate.write)` | `HO(candidate.write)` | none               |
+| `candidate_recruitments`               | `HRO(rid,read)`          | `HRO(rid,write)`      | `HRO(rid,write)`      | none               |
+| `candidate_recruitment_status_history` | EXISTS→parent read       | EXISTS→parent write   | none                  | none               |
+| `candidate_stage_notes`                | EXISTS→parent read       | EXISTS→parent write   | EXISTS→parent write   | none               |
+| `security_groups`                      | **`using (true)`**       | `HO(group.manage)`    | `HO(group.manage)`    | `HO(group.manage)` |
 
 Policies: `supabase/migrations/20260831183457_rls_policies.sql:69-230`;
 notes `20260901210000_candidate_stage_notes.sql:28-67`.
@@ -106,7 +106,7 @@ is denied by absence. RLS is enabled on all tables.
 
 **Attribution caveat for the plan.** Table grants (`:234-244`) are narrowed to
 the verbs that have policies. A `DELETE` on `recruitments` therefore fails as
-`42501` at the *grant* layer, not via RLS. A test asserting "RLS denied it"
+`42501` at the _grant_ layer, not via RLS. A test asserting "RLS denied it"
 would be asserting the wrong mechanism.
 
 ### Risk #1 — cross-group read and write
@@ -126,7 +126,7 @@ What is **not** covered anywhere, and is HTTP-observable:
   an invisible row makes the update a silent no-op returning `null`, which the
   handler maps to **404** (`src/pages/api/recruitments/[id]/index.ts:46`). The
   existing test already encodes this (`HM PATCH → 404`). Phase 1 must assert
-  the *pair*: the non-member gets 404 **and** the row is unchanged when read
+  the _pair_: the non-member gets 404 **and** the row is unchanged when read
   back by a member. Asserting only the status code is the test plan's named
   anti-pattern.
 - **The multi-group principal.** Because `has_recruitment_operation` requires
@@ -150,13 +150,13 @@ So the boundary to test is the **split**, exactly as the test plan's "Context
 research must ground" column demanded ("Which fields are per-recruitment
 versus shared"):
 
-| Shared (org-wide, `candidate.read`) | Per-recruitment (`HRO`) |
-|---|---|
+| Shared (org-wide, `candidate.read`)      | Per-recruitment (`HRO`)                                       |
+| ---------------------------------------- | ------------------------------------------------------------- |
 | `candidates.full_name`, `email`, `phone` | `candidate_recruitments` link, `current_stage_id`, `added_at` |
-| `candidate_cvs` rows and CV bytes | `candidate_recruitment_status_history` |
-| | `candidate_stage_notes` |
+| `candidate_cvs` rows and CV bytes        | `candidate_recruitment_status_history`                        |
+|                                          | `candidate_stage_notes`                                       |
 
-Testing that a non-member *can* see the shared profile is correct behaviour;
+Testing that a non-member _can_ see the shared profile is correct behaviour;
 testing that the shared fields don't leak is the plan's named anti-pattern
 ("exercising only the shared fields, where by construction no leak is
 possible"). **The assertion is: a viewer holding `candidate.read` but not a
@@ -195,7 +195,7 @@ The full write surface to enumerate:
 Two genuine weaknesses, both **accepted by prior decision** — Phase 1 should
 characterise them, not silently "fix" them:
 
-- **Unscoped group assignment.** `recruitment_security_groups` INSERT *and*
+- **Unscoped group assignment.** `recruitment_security_groups` INSERT _and_
   DELETE both use the broad `HO('recruitment.write')`
   (`20260831183457_rls_policies.sql:155-160`), and `create_recruitment` checks
   only the blanket operation without validating that the caller belongs to the
@@ -240,15 +240,15 @@ recruitment Y:
   author field (`src/types.ts:99`).
 
 A related gap worth one assertion: `move_candidate_stage` does not verify that
-`to_stage_id` belongs to the recruitment's stage set. A foreign *override* stage
+`to_stage_id` belongs to the recruitment's stage set. A foreign _override_ stage
 is caught by the `BEFORE UPDATE` consistency trigger
 (`20260901161434_kanban_stage_customization.sql:54-74`, `22023`), but any
-*global default* stage id is accepted unconditionally.
+_global default_ stage id is accepted unconditionally.
 
 `GET /api/security-groups` also returns the full group list unfiltered
 (`src/pages/api/security-groups.ts:15`), relying on `security_groups_select
 using (true)`. This is intentional — FR-001a needs the list at creation time
-(`core-recruitment-data-foundation/plan.md:163`) — but group *names* are
+(`core-recruitment-data-foundation/plan.md:163`) — but group _names_ are
 organisational metadata, so it deserves a documented expected-value assertion
 rather than being left implicit.
 
@@ -272,7 +272,7 @@ Non-obvious constraints any new suite must copy:
 - **No data reset of any kind** — no `beforeEach`, no truncation, no
   transaction rollback. The discipline is create-your-own-fixture and never
   assert on global counts. Rows accumulate; CI resets with
-  `npx supabase db reset --local` *after* the integration job.
+  `npx supabase db reset --local` _after_ the integration job.
 - `validCreateBody()` uses `groupIds: [1]`, relying on seed insertion order.
   New fixtures should look groups up **by name**, as `seed.sql` itself does.
 
@@ -303,13 +303,13 @@ wiring this script is a cheap, high-value part of that.
 
 Seeded principals (`supabase/seed.sql:31-89`), each in exactly one group:
 
-| Principal | Group | Operations |
-|---|---|---|
-| `hr.test@example.com` | HR/Rekruter | `recruitment.read/write`, `candidate.read/write` |
-| `hiring-manager.test@example.com` | Hiring Manager | `recruitment.read`, `candidate.read` |
-| `admin.test@example.com` | Administrator | `group.manage` **only** |
+| Principal                         | Group          | Operations                                       |
+| --------------------------------- | -------------- | ------------------------------------------------ |
+| `hr.test@example.com`             | HR/Rekruter    | `recruitment.read/write`, `candidate.read/write` |
+| `hiring-manager.test@example.com` | Hiring Manager | `recruitment.read`, `candidate.read`             |
+| `admin.test@example.com`          | Administrator  | `group.manage` **only**                          |
 
-There is exactly **one** recruitment (`Backend Engineer`), linked to *both*
+There is exactly **one** recruitment (`Backend Engineer`), linked to _both_
 HR/Rekruter and Hiring Manager (`seed.sql:94-105`).
 
 The seed comment calls the Administrator the cross-group-isolation fixture, and
@@ -322,7 +322,7 @@ proposition risk #1 exists to test.
 
 To prove isolation rather than mere lack of privilege, Phase 1 needs:
 
-- **(a)** a fourth group with the *same* operations as HR/Rekruter, and a user
+- **(a)** a fourth group with the _same_ operations as HR/Rekruter, and a user
   in it — the "same powers, wrong tenant" principal;
 - **(b)** a **second recruitment** scoped only to that fourth group, so each
   principal has a recruitment the other cannot see (isolation becomes
@@ -338,7 +338,7 @@ editing `supabase/seed.sql` and extending `SEEDED_CREDENTIALS`
 integration and e2e test's environment, so it should be its own early sub-phase
 with the full suite re-run as its verification.
 
-Note also that a *new* recruitment must not disturb existing assertions: e2e
+Note also that a _new_ recruitment must not disturb existing assertions: e2e
 specs already PATCH freshly created recruitments off `draft` to avoid polluting
 filter assertions (`tests/e2e/candidates.spec.ts:6-33`).
 
@@ -368,24 +368,24 @@ filter assertions (`tests/e2e/candidates.spec.ts:6-33`).
 - **Single enforcement point, by policy.** Authorization is in Postgres and
   nowhere else. This is a strength for auditability and the reason the SQL
   harness is so thorough — but it means the application layer's own scoping
-  logic (the three TS pre-checks) has *no* coverage at all, because the SQL
+  logic (the three TS pre-checks) has _no_ coverage at all, because the SQL
   harness cannot see it and unit tests stub the client.
 - **Two-tier grants are a deliberate design, not an oversight.** Org-wide for
   `candidate.*` and `group.manage`; recruitment-scoped for `recruitment.*` on
   existing rows. Every broad check is accompanied by a migration comment
   explaining it. A test suite that treats a broad check as a bug will produce
   noise; the correct posture is to pin the intended behaviour so an
-  *unintentional* widening is caught.
+  _unintentional_ widening is caught.
 - **"No policy" is the deny mechanism.** Absent DELETE/UPDATE policies plus
   narrowed grants mean denial arrives at the grant layer. Tests should assert
-  the *effect* (no row change), not a specific SQLSTATE origin.
+  the _effect_ (no row change), not a specific SQLSTATE origin.
 - **404 is the tenancy signal, not 403.** For scoped reads and updates, an
   invisible row is indistinguishable from a missing one — deliberately.
   Assertions must therefore always pair the response with a read-back by a
   legitimate member; the status code alone is not evidence of a data boundary.
 - **Review history shows this risk class is real and recurring.** Two
   authorization defects (email enumeration; cross-recruitment note stages) and
-  one tautological assertion were all caught in *review*, not by tests. That
+  one tautological assertion were all caught in _review_, not by tests. That
   is the strongest available argument for Phase 1's cost.
 
 ## Historical Context (from prior changes)
@@ -431,8 +431,7 @@ open questions.
    a recruitment they cannot read — is **raised for the user's decision** and
    tracked as its own item; it is characterised by a test here, not repaired
    here.
-3. **The note-gate bypass on `candidate_recruitments` UPDATE stays with Phase
-   2.** It is flagged in this document and deliberately not asserted in Phase
+3. **The note-gate bypass on `candidate_recruitments` UPDATE stays with Phase 2.** It is flagged in this document and deliberately not asserted in Phase
    1, to keep the phases from overlapping.
 4. **`rls_verification.sql` gets an npm script in Phase 1** (fixing the
    documented-broken `supabase db query -f` invocation in its header at
@@ -446,7 +445,7 @@ open questions.
 6. **Auditing the 33 existing SQL assertions for the tautology class**
    (`recruiter-customizes-kanban-stages/reviews/impl-review.md:29`) is a
    follow-up, not Phase 1 scope. Worth one note in the plan's epilogue: if an
-   *isolation* assertion is tautological, the isolation proof is illusory.
+   _isolation_ assertion is tautological, the isolation proof is illusory.
 
 ## Open Questions
 

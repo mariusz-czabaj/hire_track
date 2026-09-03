@@ -39,25 +39,25 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 
 ## At a glance
 
-| ID | Change ID | Outcome (user can …) | Prerequisites | PRD refs | Status |
-|---|---|---|---|---|---|
-| F-01 | core-recruitment-data-foundation | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa | — | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
-| S-01 | recruiter-views-kanban-board | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów | F-01 | US-01, FR-003, FR-004, FR-005, FR-010 | in-progress |
-| S-02 | recruiter-creates-recruitment | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status | F-01, S-01 | FR-001, FR-001a, FR-002 | in-progress |
-| S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji | F-01, S-01 | FR-004 | in-progress |
-| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu) | S-01, S-02 | FR-006, FR-008, FR-009, FR-013, Business Logic | in-progress |
-| S-05 | candidate-profile-and-cv-upload | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach | S-04 | FR-011, FR-012, FR-013a, NFR-retencja | in-progress |
-| S-06 | candidate-history-search | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01 | US-02, FR-014, FR-015, FR-016 | proposed |
-| S-07 | admin-manages-security-groups | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników | F-01 | FR-017, FR-018 | proposed |
+| ID   | Change ID                          | Outcome (user can …)                                                                                       | Prerequisites | PRD refs                                                            | Status      |
+| ---- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------- | ----------- |
+| F-01 | core-recruitment-data-foundation   | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa                           | —             | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
+| S-01 | recruiter-views-kanban-board       | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów                            | F-01          | US-01, FR-003, FR-004, FR-005, FR-010                               | in-progress |
+| S-02 | recruiter-creates-recruitment      | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status                    | F-01, S-01    | FR-001, FR-001a, FR-002                                             | in-progress |
+| S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji                                         | F-01, S-01    | FR-004                                                              | in-progress |
+| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu)           | S-01, S-02    | FR-006, FR-008, FR-009, FR-013, Business Logic                      | in-progress |
+| S-05 | candidate-profile-and-cv-upload    | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach               | S-04          | FR-011, FR-012, FR-013a, NFR-retencja                               | in-progress |
+| S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01    | US-02, FR-014, FR-015, FR-016                                       | proposed    |
+| S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | F-01          | FR-017, FR-018                                                      | proposed    |
 
 ## Streams
 
 Pomoc nawigacyjna — grupuje elementy dzielące ten sam łańcuch zależności. Kanoniczna kolejność wciąż żyje w grafie zależności poniżej; ta tabela to proponowana kolejność czytania po równoległych ścieżkach.
 
-| Stream | Theme | Chain | Note |
-|---|---|---|---|
-| A | Główna pętla rekrutera | `F-01` → `S-01` → `S-02` → `S-03` → `S-04` → `S-05` → `S-06` | S-05 i S-06 mogą iść równolegle po S-04 (nie zależą od siebie nawzajem); to dominujący ciąg must-have — sekwencjonowany pierwszy zgodnie z celem `speed`. |
-| B | Administracja i uprawnienia | `F-01` → `S-07` | Niezależny od głównej pętli — S-07 potrzebuje tylko F-01, więc może iść równolegle z S-01…S-06 (przy `top_blocker: time` to realna dźwignia — osobny agent/branch może go dowozić równocześnie). |
+| Stream | Theme                       | Chain                                                        | Note                                                                                                                                                                                             |
+| ------ | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A      | Główna pętla rekrutera      | `F-01` → `S-01` → `S-02` → `S-03` → `S-04` → `S-05` → `S-06` | S-05 i S-06 mogą iść równolegle po S-04 (nie zależą od siebie nawzajem); to dominujący ciąg must-have — sekwencjonowany pierwszy zgodnie z celem `speed`.                                        |
+| B      | Administracja i uprawnienia | `F-01` → `S-07`                                              | Niezależny od głównej pętli — S-07 potrzebuje tylko F-01, więc może iść równolegle z S-01…S-06 (przy `top_blocker: time` to realna dźwignia — osobny agent/branch może go dowozić równocześnie). |
 
 ## Baseline
 
@@ -176,16 +176,16 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID | Suggested issue title | Ready for `/10x-plan` | Notes |
-|---|---|---|---|---|
-| F-01 | core-recruitment-data-foundation | Fundament danych i RLS: rekrutacje, kandydaci, grupy bezpieczeństwa | yes | Uruchom `/10x-plan core-recruitment-data-foundation` — rekomendowany następny krok |
-| S-01 | recruiter-views-kanban-board | Rekruter przegląda listę rekrutacji i kanban kandydatów | no | Czeka na F-01 |
-| S-02 | recruiter-creates-recruitment | Rekruter tworzy i zarządza statusem rekrutacji | no | Czeka na F-01, S-01 |
-| S-03 | recruiter-customizes-kanban-stages | Rekruter nadpisuje etapy kanban per rekrutacja | no | Czeka na F-01, S-01 |
-| S-04 | recruiter-manages-candidate-status | Rekruter zarządza statusem kandydata z wymaganą notatką | no | Czeka na S-01, S-02 |
-| S-05 | candidate-profile-and-cv-upload | Profil kandydata i upload CV z retencją 12 miesięcy | no | Czeka na S-04 |
-| S-06 | candidate-history-search | Wyszukiwanie historii kandydata w bazie | no | Czeka na S-04, F-01 |
-| S-07 | admin-manages-security-groups | Administrator zarządza grupami bezpieczeństwa i użytkownikami | no | Czeka na F-01; może iść równolegle z S-01…S-06 |
+| Roadmap ID | Change ID                          | Suggested issue title                                               | Ready for `/10x-plan` | Notes                                                                              |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------- |
+| F-01       | core-recruitment-data-foundation   | Fundament danych i RLS: rekrutacje, kandydaci, grupy bezpieczeństwa | yes                   | Uruchom `/10x-plan core-recruitment-data-foundation` — rekomendowany następny krok |
+| S-01       | recruiter-views-kanban-board       | Rekruter przegląda listę rekrutacji i kanban kandydatów             | no                    | Czeka na F-01                                                                      |
+| S-02       | recruiter-creates-recruitment      | Rekruter tworzy i zarządza statusem rekrutacji                      | no                    | Czeka na F-01, S-01                                                                |
+| S-03       | recruiter-customizes-kanban-stages | Rekruter nadpisuje etapy kanban per rekrutacja                      | no                    | Czeka na F-01, S-01                                                                |
+| S-04       | recruiter-manages-candidate-status | Rekruter zarządza statusem kandydata z wymaganą notatką             | no                    | Czeka na S-01, S-02                                                                |
+| S-05       | candidate-profile-and-cv-upload    | Profil kandydata i upload CV z retencją 12 miesięcy                 | no                    | Czeka na S-04                                                                      |
+| S-06       | candidate-history-search           | Wyszukiwanie historii kandydata w bazie                             | no                    | Czeka na S-04, F-01                                                                |
+| S-07       | admin-manages-security-groups      | Administrator zarządza grupami bezpieczeństwa i użytkownikami       | no                    | Czeka na F-01; może iść równolegle z S-01…S-06                                     |
 
 ## Open Roadmap Questions
 

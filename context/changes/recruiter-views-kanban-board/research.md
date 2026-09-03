@@ -32,7 +32,7 @@ Five findings dominate planning:
 1. **The data layer is ready and indexed for exactly this query.** `candidate_recruitments` has indexes on `recruitment_id` and `current_stage_id` added specifically for the kanban's access pattern, and seed data includes a live recruitment with 5 candidates across 5 of 6 default stages plus one deliberately empty column.
 2. **Generated Supabase `Database` types are a hard prerequisite, not a nicety.** `createServerClient` is called untyped ([src/lib/supabase.ts:9](src/lib/supabase.ts:9)) while ESLint runs `tseslint.configs.strictTypeChecked` ([eslint.config.js:15](eslint.config.js:15)). Every field access on an untyped query result trips `no-unsafe-member-access`/`-assignment`. Typed query code is effectively unwritable until types are generated.
 3. **S-01 is read-only.** Moving candidates is FR-008/FR-009 → S-04. Confirmed three ways: the PRD never mentions drag-and-drop in US-01/FR-005/FR-010; the roadmap assigns the move to S-04; and F-01 deliberately ships **no** write policy or write grant on `kanban_stages` and no notes table, so a drag has no server contract to call.
-4. **Five conventions CLAUDE.md describes as established do not exist**: `src/types.ts`, generated DB types, `src/lib/services/`, zod (not even a dependency), and any JSON API/response envelope. S-01 will be *defining* these, not following them.
+4. **Five conventions CLAUDE.md describes as established do not exist**: `src/types.ts`, generated DB types, `src/lib/services/`, zod (not even a dependency), and any JSON API/response envelope. S-01 will be _defining_ these, not following them.
 5. **Two product gaps need a decision, not a citation**: the list view's column set is entirely unspecified anywhere, and FR-003's two-bucket filter (`otwarte/zamknięte`) does not map onto the three stored status values (`draft`/`live`/`closed`).
 
 A secondary but visible risk: the existing pages are hand-styled dark glassmorphism, while shadcn/ui is configured for light-mode tokens and nothing ever sets `.dark`. A `Card`-based board dropped onto `bg-cosmic` will look wrong without a deliberate decision.
@@ -48,7 +48,7 @@ The kanban half is fully specified; the list half is thin.
 - **FR-003** ([prd.md:83](context/foundation/prd.md:83)): list of recruitments with status filtering "(otwarte/zamknięte)". must-have.
 - **FR-005** ([prd.md:86](context/foundation/prd.md:86)): open a recruitment, see candidates on a kanban with a per-column counter. must-have.
 - **FR-010** ([prd.md:95](context/foundation/prd.md:95)): candidate card shows the date added to the recruitment. must-have.
-- **FR-004** ([prd.md:84](context/foundation/prd.md:84)) is narrowed for S-01 to *default stage set only* ([roadmap.md:95](context/foundation/roadmap.md:95)); per-recruitment override is S-03.
+- **FR-004** ([prd.md:84](context/foundation/prd.md:84)) is narrowed for S-01 to _default stage set only_ ([roadmap.md:95](context/foundation/roadmap.md:95)); per-recruitment override is S-03.
 
 **NFRs that bind S-01** ([prd.md:114-118](context/foundation/prd.md:114)): list and kanban views load in under 2 seconds; no candidate data reachable by an unauthenticated or unauthorized user; last two major versions of Chrome, Firefox, Edge. The CV-retention NFR is S-05's.
 
@@ -56,9 +56,10 @@ The kanban half is fully specified; the list half is thin.
 
 **Non-goals touching this slice** ([prd.md:145-151](context/foundation/prd.md:145)): no public job-posting page (so no unauthenticated view), no offline support (no optimistic cache requirement), single-tenant (no tenant filter in queries).
 
-**Access control** ([prd.md:127-143](context/foundation/prd.md:127)): email+password auth; RBAC where an operation is available if the user belongs to a group holding it. Example groups are explicitly *configuration, not schema*: HR/Rekruter (full management), Hiring Manager (read-only status view + candidate search), Administrator (groups and users). Unauthenticated → redirect to login.
+**Access control** ([prd.md:127-143](context/foundation/prd.md:127)): email+password auth; RBAC where an operation is available if the user belongs to a group holding it. Example groups are explicitly _configuration, not schema_: HR/Rekruter (full management), Hiring Manager (read-only status view + candidate search), Administrator (groups and users). Unauthenticated → redirect to login.
 
 Two documentation slips worth not propagating:
+
 - US-01's Then clause says "datą aplikacji" ([prd.md:56](context/foundation/prd.md:56)) while its own acceptance criterion and FR-010 say "datą dodania do rekrutacji" ([prd.md:62](context/foundation/prd.md:62), [prd.md:95](context/foundation/prd.md:95)). The schema column is `added_at`. **"Data dodania" is canonical.**
 - The PRD has no section literally titled "Poza zakresem"; the roadmap's references point at `## Non-Goals` ([prd.md:145](context/foundation/prd.md:145)).
 
@@ -79,7 +80,7 @@ All 7 migrations applied; all PKs are `bigint generated always as identity`. Nin
 **`candidate_recruitments`** ([...schema.sql:79-92](supabase/migrations/20260831182957_recruitment_candidate_schema.sql:79))
 `id`, `candidate_id` NOT NULL, `recruitment_id` NOT NULL, `current_stage_id` **NOT NULL** (FK → kanban_stages, ON DELETE RESTRICT), `added_at timestamptz default now()`, `unique (candidate_id, recruitment_id)`. Indexes on `recruitment_id` and `current_stage_id`, added because "the kanban board's primary query pattern is 'all candidates for a recruitment'" ([...schema.sql:88-92](supabase/migrations/20260831182957_recruitment_candidate_schema.sql:88)).
 
-Note: **there is no `status` column here.** Candidate status *is* `current_stage_id`. And `added_at` is FR-010's date. No `updated_at`, no notes, no CV columns.
+Note: **there is no `status` column here.** Candidate status _is_ `current_stage_id`. And `added_at` is FR-010's date. No `updated_at`, no notes, no CV columns.
 
 **`candidates`** ([...schema.sql:62-77](supabase/migrations/20260831182957_recruitment_candidate_schema.sql:62))
 `id`, `full_name` NOT NULL, `email` NOT NULL, `phone`, timestamps. Case-insensitive unique index on `lower(email)`; GIN trigram index on `full_name` (for S-06). Card display name is `full_name`.
@@ -93,21 +94,22 @@ Note: **there is no `status` column here.** Candidate status *is* `current_stage
 ### 3. RLS — what filtering S-01 gets for free, and one asymmetry
 
 Two `stable security definer` helpers with `set search_path = ''` ([20260831195143_mark_rls_helpers_stable.sql:5-36](supabase/migrations/20260831195143_mark_rls_helpers_stable.sql:5)):
-- `private.has_operation(operation)` — does the user belong to *any* group holding this operation?
+
+- `private.has_operation(operation)` — does the user belong to _any_ group holding this operation?
 - `private.has_recruitment_operation(recruitment_id, operation)` — is the operation granted on **the same group** assigned to that recruitment?
 
 Policies relevant to S-01 (all `to authenticated`; `anon` has nothing):
 
-| Table | SELECT USING | ref |
-|---|---|---|
-| `recruitments` | `has_recruitment_operation(id, 'recruitment.read')` | [rls_policies.sql:133](supabase/migrations/20260831183457_rls_policies.sql:133) |
-| `candidate_recruitments` | `has_recruitment_operation(recruitment_id, 'recruitment.read')` | [:194](supabase/migrations/20260831183457_rls_policies.sql:194) |
-| `kanban_stages` | `recruitment_id is null or has_recruitment_operation(recruitment_id, 'recruitment.read')` | [:168](supabase/migrations/20260831183457_rls_policies.sql:168) |
-| `candidates` | `has_operation('candidate.read')` — **org-wide, NOT recruitment-scoped** | [:179](supabase/migrations/20260831183457_rls_policies.sql:179) |
+| Table                    | SELECT USING                                                                              | ref                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `recruitments`           | `has_recruitment_operation(id, 'recruitment.read')`                                       | [rls_policies.sql:133](supabase/migrations/20260831183457_rls_policies.sql:133) |
+| `candidate_recruitments` | `has_recruitment_operation(recruitment_id, 'recruitment.read')`                           | [:194](supabase/migrations/20260831183457_rls_policies.sql:194)                 |
+| `kanban_stages`          | `recruitment_id is null or has_recruitment_operation(recruitment_id, 'recruitment.read')` | [:168](supabase/migrations/20260831183457_rls_policies.sql:168)                 |
+| `candidates`             | `has_operation('candidate.read')` — **org-wide, NOT recruitment-scoped**                  | [:179](supabase/migrations/20260831183457_rls_policies.sql:179)                 |
 
 Three consequences for the plan:
 
-- **A board query needs two operations**, not one: `recruitment.read` on that recruitment (for the link rows) *and* org-wide `candidate.read` (for names). A user with only `recruitment.read` sees the columns and counts but no candidate identities. The board's row set is bounded by `candidate_recruitments`, not by `candidates` ([plan.md:22](context/changes/core-recruitment-data-foundation/plan.md:22)).
+- **A board query needs two operations**, not one: `recruitment.read` on that recruitment (for the link rows) _and_ org-wide `candidate.read` (for names). A user with only `recruitment.read` sees the columns and counts but no candidate identities. The board's row set is bounded by `candidate_recruitments`, not by `candidates` ([plan.md:22](context/changes/core-recruitment-data-foundation/plan.md:22)).
 - **RLS makes an unauthorized recruitment indistinguishable from a missing one** — the query returns zero rows, not an error. S-01 must decide deliberately what a recruiter sees when opening an id they cannot access (404 page is the honest answer; a 403 would leak existence).
 - **Read-only for Hiring Manager is already enforced in Postgres**, not in the UI ([plan-brief.md:15](context/changes/core-recruitment-data-foundation/plan-brief.md:15)), verified by [supabase/tests/rls_verification.sql](supabase/tests/rls_verification.sql) (5 assertion blocks, run manually via psql, not wired to CI). The `<2s` NFR also inherits F-01's `(select ...)`-wrapped, `stable`-helper posture — evaluated per query, not per row.
 
@@ -155,14 +157,14 @@ Also note: no endpoint exports `prerender = false` (it works because `output: "s
 
 **What CLAUDE.md claims exists but does not:**
 
-| Convention (CLAUDE.md) | Reality |
-|---|---|
-| `src/types.ts` for shared entities/DTOs | **File does not exist** |
-| Generated Supabase `Database` types | **None** — zero hits for `Database`/`database.types`; no npm script generates them; `createServerClient` is untyped at [src/lib/supabase.ts:9](src/lib/supabase.ts:9) |
-| `src/lib/services/` for business logic | **Directory does not exist**; `src/lib/` holds only `supabase.ts`, `utils.ts`, `config-status.ts` |
-| zod input validation | **Not a dependency** (transitive only); zero imports in `src/` |
-| `src/components/hooks/` | **Directory does not exist** |
-| Any `.from()` query | **Zero** — only `auth.*` calls exist |
+| Convention (CLAUDE.md)                  | Reality                                                                                                                                                               |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/types.ts` for shared entities/DTOs | **File does not exist**                                                                                                                                               |
+| Generated Supabase `Database` types     | **None** — zero hits for `Database`/`database.types`; no npm script generates them; `createServerClient` is untyped at [src/lib/supabase.ts:9](src/lib/supabase.ts:9) |
+| `src/lib/services/` for business logic  | **Directory does not exist**; `src/lib/` holds only `supabase.ts`, `utils.ts`, `config-status.ts`                                                                     |
+| zod input validation                    | **Not a dependency** (transitive only); zero imports in `src/`                                                                                                        |
+| `src/components/hooks/`                 | **Directory does not exist**                                                                                                                                          |
+| Any `.from()` query                     | **Zero** — only `auth.*` calls exist                                                                                                                                  |
 
 **The lint gate is the sharpest constraint.** [eslint.config.js:15](eslint.config.js:15) extends `strictTypeChecked` + `stylisticTypeChecked` with `projectService: true`. Rules that will bite:
 
@@ -236,6 +238,6 @@ Ordered by how much they change the plan.
 5. **UI language.** English UI vs Polish PRD and Polish seeded stage names. Either rename the stage rows to English or accept mixed-language UI. No i18n framework exists.
 6. **Theme.** Activate `.dark` on `<html>` so shadcn tokens match the existing `bg-cosmic` glassmorphism, or hand-style the board with `className` overrides. This decision precedes installing `card`/`badge`/`select`.
 7. **Unauthorized/missing recruitment.** RLS returns zero rows for both. Confirm 404-style handling (recommended — a 403 leaks existence).
-8. **Hiring Manager vs Recruiter view scope** (inherited open question, [roadmap.md:100](context/foundation/roadmap.md:100), owner: user, non-blocking). Since S-01 is read-only for both roles, this reduces to: does S-01 need *any* role-conditional UI, or is identical chrome acceptable until S-02/S-04 introduce write affordances? Note the Administrator seed user sees zero recruitments — the empty-list state is reachable in practice.
+8. **Hiring Manager vs Recruiter view scope** (inherited open question, [roadmap.md:100](context/foundation/roadmap.md:100), owner: user, non-blocking). Since S-01 is read-only for both roles, this reduces to: does S-01 need _any_ role-conditional UI, or is identical chrome acceptable until S-02/S-04 introduce write affordances? Note the Administrator seed user sees zero recruitments — the empty-list state is reachable in practice.
 9. **Two-second NFR has no load target.** Roadmap open questions 1–2 (QPS, data volume) are unanswered and marked non-blocking, so `<2s` is untestable beyond seed-scale. Also: `recruitments` has no index beyond its PK — fine at seed scale, worth noting for the list query's sort/filter.
 10. **Test infrastructure (scope decision).** None exists. Introducing vitest or Playwright for S-01 means framework + config + CI step, and CI's branch filter is wrong anyway. Surface rather than assume.

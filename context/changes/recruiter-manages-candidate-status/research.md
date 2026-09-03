@@ -33,7 +33,7 @@ The data foundation for candidates is already in place and was deliberately desi
 
 Two structural facts dominate the design:
 
-- **Candidate status *is* `candidate_recruitments.current_stage_id`** — there is no separate status column. A move is a stage re-map, and it is already permitted for `recruitment.write` holders by plain RLS (`candidate_recruitments_update`). That means a direct PostgREST `UPDATE` would **bypass any application-level note gate**. A `SECURITY DEFINER` RPC is the only reliable choke point for a rule the PRD states as a hard block.
+- **Candidate status _is_ `candidate_recruitments.current_stage_id`** — there is no separate status column. A move is a stage re-map, and it is already permitted for `recruitment.write` holders by plain RLS (`candidate_recruitments_update`). That means a direct PostgREST `UPDATE` would **bypass any application-level note gate**. A `SECURITY DEFINER` RPC is the only reliable choke point for a rule the PRD states as a hard block.
 - **Adding the first candidate is a one-way door for stage customization.** S-03's `replace_recruitment_stages` / `reset_recruitment_stages` raise `PA001 stages_locked` as soon as any `candidate_recruitments` row exists for that recruitment (`supabase/migrations/20260901162000_kanban_stage_rpcs.sql:38-40`, `:88-90`). S-04 shipping makes that gate real in production.
 
 The backend, service, hook, dialog, and test conventions are strongly established and should be copied verbatim rather than re-invented; they are catalogued below.
@@ -61,15 +61,15 @@ Single table `kanban_stages` with `recruitment_id is null` = global default, non
 
 Two `stable security definer` helpers in schema `private`: `has_operation(op)` and `has_recruitment_operation(recruitment_id, op)` ([20260831183457_rls_policies.sql](supabase/migrations/20260831183457_rls_policies.sql), marked stable by `20260831195143`). Policies relevant to S-04:
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|---|---|---|---|---|
-| `candidates` (`:179-190`) | `candidate.read` (org-wide) | `candidate.write` | `candidate.write` | none (intentional) |
-| `candidate_recruitments` (`:194-205`) | scoped `recruitment.read` | scoped `recruitment.write` | scoped `recruitment.write` | none |
-| `candidate_recruitment_status_history` (`:210-230`) | via parent's `recruitment.read` | via parent's `recruitment.write` | none — append-only | none |
+| Table                                               | SELECT                          | INSERT                           | UPDATE                     | DELETE             |
+| --------------------------------------------------- | ------------------------------- | -------------------------------- | -------------------------- | ------------------ |
+| `candidates` (`:179-190`)                           | `candidate.read` (org-wide)     | `candidate.write`                | `candidate.write`          | none (intentional) |
+| `candidate_recruitments` (`:194-205`)               | scoped `recruitment.read`       | scoped `recruitment.write`       | scoped `recruitment.write` | none               |
+| `candidate_recruitment_status_history` (`:210-230`) | via parent's `recruitment.read` | via parent's `recruitment.write` | none — append-only         | none               |
 
 Note the asymmetry: **`candidate.write` governs the profile, `recruitment.write` governs the link row and history.** Adding a candidate to a board needs both. A new notes table needs its own policies and grants; the fixed 5-value `operation` enum should not need extending (and `alter type … add value` cannot run in the same transaction anyway — verified in S-03).
 
-Denial semantics, established and mandatory: **not visible → 404; visible but no write → 403.** No client-side capability gating exists anywhere by explicit decision — a Hiring Manager sees the write affordance and must get a *clean* denial, not a crash (`recruiter-creates-recruitment/reviews/impl-review.md` F7). S-04 adds the biggest write affordance yet and must be assertion-tested the same way.
+Denial semantics, established and mandatory: **not visible → 404; visible but no write → 403.** No client-side capability gating exists anywhere by explicit decision — a Hiring Manager sees the write affordance and must get a _clean_ denial, not a crash (`recruiter-creates-recruitment/reviews/impl-review.md` F7). S-04 adds the biggest write affordance yet and must be assertion-tested the same way.
 
 ### RPC conventions
 
@@ -132,10 +132,13 @@ Dialog/form pattern from [StageEditor.tsx](src/components/recruitments/StageEdit
 ### Test conventions
 
 - **Unit** (`npm run test`, jsdom, excludes `*.integration.test.ts`): no mocking library. Services use a hand-rolled `FakeQueryBuilder` implementing `PromiseLike` (`recruitments.test.ts:24-65`); components use a local `mockFetch(config)` that **throws on any unregistered URL** and is installed with `vi.stubGlobal`. Coverage shape to mirror: happy path payload, 422 field error on the right row, clean 403, disabled/read-only variant.
-- **Integration** (`npm run test:integration`, node env): real HTTP against a running dev server. [integration-client.ts](src/lib/test-support/integration-client.ts) signs in through the real `POST /api/auth/signin` with seeded `hr.test@example.com` / `hiring-manager.test@example.com` / `admin.test@example.com` / `password123`, and must send `Origin` or Astro's CSRF check rejects it (`:44-48`). **No DB reset between tests** — create your own recruitment per case, never mutate seeds. Each test asserts status *and* `body.error.code`, across the HR-allowed / HM-403 / admin-404 matrix.
+- **Integration** (`npm run test:integration`, node env): real HTTP against a running dev server. [integration-client.ts](src/lib/test-support/integration-client.ts) signs in through the real `POST /api/auth/signin` with seeded `hr.test@example.com` / `hiring-manager.test@example.com` / `admin.test@example.com` / `password123`, and must send `Origin` or Astro's CSRF check rejects it (`:44-48`). **No DB reset between tests** — create your own recruitment per case, never mutate seeds. Each test asserts status _and_ `body.error.code`, across the HR-allowed / HM-403 / admin-404 matrix.
 - **E2E** (Playwright, chromium, `workers: 1`, alphabetical file order against a shared DB): `signInAs(page, "hr")`, seed via `page.request.post("/api/recruitments", …)` in `beforeAll`, and **do not touch the seeded "Backend Engineer" recruitment** — `STAGE_ORDER` in `tests/e2e/recruitments.spec.ts:4` asserts its board and it holds 5 candidates. Every island form fill needs the hydration-race guard:
   ```ts
-  await expect(async () => { await field.fill(v); await expect(field).toHaveValue(v); }).toPass({ timeout: 10_000 });
+  await expect(async () => {
+    await field.fill(v);
+    await expect(field).toHaveValue(v);
+  }).toPass({ timeout: 10_000 });
   ```
 - **RLS verification**: `supabase/tests/rls_verification.sql`, 18 numbered assertions, each in its own `begin; set_config('request.jwt.claims', …); set local role authenticated; do $$ … raise exception 'FAIL: …' … $$; rollback;` block. Run it with `docker exec -i supabase_db_10x-astro-starter psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/rls_verification.sql` — `npx supabase db query --local -f` cannot run a multi-statement script, and the script's own header comment still recommends the broken invocation.
 
@@ -167,7 +170,7 @@ Dialog/form pattern from [StageEditor.tsx](src/components/recruitments/StageEdit
 ## Historical Context (from prior changes)
 
 - `context/changes/core-recruitment-data-foundation/plan.md:105` — the `lower(email)` lookup-then-link flow is **explicitly assigned to S-04**; `:26` defers notes and the no-note rule to S-04.
-- `context/changes/recruiter-views-kanban-board/research.md:82` — candidate status *is* `current_stage_id`, no status column; `:87` — "S-04 must insert [history] alongside every stage change"; `plan.md:50, :404` — the board is deliberately read-only on candidate state.
+- `context/changes/recruiter-views-kanban-board/research.md:82` — candidate status _is_ `current_stage_id`, no status column; `:87` — "S-04 must insert [history] alongside every stage change"; `plan.md:50, :404` — the board is deliberately read-only on candidate state.
 - `context/changes/recruiter-creates-recruitment/reviews/impl-review.md` — F1 (RPC must be in `public`), F3 (`returning` the full row), F4 (group assignment not scoped to caller's groups — accepted), F7 (Hiring Manager must get a clean denial, and a status click on the already-current value proves nothing).
 - `context/changes/recruiter-customizes-kanban-stages/plan.md:46` and `research.md:303` — whether a bulk stage re-map writes history, with what `changed_by`, and whether it is exempt from the note rule is **explicitly handed to S-04**.
 - `context/changes/recruiter-customizes-kanban-stages/plan-brief.md:67` — the zero-candidates customization gate is "cheap today only because S-04 hasn't shipped".

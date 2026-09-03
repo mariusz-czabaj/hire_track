@@ -15,7 +15,7 @@ from @context/foundation/roadmap.md
 
 **Supabase Storage retained**; Cloudflare R2 and the S3/GCS/Azure/B2 family were evaluated specifically for native
 object TTL and declined. Decisive finding: on every store surveyed, lifecycle deletion is asynchronous with no
-contractual upper bound, and the object stays *readable* past the deadline (GCS states this outright). So store-side
+contractual upper bound, and the object stays _readable_ past the deadline (GCS states this outright). So store-side
 TTL cannot deliver the access half of FR-013a — the app-side check is mandatory regardless of store, and switching
 would additionally cost server-side size enforcement (R2 has none), reviewable config (R2 lifecycle and CORS are
 out-of-band state), and CI coverage (presigned uploads cannot reach local R2).
@@ -54,3 +54,14 @@ Administrator's DELETE grant unreachable in practice. Fixed by widening SELECT t
 **Local signed-upload-URL TTL measured empirically: exactly 7200 seconds (2 hours)**, matching the widely-reported
 hosted behaviour rather than the storage server's 60-second default. Verified via `iat`/`exp` on a minted token
 against the local stack. Satisfies plan.md's Phase 3 manual item early; Phase 3 need not re-measure.
+
+### 2026-09-03 — Phase 2 implementation notes
+
+**A hiring manager's denied PATCH surfaces as 404, not 403.** `updateCandidateProfile` is a plain RLS-covered
+`UPDATE` (no RPC, per plan.md's stated reasoning: a single-table write with no cross-row invariant to enforce).
+Postgres RLS on `UPDATE` filters the row from the `USING` clause rather than raising `42501` the way an RPC's own
+read-then-write permission check does — a write-denied caller and a nonexistent candidate are indistinguishable at
+the SQL layer, so both surface as `404 not_found`. This mirrors the existing `updateRecruitmentStatus` /
+`PATCH /api/recruitments/[id]` pattern (`recruitments/index.integration.test.ts`'s "denied with 404 (scoped-write,
+not authorized)" case), not a new gap. Still a clean denial — no crash, no silently-applied write — so it satisfies
+the plan's Phase 2 manual item as written; the integration test asserts 404 rather than 403 accordingly.

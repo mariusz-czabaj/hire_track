@@ -31,3 +31,21 @@ export function handleCandidateRpcError(error: unknown): Response {
   console.error(error);
   return jsonError(500, "internal", "Failed to process the candidate request");
 }
+
+// Shared by the candidate-profile routes, which perform plain RLS-covered
+// table operations rather than RPCs, so only the RLS-denial and
+// data-validation codes Postgres can raise directly apply here. Phase 3
+// extends this pattern with handleCandidateCvError for the CV lifecycle's
+// own errcodes (PA005, 23505).
+export function handleCandidateProfileError(error: unknown): Response {
+  const code = (error as { code?: string }).code;
+  if (code === "42501") {
+    return jsonError(403, "forbidden", "You are not allowed to perform this action");
+  }
+  if (code === "22023") {
+    const message = (error as { message?: string }).message ?? "Invalid candidate data";
+    return jsonError(422, "invalid_request", message);
+  }
+  console.error(error);
+  return jsonError(500, "internal", "Failed to process the candidate request");
+}

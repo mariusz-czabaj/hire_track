@@ -45,9 +45,9 @@ Tests follow three non-negotiable principles for this project:
 2. **User concerns are first-class evidence.** Risks anchored in "<the
    team is worried about X, and the failure would surface somewhere in
    <area>>" carry the same weight as PRD lines or hot-spot data.
-3. **Risks are scenarios, not code locations.** This plan documents *what
-   could fail* and *why we believe it's likely* — drawn from documents,
-   interview, and codebase *signal* (churn, structure, test base). It does
+3. **Risks are scenarios, not code locations.** This plan documents _what
+   could fail_ and _why we believe it's likely_ — drawn from documents,
+   interview, and codebase _signal_ (churn, structure, test base). It does
    NOT claim to know which line owns the failure. That knowledge is
    produced by `/10x-research` during each rollout phase. If the plan and
    research disagree about where the failure lives, research is the
@@ -67,14 +67,14 @@ Short by design. Tone is imperative — these are the rules every downstream pha
 
 The top failure scenarios this project must protect against, ordered by
 risk = impact × likelihood. Risks are failure scenarios in user / business
-terms, not test names. The Source column cites the *evidence that surfaced
-this risk* — never a specific file as "where the failure lives" (that is
+terms, not test names. The Source column cites the _evidence that surfaced
+this risk_ — never a specific file as "where the failure lives" (that is
 research's job, see §1 principle #3).
 
-| # | Risk (failure scenario)                  | Impact | Likelihood | Source (evidence — not anchor)                                          |
-|---|------------------------------------------|--------|------------|--------------------------------------------------------------------------|
-| 1 | <one-line failure scenario>               | High   | High       | <PRD §... | roadmap §... | archive/<slice>/plan.md | interview Q<n> | hot-spot dir `<path>` (N commits/30d)> |
-| ... | ... | ... | ... | ... |
+| #   | Risk (failure scenario)     | Impact | Likelihood | Source (evidence — not anchor) |
+| --- | --------------------------- | ------ | ---------- | ------------------------------ | ------------ | ----------------------- | -------------- | -------------------------------------- |
+| 1   | <one-line failure scenario> | High   | High       | <PRD §...                      | roadmap §... | archive/<slice>/plan.md | interview Q<n> | hot-spot dir `<path>` (N commits/30d)> |
+| ... | ...                         | ...    | ...        | ...                            |
 ```
 
 5–7 rows. Every row cites at least one source.
@@ -83,11 +83,11 @@ research's job, see §1 principle #3).
 Low scale so two readers agree on the same row. Do not invent finer
 gradations — the goal is ordering, not false precision.
 
-| Rating | Impact | Likelihood |
-|--------|--------|------------|
-| High   | user loses access, data, or money; failure is publicly visible | area changes weekly, or we have already been burned here |
-| Medium | feature degrades, a workaround exists, only some users affected | touched occasionally, has been a source of bugs |
-| Low    | cosmetic, easily reverted, no data effect | stable code, rarely touched |
+| Rating | Impact                                                          | Likelihood                                               |
+| ------ | --------------------------------------------------------------- | -------------------------------------------------------- |
+| High   | user loses access, data, or money; failure is publicly visible  | area changes weekly, or we have already been burned here |
+| Medium | feature degrades, a workaround exists, only some users affected | touched occasionally, has been a source of bugs          |
+| Low    | cosmetic, easily reverted, no data effect                       | stable code, rarely touched                              |
 
 Order rows by impact × likelihood. Protect High × High first; High-impact ×
 Low-likelihood scenarios (e.g. a cloud provider outage) usually belong to
@@ -133,8 +133,8 @@ is the durable handoff from risk analysis to `/10x-research` and
 ```markdown
 ### Risk Response Guidance
 
-| Risk | What would prove protection | Must challenge | Context `/10x-research` must ground | Likely cheapest layer | Anti-pattern to avoid |
-|------|-----------------------------|----------------|--------------------------------------|-----------------------|-----------------------|
+| Risk | What would prove protection                                    | Must challenge                              | Context `/10x-research` must ground                                                                  | Likely cheapest layer                                                                        | Anti-pattern to avoid                                                                                                              |
+| ---- | -------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | #1   | <observable behavior or failure mode a useful test must catch> | <obvious assumption not to accept silently> | <entry point / persisted state / external boundary / contract / ordering guarantee / fixture source> | <unit / integration / contract / e2e / hook / visual diff / AI-native review / manual smoke> | <implementation mirror / happy-path-only / copied production calculation / over-mocking / brittle ordering / meaningless snapshot> |
 ```
 
@@ -157,24 +157,24 @@ Each row is a discrete rollout phase that will open its own change folder
 via `/10x-new`. Status moves left-to-right through the values below; the
 orchestrator updates Status as artifacts appear on disk.
 
-| # | Phase name                | Goal (one line)                                  | Risks covered | Test types              | Status        | Change folder                                       |
-|---|---------------------------|--------------------------------------------------|----------------|-------------------------|---------------|-----------------------------------------------------|
-| 1 | Critical-path coverage    | Defend Risk #1+#2 at the cheapest layer          | #1, #2         | unit + integration      | not started   | —                                                   |
-| 2 | Integration around hot-spots | Catch regressions in churn-heavy modules       | #3, #4         | integration             | not started   | —                                                   |
-| 3 | AI-native layer           | Post-edit hook on validation + vision review on top screens | cross-cutting | post-edit-hook, vision review | not started | —                                       |
-| 4 | Quality-gates wiring      | Lock the floor in CI                              | cross-cutting  | gates                   | not started   | —                                                   |
+| #   | Phase name                   | Goal (one line)                                             | Risks covered | Test types                    | Status      | Change folder |
+| --- | ---------------------------- | ----------------------------------------------------------- | ------------- | ----------------------------- | ----------- | ------------- |
+| 1   | Critical-path coverage       | Defend Risk #1+#2 at the cheapest layer                     | #1, #2        | unit + integration            | not started | —             |
+| 2   | Integration around hot-spots | Catch regressions in churn-heavy modules                    | #3, #4        | integration                   | not started | —             |
+| 3   | AI-native layer              | Post-edit hook on validation + vision review on top screens | cross-cutting | post-edit-hook, vision review | not started | —             |
+| 4   | Quality-gates wiring         | Lock the floor in CI                                        | cross-cutting | gates                         | not started | —             |
 ```
 
 **Status vocabulary** (fixed — parser literals):
 
-| Value          | Meaning                                                                          |
-|----------------|----------------------------------------------------------------------------------|
-| `not started`  | No change folder for this rollout phase yet.                                     |
-| `change opened` | `context/changes/<id>/` exists with `change.md`; research not done.            |
-| `researched`   | `research.md` exists in the change folder.                                       |
-| `planned`      | `plan.md` exists with a `## Progress` section.                                   |
-| `implementing` | Progress section has at least one `[x]` and at least one `[ ]`.                  |
-| `complete`     | Progress section is fully `[x]`.                                                 |
+| Value           | Meaning                                                             |
+| --------------- | ------------------------------------------------------------------- |
+| `not started`   | No change folder for this rollout phase yet.                        |
+| `change opened` | `context/changes/<id>/` exists with `change.md`; research not done. |
+| `researched`    | `research.md` exists in the change folder.                          |
+| `planned`       | `plan.md` exists with a `## Progress` section.                      |
+| `implementing`  | Progress section has at least one `[x]` and at least one `[ ]`.     |
+| `complete`      | Progress section is fully `[x]`.                                    |
 
 3–5 rollout phases is the sweet spot. Fewer makes the rollout too coarse; more makes prioritization useless. AI-native and gates phases are not mandatory — include them only when the brief justified them under cost × signal.
 
@@ -192,13 +192,13 @@ plus the MCP/tools actually exposed in the current session. If a useful docs
 or search MCP such as Context7 or Exa.ai is not available, say that instead
 of assuming access.
 
-| Layer                | Tool                       | Version | Notes                                |
-|----------------------|----------------------------|---------|--------------------------------------|
-| unit + integration   | <Vitest / Jest / pytest>   | <x.y>   | <one-line note>                      |
-| API mocking          | <MSW / httpx-mock / ...>   | <x.y>   | <one-line note>                      |
-| e2e                  | <Playwright / Cypress>     | <x.y>   | <one-line note>                      |
-| accessibility        | <axe-core>                 | <x.y>   | <one-line note>                      |
-| (optional) AI-native | <Playwright MCP — checked: YYYY-MM-DD> | n/a | <when NOT to use>           |
+| Layer                | Tool                                   | Version | Notes             |
+| -------------------- | -------------------------------------- | ------- | ----------------- |
+| unit + integration   | <Vitest / Jest / pytest>               | <x.y>   | <one-line note>   |
+| API mocking          | <MSW / httpx-mock / ...>               | <x.y>   | <one-line note>   |
+| e2e                  | <Playwright / Cypress>                 | <x.y>   | <one-line note>   |
+| accessibility        | <axe-core>                             | <x.y>   | <one-line note>   |
+| (optional) AI-native | <Playwright MCP — checked: YYYY-MM-DD> | n/a     | <when NOT to use> |
 
 If a row reads "none yet — see Phase <N>", that gap is addressed by the
 named rollout phase.
@@ -206,6 +206,7 @@ named rollout phase.
 Immediately after the table, include a compact grounding note:
 
 **Stack grounding tools (current session):**
+
 - Docs: <Context7 / framework docs MCP / none> — <what was checked or why skipped>; checked: <YYYY-MM-DD>
 - Search: <Exa.ai / web search MCP / none> — <what was checked or why skipped>; checked: <YYYY-MM-DD>
 - Runtime/browser: <Playwright MCP / browser tool / none> — <possible use, or "not used">; checked: <YYYY-MM-DD>
@@ -228,15 +229,15 @@ The full set of gates that must pass before a change reaches production.
 "Required for §3 Phase <N>" means the gate is enforced once that rollout
 phase lands; before that, the gate is `planned`.
 
-| Gate                          | Where             | Required?                   | Catches                                       |
-|-------------------------------|-------------------|------------------------------|-----------------------------------------------|
-| lint + typecheck              | local + CI        | required                     | syntactic / type drift                        |
-| unit + integration            | local + CI        | required after §3 Phase 1    | logic regressions                             |
-| e2e on critical flows         | CI on PR          | required after §3 Phase 1    | broken critical user paths                    |
-| post-edit hook                | local (agent loop) | recommended after §3 Phase 3 | regressions at edit time                     |
-| visual diff (deterministic)   | CI on PR          | optional                     | rendering regressions                         |
-| multimodal visual review      | CI on PR          | optional                     | visual issues classic diff misses             |
-| pre-prod smoke                | between merge + prod | optional                  | environment-specific failures                 |
+| Gate                        | Where                | Required?                    | Catches                           |
+| --------------------------- | -------------------- | ---------------------------- | --------------------------------- |
+| lint + typecheck            | local + CI           | required                     | syntactic / type drift            |
+| unit + integration          | local + CI           | required after §3 Phase 1    | logic regressions                 |
+| e2e on critical flows       | CI on PR             | required after §3 Phase 1    | broken critical user paths        |
+| post-edit hook              | local (agent loop)   | recommended after §3 Phase 3 | regressions at edit time          |
+| visual diff (deterministic) | CI on PR             | optional                     | rendering regressions             |
+| multimodal visual review    | CI on PR             | optional                     | visual issues classic diff misses |
+| pre-prod smoke              | between merge + prod | optional                     | environment-specific failures     |
 ```
 
 Every row corresponds to a gate that either **is** wired or **will be wired by a named rollout phase**. Do not list gates with no rollout phase pointing at them — that is aspirational.
@@ -256,7 +257,7 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.1 Adding a unit test
 
-- **Location**: <package>/src/__tests__/ next to the unit under test.
+- **Location**: <package>/src/**tests**/ next to the unit under test.
 - **Naming**: <module>.unit.test.<ext>.
 - **Reference test**: <path-to-canonical-existing-test>.
 - **Run locally**: <exact command>.

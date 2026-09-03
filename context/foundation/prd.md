@@ -39,7 +39,7 @@ MVP jest gotowy, gdy rekruter może: zalogować się, zobaczyć listę rekrutacj
 
 ### Secondary
 
-*(usunięte — powiadomienia e-mail wyłączone z MVP)*
+_(usunięte — powiadomienia e-mail wyłączone z MVP)_
 
 ### Guardrails
 
@@ -129,11 +129,13 @@ Wejście reguły: bieżący status kandydata w rekrutacji oraz treść notatki r
 **Uwierzytelnianie MVP:** użytkownik loguje się za pomocą adresu e-mail i hasła. Dostęp do jakichkolwiek danych systemu bez aktywnej sesji jest niedozwolony.
 
 **Model uprawnień — RBAC z grupami bezpieczeństwa:**
+
 - Administrator tworzy grupy bezpieczeństwa i przypisuje im dozwolone operacje.
 - Użytkownicy są przypisywani do grup przez administratora.
 - Operacja jest dostępna dla użytkownika, gdy należy do grupy posiadającej tę operację.
 
 **Przykładowe grupy (konfiguracja — nie część schematu):**
+
 - HR/Rekruter — pełne zarządzanie kandydatami, rekrutacjami i stanowiskami.
 - Hiring Manager — podgląd statusu rekrutacji i przeszukiwanie bazy kandydatów (tylko odczyt).
 - Administrator — zarządzanie grupami i użytkownikami.

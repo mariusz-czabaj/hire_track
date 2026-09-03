@@ -12,7 +12,7 @@ produces no write effect across every domain endpoint.** Covers risks #1
 PII), and #5 (a read-only principal succeeding at a write).
 
 The motivation is empirical, not theoretical. Two real authorization defects
-shipped and were caught in *review*, not by tests — org-wide email enumeration
+shipped and were caught in _review_, not by tests — org-wide email enumeration
 via an unguarded `SECURITY DEFINER` RPC, and cross-recruitment stage confusion.
 One review's own words are this phase's charter: "An assertion that a caller
 cannot resolve emails for ids outside their visibility would have caught F1
@@ -46,21 +46,22 @@ an authorization test.
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-| --- | --- | --- | --- |
-| Fixture location | Expand `supabase/seed.sql`, not per-test setup | Matches the existing pattern and keeps one source of truth for principals. | Research |
-| Fixture scope | All four: HR-equivalent peer group + user, 2nd recruitment, no-group user, multi-group user | The seed edit already forces a full three-suite re-run, so folding in the cheap extras avoids paying that cost twice; the multi-group user is the only way to reach the untested `go.group_id = rsg.group_id` conjunct. | Plan |
-| Suite layout | One dedicated cross-cutting suite | The contract reads as one document and per-endpoint rows sit side by side, so a missing verb is visible — worth an explicit carve-out from cookbook §6.2's beside-the-route convention. | Plan |
-| Write coverage | All 7 write verbs, non-member principal, each with a state read-back | Directly refutes risk #5's named anti-pattern (test one endpoint and generalise) at bounded cost. | Plan |
-| The two accepted weaknesses | Characterization tests citing the prior SKIPPED decision; not repaired | A future change moving the boundary in either direction then fails visibly. | Research + Plan |
-| Risk #4 framing | Test the shared-vs-per-recruitment **split**, both directions | Org-wide candidate visibility is intentional and PRD-sourced (FR-007); testing the shared fields is the named anti-pattern. | Research |
-| Risk #4 observable | The `PA003 candidate_name_mismatch` path is the positive half | `getCandidateDetail` is already recruitment-scoped, so per-recruitment fields are unreachable by construction; `PA003` is the only HTTP-observable shared-identity surface, and it fires *after* the authorization checks. | Plan |
-| SQL harness | Add `test:rls` and fix the broken header comment; CI blocking deferred | Makes 33 advisory assertions runnable now while leaving gate-hardening to test-plan Phase 4. | Research + Plan |
-| Note-gate bypass | Deferred to test-plan Phase 2 | Keeps the phases from overlapping. | Research |
+| Decision                    | Choice                                                                                      | Why (1 sentence)                                                                                                                                                                                                           | Source          |
+| --------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| Fixture location            | Expand `supabase/seed.sql`, not per-test setup                                              | Matches the existing pattern and keeps one source of truth for principals.                                                                                                                                                 | Research        |
+| Fixture scope               | All four: HR-equivalent peer group + user, 2nd recruitment, no-group user, multi-group user | The seed edit already forces a full three-suite re-run, so folding in the cheap extras avoids paying that cost twice; the multi-group user is the only way to reach the untested `go.group_id = rsg.group_id` conjunct.    | Plan            |
+| Suite layout                | One dedicated cross-cutting suite                                                           | The contract reads as one document and per-endpoint rows sit side by side, so a missing verb is visible — worth an explicit carve-out from cookbook §6.2's beside-the-route convention.                                    | Plan            |
+| Write coverage              | All 7 write verbs, non-member principal, each with a state read-back                        | Directly refutes risk #5's named anti-pattern (test one endpoint and generalise) at bounded cost.                                                                                                                          | Plan            |
+| The two accepted weaknesses | Characterization tests citing the prior SKIPPED decision; not repaired                      | A future change moving the boundary in either direction then fails visibly.                                                                                                                                                | Research + Plan |
+| Risk #4 framing             | Test the shared-vs-per-recruitment **split**, both directions                               | Org-wide candidate visibility is intentional and PRD-sourced (FR-007); testing the shared fields is the named anti-pattern.                                                                                                | Research        |
+| Risk #4 observable          | The `PA003 candidate_name_mismatch` path is the positive half                               | `getCandidateDetail` is already recruitment-scoped, so per-recruitment fields are unreachable by construction; `PA003` is the only HTTP-observable shared-identity surface, and it fires _after_ the authorization checks. | Plan            |
+| SQL harness                 | Add `test:rls` and fix the broken header comment; CI blocking deferred                      | Makes 33 advisory assertions runnable now while leaving gate-hardening to test-plan Phase 4.                                                                                                                               | Research + Plan |
+| Note-gate bypass            | Deferred to test-plan Phase 2                                                               | Keeps the phases from overlapping.                                                                                                                                                                                         | Research        |
 
 ## Scope
 
 **In scope:**
+
 - Seed expansion with four new principals and a second recruitment; harness `SEEDED_CREDENTIALS` extension
 - One cross-cutting authorization suite: read boundary, risk #4 split, all 7 write verbs, read-only-principal denials
 - The three TypeScript-only mismatched-`[id]` pre-checks that SQL impersonation cannot reach
@@ -69,6 +70,7 @@ an authorization test.
 - `test:rls` script, SQL header fix, test-plan §6.4 + §6.2 carve-out
 
 **Out of scope:**
+
 - Fixing either accepted weakness (the DELETE half is raised for decision, not repaired)
 - The note-gate bypass on `candidate_recruitments` UPDATE (test-plan Phase 2)
 - Making `test:rls` blocking in CI (test-plan Phase 4)
@@ -81,7 +83,7 @@ an authorization test.
 Fixtures first, assertions second. The seed change perturbs the pristine
 baseline every existing integration test and e2e spec runs against, so it ships
 alone with all three suites re-run green as its only gate. Assertions then layer
-onto a stable fixture set, organised by *proposition* rather than by route.
+onto a stable fixture set, organised by _proposition_ rather than by route.
 
 Two invariants govern every assertion. **404 is the tenancy signal, not 403** —
 an invisible row makes a scoped update a silent no-op, so a status code alone is
@@ -92,13 +94,13 @@ once in this repo.
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Seed fixtures & harness principals | Four new principals, a second recruitment, extended `SEEDED_CREDENTIALS` | Perturbs the baseline for every existing test; `validCreateBody()`'s ordinal `groupIds: [1]` will break |
-| 2. Read boundary suite | The new suite: symmetrical invisibility, risk #4 split both ways, multi-group conjunct, no-group floor case | First integration coverage of three new route module graphs — inherits the Vite optimizer flake hazard |
-| 3. Write surface | All 7 write verbs with state read-backs, plus the 3 TypeScript-only pre-checks | Expected status varies by denial mechanism; "normalising" them would encode the wrong thing |
-| 4. Characterization of weaknesses | Both halves of the unscoped group assignment pinned with citations | A green test documenting a weakness can be misread as endorsement |
-| 5. Runnability & cookbook | `test:rls`, SQL header fix, §6.4 filled, §3 row closed | `docker exec` container name is environment-specific |
+| Phase                                 | What it delivers                                                                                            | Key risk                                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 1. Seed fixtures & harness principals | Four new principals, a second recruitment, extended `SEEDED_CREDENTIALS`                                    | Perturbs the baseline for every existing test; `validCreateBody()`'s ordinal `groupIds: [1]` will break |
+| 2. Read boundary suite                | The new suite: symmetrical invisibility, risk #4 split both ways, multi-group conjunct, no-group floor case | First integration coverage of three new route module graphs — inherits the Vite optimizer flake hazard  |
+| 3. Write surface                      | All 7 write verbs with state read-backs, plus the 3 TypeScript-only pre-checks                              | Expected status varies by denial mechanism; "normalising" them would encode the wrong thing             |
+| 4. Characterization of weaknesses     | Both halves of the unscoped group assignment pinned with citations                                          | A green test documenting a weakness can be misread as endorsement                                       |
+| 5. Runnability & cookbook             | `test:rls`, SQL header fix, §6.4 filled, §3 row closed                                                      | `docker exec` container name is environment-specific                                                    |
 
 **Prerequisites:** a local Supabase stack (`npx supabase start`) and a running
 Astro dev server — both manual by design, since `vitest.integration.config.ts`

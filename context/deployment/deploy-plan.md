@@ -14,15 +14,15 @@ status: approved
 
 ## Pre-flight status (checked against infrastructure.md's risk register)
 
-| Item | Status |
-|---|---|
-| `wrangler.jsonc` shaped for Workers (`main` entrypoint, not `pages_build_output_dir`) | ✅ Already correct |
-| `.env` + `.dev.vars` populated with `SUPABASE_URL` / `SUPABASE_KEY` for local dev | ✅ Already set |
-| `.dev.vars.example` present for onboarding | ❌ Missing — housekeeping item below |
-| Scoped Cloudflare API token (Workers Scripts: Edit only) for CI use | ❌ Not created — manual gate below |
-| Production Worker secrets (`SUPABASE_URL`/`SUPABASE_KEY`) set via `wrangler secret put` | ❌ Not set — automated step below |
-| CV upload architecture decided (direct-to-Supabase presigned URL, not Worker-proxied) | ❌ Not decided — blocks FR-012 implementation, not this deploy |
-| `tech-stack.md` `ci_provider` matches actual `.github/workflows/ci.yml` (GitHub Actions, lint+build only, no deploy step) | ✅ Corrected — `ci_provider: github-actions` |
+| Item                                                                                                                      | Status                                                         |
+| ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `wrangler.jsonc` shaped for Workers (`main` entrypoint, not `pages_build_output_dir`)                                     | ✅ Already correct                                             |
+| `.env` + `.dev.vars` populated with `SUPABASE_URL` / `SUPABASE_KEY` for local dev                                         | ✅ Already set                                                 |
+| `.dev.vars.example` present for onboarding                                                                                | ❌ Missing — housekeeping item below                           |
+| Scoped Cloudflare API token (Workers Scripts: Edit only) for CI use                                                       | ❌ Not created — manual gate below                             |
+| Production Worker secrets (`SUPABASE_URL`/`SUPABASE_KEY`) set via `wrangler secret put`                                   | ❌ Not set — automated step below                              |
+| CV upload architecture decided (direct-to-Supabase presigned URL, not Worker-proxied)                                     | ❌ Not decided — blocks FR-012 implementation, not this deploy |
+| `tech-stack.md` `ci_provider` matches actual `.github/workflows/ci.yml` (GitHub Actions, lint+build only, no deploy step) | ✅ Corrected — `ci_provider: github-actions`                   |
 
 ## Manual gates (human-only, panel operations)
 
@@ -46,7 +46,7 @@ status: approved
 ## Verification steps (after first deploy)
 
 1. Confirm the Worker URL responds (`curl -I <worker-url>` → expect `200`).
-2. Confirm Supabase connectivity from a *deployed* request (not just local) — e.g. hit an app route that calls `createClient()` and check it doesn't fall back to the `null` client (missing-env-var path in `src/lib/supabase.ts`).
+2. Confirm Supabase connectivity from a _deployed_ request (not just local) — e.g. hit an app route that calls `createClient()` and check it doesn't fall back to the `null` client (missing-env-var path in `src/lib/supabase.ts`).
 3. Confirm `wrangler tail` streams live logs with no immediate errors.
 4. Confirm rollback works: `wrangler rollback` once, verify the previous version serves, then re-deploy forward.
 
@@ -58,6 +58,7 @@ status: approved
 ## Out of scope
 
 Carried from `infrastructure.md`:
+
 - Docker image configuration.
 - Full CI/CD deploy-on-merge wiring (GitHub Actions currently only runs lint + build).
 - Production-scale architecture (multi-region, HA, DR).

@@ -17,6 +17,7 @@ checkpoint:
 System wspomagający prowadzenie rekrutacji w organizacji.
 
 **Ból:**
+
 1. Brak widoczności aktualnego statusu rekrutacji na stanowisko — każdy pyta każdego zamiast zobaczyć w jednym miejscu.
 2. Dane kandydatów uwięzione w arkuszach kalkulacyjnych — trudne do przeszukiwania, brak synchronizacji, wiele wersji pliku.
 3. Brak możliwości podjęcia decyzji o ponownym rozważeniu kandydata z poprzedniej rekrutacji.
@@ -41,11 +42,13 @@ Zgłasza zapotrzebowanie na stanowisko i chce wiedzieć co się dzieje z "jego" 
 **Uwierzytelnianie MVP:** e-mail + hasło. Docelowo: OAuth (Google lub Microsoft — do ustalenia przy wyborze stacku).
 
 **Model uprawnień:** RBAC z grupami bezpieczeństwa.
+
 - Administrator tworzy grupy i przypisuje im dozwolone operacje.
 - Użytkownicy są przypisywani do grup.
 - Operacja jest dostępna dla użytkownika, jeśli należy do grupy mającej tę operację.
 
 **Przykładowe grupy (nie są częścią schematu — do ustalenia przy implementacji):**
+
 - HR/Rekruter — pełne zarządzanie kandydatami, rekrutacjami, stanowiskami.
 - Hiring Manager — podgląd statusu swoich rekrutacji, przeszukiwanie bazy kandydatów (tylko odczyt).
 - Administrator — zarządzanie grupami i użytkownikami.
@@ -53,17 +56,21 @@ Zgłasza zapotrzebowanie na stanowisko i chce wiedzieć co się dzieje z "jego" 
 ## Success Criteria
 
 ### Primary
+
 MVP działa gdy rekruter może: zalogować się, zobaczyć listę rekrutacji (filtrowaną po statusie), otworzyć rekrutację jako tablicę kanban kandydatów, zmienić status kandydata, otworzyć profil kandydata z danymi osobowymi, uploadem CV i notatkami rekrutera po rozmowie. Hiring Manager może przejrzeć status swoich rekrutacji i wyszukać kandydata po imieniu/nazwisku przez historię rekrutacji.
 
 ### Secondary
-*(usunięte — powiadomienia e-mail wyłączone z MVP)*
+
+_(usunięte — powiadomienia e-mail wyłączone z MVP)_
 
 ### Guardrails
+
 - Dane kandydatów dostępne wyłącznie dla zalogowanych użytkowników organizacji.
 - Upload CV musi być niezawodny — utrata pliku jest niedopuszczalna.
 - Zmiana statusu kandydata musi być odwracalna.
 
 ## Timeline Budget
+
 - `mvp_weeks: 2`
 - `after_hours_only: true`
 - `hard_deadline: null`
@@ -71,6 +78,7 @@ MVP działa gdy rekruter może: zalogować się, zobaczyć listę rekrutacji (fi
 ## Functional Requirements
 
 ### Rekrutacje
+
 - FR-001: Rekruter może utworzyć nową rekrutację ze stanowiskiem i metadanymi (lokalizacja, dział, typ zatrudnienia, data otwarcia). Priority: must-have
 - FR-001a: Podczas tworzenia rekrutacji rekruter musi przypisać co najmniej jedną grupę bezpieczeństwa — rekrutacja jest widoczna i edytowalna wyłącznie przez użytkowników należących do przypisanych grup; lista grup zarządzana jest przez administratora i pobierana w momencie tworzenia rekrutacji. Priority: must-have
 - FR-002: Rekruter może ustawić/zmienić status rekrutacji (Draft / Live / Closed). Priority: must-have
@@ -80,6 +88,7 @@ MVP działa gdy rekruter może: zalogować się, zobaczyć listę rekrutacji (fi
 - FR-005: Użytkownik może otworzyć rekrutację i zobaczyć kandydatów na tablicy kanban z licznikiem per kolumna. Priority: must-have
 
 ### Kandydaci
+
 - FR-006: Rekruter może dodać kandydata do rekrutacji (kandydat to niezależny profil powiązany z wieloma rekrutacjami). Priority: must-have
 - FR-007: Jeden kandydat może brać udział w wielu rekrutacjach jednocześnie lub kolejno; profil (dane, CV) jest współdzielony, notatki i status są osobne per rekrutacja. Priority: must-have
   > Sokrates: Złożoność danych rozważona — profil wsp. + notatki per rekrutacja to świadomy wybór. Utrata tego wymogu uniemożliwia wyszukiwanie historii kandydata.
@@ -92,12 +101,14 @@ MVP działa gdy rekruter może: zalogować się, zobaczyć listę rekrutacji (fi
 - FR-013: Rekruter może dodać/edytować notatki po rozmowie per kandydat per rekrutacja. Priority: must-have
 
 ### Baza kandydatów
+
 - FR-014: Użytkownik może przejść do widoku "Kandydaci" — listy wszystkich kandydatów ze wszystkich rekrutacji. Priority: must-have
 - FR-015: Użytkownik może wyszukać kandydata po imieniu/nazwisku przez historię wszystkich rekrutacji. Priority: must-have
 - FR-016: Widok kandydata pokazuje wszystkie rekrutacje, w których brał udział, z pełnym logiem zmian statusów per rekrutacja. Priority: must-have
   > Sokrates: "Tylko aktualny etap" rozważone i odrzucone — pełny log jest potrzebny do oceny historii kandydata (kiedy przez jakie etapy przechodził).
 
 ### Administracja
+
 - FR-017: Administrator może tworzyć grupy bezpieczeństwa i przypisywać operacje do grup. Priority: must-have
 - FR-018: Administrator może dodawać/usuwać użytkowników z grup. Priority: must-have
 
@@ -108,6 +119,7 @@ MVP działa gdy rekruter może: zalogować się, zobaczyć listę rekrutacji (fi
 - **Brak publicznej strony ogłoszenia o pracę** — system nie generuje publicznych job postingów dla kandydatów zewnętrznych. Rationale: kandydaci są dodawani przez rekrutera, nie aplikują samodzielnie.
 
 ## Forward: tech-stack
+
 - Sugestie pytań rekrutacyjnych AI (poza MVP) — będzie wymagać modelu kompetencji i integracji z LLM.
 - Docelowo OAuth (Google lub Microsoft) zamiast email+hasło.
 
@@ -130,12 +142,13 @@ Miejsce w flow: rekruter próbuje przesunąć kandydata na kanbanie — system s
 ## User Stories
 
 ### US-01: Rekruter przegląda aktualny status rekrutacji
+
 Given rekruter jest zalogowany,
 When otwiera listę rekrutacji i klika w rekrutację "Floor Manager",
 Then widzi tablicę kanban z kandydatami pogrupowanymi po etapach, z licznikiem per kolumna i datą aplikacji na każdej karcie.
 
 ### US-02: Rekruter wyszukuje historię kandydata
+
 Given rekruter jest zalogowany,
 When przechodzi do sekcji "Kandydaci" i wyszukuje po nazwisku "Kowalski",
 Then widzi kandydata Kowalski oraz listę wszystkich rekrutacji, w których brał udział, z pełnym logiem zmian statusów.
-

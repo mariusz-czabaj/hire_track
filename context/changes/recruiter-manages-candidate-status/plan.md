@@ -16,7 +16,7 @@ The F-01 schema anticipated this slice, but every write path is missing.
 - `candidates(id, full_name, email, phone, …)` with `unique index candidates_email_key on candidates (lower(email))`
   and a trigram index on `full_name` — `supabase/migrations/20260831182957_recruitment_candidate_schema.sql:62-77`.
 - `candidate_recruitments(candidate_id, recruitment_id, current_stage_id, added_at, unique(candidate_id, recruitment_id))`
-  — `:79-92`. **Candidate status *is* `current_stage_id`**; there is no status column.
+  — `:79-92`. **Candidate status _is_ `current_stage_id`**; there is no status column.
 - `candidate_recruitment_status_history` — append-only, no UPDATE/DELETE policy — `:94-105`.
 - A `before insert or update` trigger on `candidate_recruitments` rejecting a `current_stage_id` whose stage
   belongs to another recruitment, errcode `22023` — `20260901161434_kanban_stage_customization.sql:54-79`.
@@ -43,7 +43,7 @@ The F-01 schema anticipated this slice, but every write path is missing.
   carrying `stage_id` would silently escape that guard and allow deletion of a stage a note points at.
 - **Adding the first candidate permanently locks stage customization** — `replace_recruitment_stages` and
   `reset_recruitment_stages` raise `PA001 stages_locked` once any `candidate_recruitments` row exists
-  (`20260901162000_kanban_stage_rpcs.sql:38-40`, `:88-90`). Test fixtures must customize stages *before* adding candidates.
+  (`20260901162000_kanban_stage_rpcs.sql:38-40`, `:88-90`). Test fixtures must customize stages _before_ adding candidates.
 - **Errcodes are a documented codebook** (`20260901162000:5-11`): `42501`, `P0002`, `22023`, `PA001`, `PA002`.
   `23503` already means "nonexistent group" at the recruitments route. This slice needs two fresh codes.
   `PA002` is still unmapped in every route.
@@ -101,7 +101,7 @@ The move RPC accepts an optional note precisely so the blocked case is never a d
 ## Critical Implementation Details
 
 **Ordering — the note is written for the source stage.** `move_candidate_stage` must capture
-`current_stage_id` into a local variable *before* updating it, upsert the supplied note against that captured
+`current_stage_id` into a local variable _before_ updating it, upsert the supplied note against that captured
 source stage, then evaluate the gate, then update. Upserting after the update would attach the note to the
 target stage and silently unblock the next move instead of this one.
 
@@ -416,7 +416,7 @@ Each card links to `/recruitments/{id}/candidates/{candidateRecruitmentId}` and 
 indexed, name-bearing `aria-label` so both RTL and Playwright can target it by role. `CandidateCardDto` is
 unchanged, so the board read path and its existing tests are untouched.
 
-**Addendum (impl-review F7)**: `CandidateCardDto` in fact *does* gain a `candidateRecruitmentId` field —
+**Addendum (impl-review F7)**: `CandidateCardDto` in fact _does_ gain a `candidateRecruitmentId` field —
 the card→detail link above requires it, and no other identifier in the DTO can produce that URL. `resolveKanbanStages`
 and `KanbanStageRow` in `src/lib/services/recruitments.ts` were also exported for reuse in `candidates.ts`, per this
 phase's own stage-resolution rule. Both changes were correctly made during implementation; this note corrects the

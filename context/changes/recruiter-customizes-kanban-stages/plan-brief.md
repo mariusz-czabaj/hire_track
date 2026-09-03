@@ -19,22 +19,22 @@ A recruiter opens a board, clicks a control beside the status control, and edits
 
 ## Key Decisions Made
 
-| Decision | Choice | Why | Source |
-| --- | --- | --- | --- |
-| Scope of "customize" | Rename + reorder + add + remove | Anything less doesn't deliver FR-004 — processes differ in which stages exist, not just labels | Plan |
-| Existing candidates | Block customization once any candidate exists | Removes the vanishing-candidate bug, the re-map, and the S-03/S-04 boundary question at once; S-04 hasn't shipped so no real recruitment has candidates | Plan |
-| Global defaults editable | Yes, gated on `group.manage` | The seeded Administrator group already holds exactly that operation — no enum change, no extra migration | Plan |
-| Defaults delete safety | Per-row: refuse if referenced | A blanket zero-candidates gate would ship the feature dead — the seed alone puts candidates on defaults | Plan |
-| Admin UI | API + RPC only; screen deferred to S-07 | The hard part is the diff/renumber/refusal logic; a bare CRUD screen belongs with S-07's admin surface | Plan |
-| Write algorithm | Delete+reinsert for overrides, diff+renumber for defaults | Overrides are provably unreferenced under the gate; default rows are referenced and cannot be deleted wholesale | Research |
-| Reorder mechanism | Two-phase negate-then-assign | Verified: single-statement and row-by-row renumbers both fail with `23505` | Research |
-| Stage↔recruitment integrity | Trigger, not composite FK | Both columns are `not null`, so a composite FK would reject every candidate on a global default stage and break the seed | Plan |
-| Denial semantics | 404 if not visible, 403 if visible but read-only | Preserves the "forbidden is indistinguishable from missing" posture while telling a Hiring Manager why the control they can see won't work | Plan |
-| DTO provenance | Board-level `stagesSource` | Resolution is all-or-nothing, so a per-stage flag would always be uniform | Research |
-| Name validation | Trim, non-empty, max length | Closes the `''` hole; no uniqueness within a set, no English-only enforcement | Plan |
-| Stage count | Min 1, no maximum | The floor must be enforced in the RPC (schema can't express it); the board scrolls horizontally so a wide set degrades but doesn't break | Plan |
-| Endpoint | `PUT /api/recruitments/[id]/stages` | Honest verb for whole-set replacement; needs a one-line widening of `useMutation`'s method union | Plan |
-| E2E fixture | Spec creates its own recruitment | A fresh recruitment has zero candidates by construction, and S-01's `STAGE_ORDER` assertions stay untouched | Plan |
+| Decision                    | Choice                                                    | Why                                                                                                                                                     | Source   |
+| --------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Scope of "customize"        | Rename + reorder + add + remove                           | Anything less doesn't deliver FR-004 — processes differ in which stages exist, not just labels                                                          | Plan     |
+| Existing candidates         | Block customization once any candidate exists             | Removes the vanishing-candidate bug, the re-map, and the S-03/S-04 boundary question at once; S-04 hasn't shipped so no real recruitment has candidates | Plan     |
+| Global defaults editable    | Yes, gated on `group.manage`                              | The seeded Administrator group already holds exactly that operation — no enum change, no extra migration                                                | Plan     |
+| Defaults delete safety      | Per-row: refuse if referenced                             | A blanket zero-candidates gate would ship the feature dead — the seed alone puts candidates on defaults                                                 | Plan     |
+| Admin UI                    | API + RPC only; screen deferred to S-07                   | The hard part is the diff/renumber/refusal logic; a bare CRUD screen belongs with S-07's admin surface                                                  | Plan     |
+| Write algorithm             | Delete+reinsert for overrides, diff+renumber for defaults | Overrides are provably unreferenced under the gate; default rows are referenced and cannot be deleted wholesale                                         | Research |
+| Reorder mechanism           | Two-phase negate-then-assign                              | Verified: single-statement and row-by-row renumbers both fail with `23505`                                                                              | Research |
+| Stage↔recruitment integrity | Trigger, not composite FK                                 | Both columns are `not null`, so a composite FK would reject every candidate on a global default stage and break the seed                                | Plan     |
+| Denial semantics            | 404 if not visible, 403 if visible but read-only          | Preserves the "forbidden is indistinguishable from missing" posture while telling a Hiring Manager why the control they can see won't work              | Plan     |
+| DTO provenance              | Board-level `stagesSource`                                | Resolution is all-or-nothing, so a per-stage flag would always be uniform                                                                               | Research |
+| Name validation             | Trim, non-empty, max length                               | Closes the `''` hole; no uniqueness within a set, no English-only enforcement                                                                           | Plan     |
+| Stage count                 | Min 1, no maximum                                         | The floor must be enforced in the RPC (schema can't express it); the board scrolls horizontally so a wide set degrades but doesn't break                | Plan     |
+| Endpoint                    | `PUT /api/recruitments/[id]/stages`                       | Honest verb for whole-set replacement; needs a one-line widening of `useMutation`'s method union                                                        | Plan     |
+| E2E fixture                 | Spec creates its own recruitment                          | A fresh recruitment has zero candidates by construction, and S-01's `STAGE_ORDER` assertions stay untouched                                             | Plan     |
 
 ## Scope
 
@@ -50,14 +50,14 @@ All multi-row writes go through `security definer` RPCs in `public` — PostgRES
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
+| Phase                           | What it delivers                                                                       | Key risk                                                                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | 1. Schema, policies & integrity | Write policies, consistency trigger, constraints, first `kanban_stages` RLS assertions | Getting a policy predicate subtly wrong — grants are already open, so only the policy stands between a recruiter and the global defaults |
-| 2. Stage-write RPCs | Replace, reset, and defaults-diff RPCs; regenerated types | The defaults diff carries the renumber and the referenced-row refusal — the most intricate code in the slice |
-| 3. Override-aware read path | Resolution in one round trip, `stagesSource` on the DTO | Must land before Phase 5 or custom boards lose every candidate |
-| 4. Stages API endpoint | `GET`/`PUT` route, errcode mapping, integration tests | `23503` already means "nonexistent group"; new refusals must not collapse into it |
-| 5. Stage editor UI | Dialog, variable-length list form, `fieldErrors` mapping, reset | Three patterns with no precedent here — stable keys, per-row labels, dotted field errors |
-| 6. End-to-end coverage | Self-created-recruitment spec | Hydration flake; must not touch S-01's seeded assertions |
+| 2. Stage-write RPCs             | Replace, reset, and defaults-diff RPCs; regenerated types                              | The defaults diff carries the renumber and the referenced-row refusal — the most intricate code in the slice                             |
+| 3. Override-aware read path     | Resolution in one round trip, `stagesSource` on the DTO                                | Must land before Phase 5 or custom boards lose every candidate                                                                           |
+| 4. Stages API endpoint          | `GET`/`PUT` route, errcode mapping, integration tests                                  | `23503` already means "nonexistent group"; new refusals must not collapse into it                                                        |
+| 5. Stage editor UI              | Dialog, variable-length list form, `fieldErrors` mapping, reset                        | Three patterns with no precedent here — stable keys, per-row labels, dotted field errors                                                 |
+| 6. End-to-end coverage          | Self-created-recruitment spec                                                          | Hydration flake; must not touch S-01's seeded assertions                                                                                 |
 
 **Prerequisites:** F-01, S-01, and S-02 shipped (S-02's create endpoint is used by the e2e fixture). Running local Supabase + Astro for integration tests; `docker exec` access for the RLS script.
 **Estimated effort:** ~4-6 sessions across 6 phases.

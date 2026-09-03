@@ -49,7 +49,7 @@ The database is already shared-profile ready. Nothing else for this slice exists
   rules out proxying CV bytes through the Worker — `workerd` silently drops bodies above ~5MB — and mandates
   browser → Storage direct upload via signed URL. Flagged there as "decide this before building the upload feature".
 - **Storage RLS is enforced at mint time only, never at upload time.** The signed upload token is a standalone bearer
-  capability; the upload request carries no session. The mint endpoint is therefore the *entire* authorisation
+  capability; the upload request carries no session. The mint endpoint is therefore the _entire_ authorisation
   perimeter — structurally the same shape as S-04's critical F1 finding, and it must be treated with the same care.
 - **Bucket config is a genuine server-side enforcement boundary.** Per-bucket `file_size_limit` and
   `allowed_mime_types` are enforced by the storage server even on a signed-URL upload the app never sees. Size is
@@ -100,7 +100,7 @@ superseded CV. A hiring manager sees the profile and can download a live CV, but
 - **No CV versioning or history UI.** One active CV per candidate, replaced on re-upload. Superseded rows are
   retained for audit but never surfaced.
 - **No candidate deletion.** No DELETE policy or grant exists on `candidates` and no FR asks for it. Retention
-  deletes a *file*, never a candidate.
+  deletes a _file_, never a candidate.
 - **No cross-recruitment candidate search or global candidate list** — FR-014..FR-016 belong to S-06. This slice
   creates the candidate-scoped route family S-06 will build on, but no list or search view.
 - **No restructuring of the S-04 notes UI.** The per-recruitment page keeps its notes exactly as they are and gains
@@ -407,6 +407,7 @@ new errcode alongside the existing codebook.
 ```
 confirm_candidate_cv(target_cv_id bigint) returns public.candidate_cvs
 ```
+
 Resolves the row, `P0002` if absent or invisible, `42501` without `candidate.write`, `22023` if the row is not
 `pending`. Marks any existing `active` row for that candidate as `superseded`, then sets this row `active`. The
 superseded row keeps its `storage_path` so the purge can still find its bytes.
@@ -414,12 +415,14 @@ superseded row keeps its `storage_path` so the purge can still find its bytes.
 ```
 list_purgeable_candidate_cvs() returns setof public.candidate_cvs
 ```
+
 Requires `candidate.write` **or** `group.manage` (`42501` otherwise). Returns rows where `object_deleted_at is null`
 and (`status = 'superseded'` or `expires_at <= now()`).
 
 ```
 mark_candidate_cv_object_deleted(target_cv_id bigint) returns public.candidate_cvs
 ```
+
 Same disjunctive gate. Sets `object_deleted_at = now()`. Separated from the listing because the Storage API call
 happens between the two and cannot sit inside a transaction.
 
@@ -739,11 +742,11 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass
-- [ ] 2.2 Integration tests pass
-- [ ] 2.3 Linting passes
-- [ ] 2.4 Type checking passes
-- [ ] 2.5 Build succeeds
+- [x] 2.1 Unit tests pass
+- [x] 2.2 Integration tests pass
+- [x] 2.3 Linting passes
+- [x] 2.4 Type checking passes
+- [x] 2.5 Build succeeds
 
 #### Manual
 

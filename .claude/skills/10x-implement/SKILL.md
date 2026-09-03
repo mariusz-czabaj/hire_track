@@ -119,9 +119,9 @@ Before proposing any phase-end or epilogue commit message, scan the conversation
 
 ## Roadmap status sync
 
-`context/foundation/roadmap.md` (produced by `/10x-roadmap`) indexes each Foundation/Slice by a stable **Change ID**. `/10x-archive` already closes the loop on the far end — when a change archives, it flips the matching roadmap item to `Status: done`. This step wires the near end: when implementation *starts*, mark the matching item **`in-progress`** so the roadmap shows live work instead of jumping straight from `ready` to `done`.
+`context/foundation/roadmap.md` (produced by `/10x-roadmap`) indexes each Foundation/Slice by a stable **Change ID**. `/10x-archive` already closes the loop on the far end — when a change archives, it flips the matching roadmap item to `Status: done`. This step wires the near end: when implementation _starts_, mark the matching item **`in-progress`** so the roadmap shows live work instead of jumping straight from `ready` to `done`.
 
-Run it **once, on entry** to the change (right after the `change.md` → `implementing` stamp) — not per phase. The lookup is **mandatory**; "best effort" scopes only the *edits* — a missing roadmap or a not-found target is skipped silently and never blocks, prompts, rolls back, or aborts the run. Do not skip the check on the assumption there's no roadmap.
+Run it **once, on entry** to the change (right after the `change.md` → `implementing` stamp) — not per phase. The lookup is **mandatory**; "best effort" scopes only the _edits_ — a missing roadmap or a not-found target is skipped silently and never blocks, prompts, rolls back, or aborts the run. Do not skip the check on the assumption there's no roadmap.
 
 1. `test -f context/foundation/roadmap.md`. If absent, skip this step silently.
 2. Capture whether the file is already dirty: `ROADMAP_PREDIRTY=$(git status --porcelain context/foundation/roadmap.md 2>/dev/null)` — used in step 5 to decide staging.
@@ -129,12 +129,14 @@ Run it **once, on entry** to the change (right after the `change.md` → `implem
    - in the `## At a glance` table — the row whose **Change ID** column cell equals `<change-id>` exactly;
    - and in the `## Foundations` / `## Slices` bodies — the `### <ID>: …` block that contains a `- **Change ID:** <change-id>` line.
 
-   `<ID>` is that item's roadmap-local id (`F-NN` or `S-NN`). Match is exact-string only — a slice can spawn several changes, so a near-miss is intentionally *not* touched. **No match** → print `ℹ context/foundation/roadmap.md has no item with Change ID "<change-id>" — roadmap left untouched.` and skip the rest of this step.
+   `<ID>` is that item's roadmap-local id (`F-NN` or `S-NN`). Match is exact-string only — a slice can spawn several changes, so a near-miss is intentionally _not_ touched. **No match** → print `ℹ context/foundation/roadmap.md has no item with Change ID "<change-id>" — roadmap left untouched.` and skip the rest of this step.
+
 4. **Match found** → read the item's current `- **Status:**`. If it is already `in-progress` or `done`, leave it untouched (**forward-only**: never regress a more-advanced status) and skip to step 5. Otherwise apply both edits with the Edit tool — each independent and best effort; if a target isn't where the `/10x-roadmap` template puts it (hand-edited or older-format roadmap), skip that sub-edit, keep going, and note what was skipped. Touch only the `Status` field; leave `Outcome`, `Prerequisites`, `Change ID`, etc. alone.
    1. **`## At a glance`** — in the matched row, set the **Status** column cell to `in-progress`.
    2. **Item body** — rewrite the item's `- **Status:**` line to `- **Status:** in-progress`.
 
    Then bump the roadmap frontmatter `updated:` to `<today>` (leave every other key alone; skip this if the file has no frontmatter).
+
 5. **Fold the flip into this change's history.** If `git` is available **and** `ROADMAP_PREDIRTY` (step 2) was empty, add `context/foundation/roadmap.md` to the current phase's touched-file set so the status flip lands in the phase's commit rather than lingering dirty. If `ROADMAP_PREDIRTY` was non-empty, the file already had uncommitted edits: leave the flip in the working tree, keep `context/foundation/roadmap.md` OUT of the touched-file set, and print `⚠ context/foundation/roadmap.md had pre-existing uncommitted changes — flipped roadmap item <ID> to in-progress in the working tree but did NOT stage it. Commit it yourself.` If `git` is unavailable, the edit simply stays in the working tree.
 
 ## Verification Approach
@@ -146,7 +148,6 @@ After implementing a phase:
 - Update your progress in your todos and in the plan's `## Progress` section
 - **Mutate ONLY the `## Progress` section.** Phase blocks (Overview, Changes Required, Success Criteria) are read-only. Use Edit to flip `- [ ] N.M <title>` → `- [x] N.M <title>` in Progress as each step completes. Do NOT edit Phase block bullets, do NOT add HTML comment progress markers at the bottom of the plan, and do NOT write any state-file sidecar.
 - **Run the phase-end commit ritual**: After all automated checks pass for the phase, walk through this sequenced ritual to author one Conventional-Commits commit and write the closing short SHA back into every Progress row flipped during the phase.
-
   1. **Manual confirmation gate.** Inform the human that automated verification passed and list the manual verification items from the plan. Pause here. Do not proceed until the human confirms manual testing succeeded. Use this format:
 
      ```
@@ -172,8 +173,7 @@ After implementing a phase:
 
   2. **Compute the staging set.** Take the touched-file set maintained during the phase (see "Tracking files touched during a phase" above) and union it with `{context/changes/<change-id>/plan.md}`. The plan file is always staged because each phase produces at least one Edit to its `## Progress` section.
 
-  3. **Detect unrelated dirty paths.** Run `git status --porcelain` and intersect with paths *outside* the staging set. If the dirty-but-untouched set is non-empty, present the offending paths and use `AskUserQuestion`:
-
+  3. **Detect unrelated dirty paths.** Run `git status --porcelain` and intersect with paths _outside_ the staging set. If the dirty-but-untouched set is non-empty, present the offending paths and use `AskUserQuestion`:
      - question: "<N> unrelated path(s) are dirty. How should I handle them?"
        header: "Dirty paths"
        options:
@@ -183,7 +183,7 @@ After implementing a phase:
          description: "Add the unrelated paths to this commit. You take responsibility for the broader scope."
        - label: "Abort"
          description: "Stop the phase commit. Resolve the dirty paths first, then re-run the ritual."
-       multiSelect: false
+         multiSelect: false
 
      If the dirty-but-untouched set is empty, skip this step.
 
@@ -198,7 +198,6 @@ After implementing a phase:
      Set `SHA=""` and skip to step 8.
 
   6. **Propose a Conventional-Commits message.** Build a subject line in the form `<type>(<change-id>): <phase title> (p<N>)`, where `<type>` is one of `feat / fix / chore / refactor / docs` chosen from the phase's nature (e.g., `feat` for new user-visible behavior, `chore` for prompt/doc edits, `refactor` for restructuring without behavior change). The phase title is the meaningful part and leads; the `(p<N>)` suffix carries the phase index. Build a short body listing the touched files, plus the `Refs:` line from "Tracking issue/task references for commits" when applicable. Use `AskUserQuestion`:
-
      - question: "Approve commit message?"
        header: "Commit msg"
        options:
@@ -208,7 +207,7 @@ After implementing a phase:
          description: "Override the subject; keep the body."
        - label: "Override entirely"
          description: "Replace both subject and body."
-       multiSelect: false
+         multiSelect: false
 
   7. **Commit via heredoc.** Run `git commit` per the global commit-message protocol:
 
@@ -227,7 +226,6 @@ After implementing a phase:
   8. **Capture the short SHA.** Run `git rev-parse --short HEAD` and store as `SHA`. Skip this step if `SHA=""` was set by step 5.
 
   9. **Write the SHA back into Progress.** For every Progress row flipped during this phase, run a targeted Edit:
-
      - Find: `- [x] N.M <title>` (no existing ` — <sha>` suffix at end of line)
      - Replace with: `- [x] N.M <title> — <SHA>`
 
@@ -259,6 +257,7 @@ After implementing a phase:
 
   **If user chooses to clear**: Copy the resume command to clipboard and display it:
   1. Copy:
+
      ```bash
      echo -n "/10x-implement <change-id> phase [next-phase-number]" | pbcopy 2>/dev/null || echo -n "/10x-implement <change-id> phase [next-phase-number]" | clip.exe 2>/dev/null || echo -n "/10x-implement <change-id> phase [next-phase-number]" | xclip -selection clipboard 2>/dev/null || true
      ```
@@ -267,6 +266,7 @@ After implementing a phase:
      # PowerShell (Windows)
      Set-Clipboard "/10x-implement <change-id> phase [next-phase-number]"
      ```
+
   2. Display:
      ```
      → /10x-implement <change-id> phase [next-phase-number] (✓ copied)
@@ -303,7 +303,6 @@ Empty-diff phases (manual-verification-only or no-op adapted phases) commit noth
 When every `- [ ]` in the entire `## Progress` section is now `- [x]`:
 
 1. **Defensive pending-items surface.** Re-scan the entire `## Progress` section one last time for any `- [ ]` rows. Under normal flow this is a no-op — the trigger condition for "After all phases" is already "every `- [ ]` is `- [x]`", so the surface should find nothing. It exists to make any unexpected stragglers explicit rather than silently lost (e.g., if a partial run, a manual edit, or a resume path bypassed the trigger). If the count is non-zero, list each row as `<phase>.<index> <title>` grouped by Automated vs Manual subsection in document order, then ask via `AskUserQuestion`:
-
    - question: "<N> Progress item(s) still pending. How to proceed?"
      header: "Stragglers"
      options:
@@ -311,7 +310,7 @@ When every `- [ ]` in the entire `## Progress` section is now `- [x]`:
        description: "STOP without flipping change.md.status. Address the stragglers manually, then re-enter the epilogue path."
      - label: "Proceed to epilogue"
        description: "Flip status: implemented and run the epilogue commit anyway. Stragglers will surface as warnings under /10x-archive."
-     multiSelect: false
+       multiSelect: false
 
    On "Pause": STOP immediately. Do NOT update `change.md`, do NOT run the epilogue commit. On "Proceed to epilogue": continue with steps 2–4 below. If the count is zero, skip this step and continue.
 

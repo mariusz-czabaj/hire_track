@@ -15,10 +15,10 @@ Rich rationale stays in conversation. The body paragraph is a one-paragraph summ
 
 ```yaml
 ---
-starter_id: <string>            # required; key from references/starter-registry.yaml
-package_manager: <string>       # optional; open string per chosen card; may be omitted entirely
-project_name: <string>          # required; kebab-case
-hints:                          # required object; subfields below
+starter_id: <string> # required; key from references/starter-registry.yaml
+package_manager: <string> # optional; open string per chosen card; may be omitted entirely
+project_name: <string> # required; kebab-case
+hints: # required object; subfields below
   language_family: <enum>
   team_size: <enum>
   deployment_target: <string>
@@ -190,7 +190,6 @@ hints:
   has_ai: true
   has_background_jobs: false
 ---
-
 ## Why this stack
 
 A solo learner shipping a recipe-matching MVP in 1 week with auth and an LLM
@@ -231,7 +230,6 @@ hints:
   has_ai: false
   has_background_jobs: true
 ---
-
 ## Why this stack
 
 Small Python team building an ingest API with background jobs. Custom path
@@ -265,7 +263,6 @@ hints:
   has_ai: false
   has_background_jobs: false
 ---
-
 ## Why this stack
 
 Solo developer building a small edge router in Go. Standard path — `go` is the

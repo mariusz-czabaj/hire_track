@@ -66,22 +66,24 @@ Before any reading, identify what kinds of upstream artifacts the user passed in
 
 **Question count and focus scale with what's provided:**
 
-| Upstream artifacts          | LOW   | MEDIUM | HIGH  | What changes vs. baseline                                                                                                              |
-| --------------------------- | ----- | ------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Task only (baseline)        | 4–6   | 7–10   | 11–15 | Full questioning across all relevant categories.                                                                                       |
-| Task + research             | 3–5   | 5–7    | 8–11  | Skip questions whose answer is already in the research doc. Don't re-spawn sub-agents to find what research already mapped.            |
-| Task + frame                | 2–3   | 4–6    | 7–9   | Skip [D]iagnostic categories — frame settled problem framing. Treat the Reframed (or Confirmed) Problem Statement as authoritative.    |
-| Task + frame + research     | 1–2   | 3–5    | 5–7   | Skip both. Ask only [S]olution-design questions that genuinely need user input.                                                        |
+| Upstream artifacts      | LOW | MEDIUM | HIGH  | What changes vs. baseline                                                                                                           |
+| ----------------------- | --- | ------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Task only (baseline)    | 4–6 | 7–10   | 11–15 | Full questioning across all relevant categories.                                                                                    |
+| Task + research         | 3–5 | 5–7    | 8–11  | Skip questions whose answer is already in the research doc. Don't re-spawn sub-agents to find what research already mapped.         |
+| Task + frame            | 2–3 | 4–6    | 7–9   | Skip [D]iagnostic categories — frame settled problem framing. Treat the Reframed (or Confirmed) Problem Statement as authoritative. |
+| Task + frame + research | 1–2 | 3–5    | 5–7   | Skip both. Ask only [S]olution-design questions that genuinely need user input.                                                     |
 
 **Principle**: every artifact passed in is a source of decisions already made. Reading them counts as listening to the user. Don't ask the user what they already wrote down.
 
 **When a frame is present**, read it FULLY and treat as authoritative:
+
 - Copy the **Reported Observation** + **Reframed (or Confirmed) Problem Statement** as the task definition. Do not re-question the framing.
 - Lift the **Hypothesis Investigation** table and **Narrowing Signals** into your "Current State Analysis" — this work is already done.
 - If the frame **Confidence: LOW** is flagged, surface that in the plan's "Open Risks & Assumptions" and ask ONE clarifying question about how to proceed (verify first, or plan with risk acknowledged).
 - Do NOT re-investigate the framing. Frame owns problem framing; you own solution design.
 
 **When research is present**, read it FULLY and use as the codebase baseline:
+
 - "Code References" section IS your codebase grounding — don't re-spawn Explore agents to find the same files.
 - "Architecture Insights" feed directly into "Current State Analysis."
 - Spawn sub-agents only to fill specific gaps research didn't cover (e.g., the exact files this plan will modify if research was broader).
@@ -277,7 +279,7 @@ Before any reading, identify what kinds of upstream artifacts the user passed in
    - Questions with obvious answers given the context already provided
    - Preferences that don't affect the plan's structure or success
 
-   **CRITICAL**: You MUST ask the number of questions appropriate to the confirmed complexity level *and* the upstream-artifacts scaling from Step 1.0. Do not shortcut this when no upstream artifacts were provided — thorough questioning prevents costly rework. Equally, do not pad questions when a frame or research already covers the ground — re-asking erodes trust in the upstream artifact. Each question should force a real decision, not confirm something obvious.
+   **CRITICAL**: You MUST ask the number of questions appropriate to the confirmed complexity level _and_ the upstream-artifacts scaling from Step 1.0. Do not shortcut this when no upstream artifacts were provided — thorough questioning prevents costly rework. Equally, do not pad questions when a frame or research already covers the ground — re-asking erodes trust in the upstream artifact. Each question should force a real decision, not confirm something obvious.
 
 ### Step 2: Research & Discovery
 
@@ -400,7 +402,7 @@ After structure approval:
    - **Sync the roadmap** (best effort): if `context/foundation/roadmap.md` carries an item whose `Change ID` equals `<change-id>`, flip that item to `Status: planning`. See "## Roadmap status sync" below. Never blocks; most changes won't trace to a roadmap.
 2. **Use this template structure** (Phase blocks contain plain bullets — `- ` not `- [ ]` — and a single canonical `## Progress` section at the bottom owns the checkbox state, see `references/progress-format.md` for the contract):
 
-````markdown
+```markdown
 # [Feature/Task Name] Implementation Plan
 
 ## Overview
@@ -538,7 +540,7 @@ A code snippet appears here ONLY when the change is non-obvious — a tricky reg
 #### Automated
 
 - [ ] 2.1 <…>
-````
+```
 
 The Progress section is mechanical — emit one `### Phase N: <name>` per phase, with `#### Automated` / `#### Manual` subsections enumerating every Success Criteria bullet from that phase as `- [ ] <phase>.<index> <title>`. Omit empty subsections. The Phase blocks themselves carry plain `- ` bullets (no checkboxes); the `## Progress` section is the only place `[ ]` / `[x]` appear.
 
@@ -573,11 +575,11 @@ After writing the full plan, generate a concise brief that gives the reader the 
 
 When a frame brief or research doc was the input, mark the **Source** column to show where the decision came from. This lets readers see the lineage: what was settled upstream vs decided in this planning session.
 
-| Decision                       | Choice            | Why (1 sentence)  | Source           |
-| ------------------------------ | ----------------- | ----------------- | ---------------- |
-| [Decision area]                | [What was chosen] | [Core rationale]  | Frame / Research / Plan |
-| [Decision area]                | [Choice]          | [Rationale]       | Frame / Research / Plan |
-| ...                            | ...               | ...               | ...              |
+| Decision        | Choice            | Why (1 sentence) | Source                  |
+| --------------- | ----------------- | ---------------- | ----------------------- |
+| [Decision area] | [What was chosen] | [Core rationale] | Frame / Research / Plan |
+| [Decision area] | [Choice]          | [Rationale]      | Frame / Research / Plan |
+| ...             | ...               | ...              | ...                     |
 
 (Omit the `Source` column if no upstream artifacts were provided — every row would be `Plan`.)
 
@@ -668,7 +670,7 @@ For non-software: structure, workflow, key dependencies.]
 
 `context/foundation/roadmap.md` (produced by `/10x-roadmap`) indexes each Foundation/Slice by a stable **Change ID**. As planning turns a roadmap item into a concrete change folder + plan, mark that item **`planning`** so the roadmap reflects that the item has left the backlog and entered active work. `/10x-implement` later advances the same item to `in-progress`, and `/10x-archive` closes it to `done`.
 
-Do this in Step 4 (right after the `change.md` → `planned` stamp). The lookup is **mandatory**; "best effort" scopes only the *edits* — a missing roadmap or a not-found target is skipped silently and never blocks, prompts, or aborts the run. Do not skip the check on the assumption there's no roadmap.
+Do this in Step 4 (right after the `change.md` → `planned` stamp). The lookup is **mandatory**; "best effort" scopes only the _edits_ — a missing roadmap or a not-found target is skipped silently and never blocks, prompts, or aborts the run. Do not skip the check on the assumption there's no roadmap.
 
 1. `test -f context/foundation/roadmap.md`. If absent, skip this step silently.
 2. Read the file. Look for `<change-id>` used as a `Change ID`:
@@ -676,11 +678,13 @@ Do this in Step 4 (right after the `change.md` → `planned` stamp). The lookup 
    - and in the `## Foundations` / `## Slices` bodies — the `### <ID>: …` block that contains a `- **Change ID:** <change-id>` line.
 
    Match is exact-string only. **No match** → print `ℹ context/foundation/roadmap.md has no item with Change ID "<change-id>" — roadmap left untouched.` and stop here.
+
 3. **Match found** → if the item's `- **Status:**` is already `planning`, `in-progress`, or `done`, leave it untouched (**forward-only**: never regress a more-advanced status) and stop. Otherwise apply both edits with the Edit tool — each independent and best effort; skip a sub-edit whose target isn't where the `/10x-roadmap` template puts it, and note the skip. Touch only the `Status` field:
    1. **`## At a glance`** — set the matched row's **Status** cell to `planning`.
    2. **Item body** — rewrite the item's `- **Status:**` line to `- **Status:** planning`.
 
    Then bump the roadmap frontmatter `updated:` to `<today>` (skip if there is no frontmatter).
+
 4. `/10x-plan` does not commit its own artifacts; leave the flip in the working tree. It is committed later alongside the change's first `/10x-implement` phase (which re-flips the same item to `in-progress`).
 
 ## Important Guidelines

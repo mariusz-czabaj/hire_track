@@ -11,14 +11,17 @@ This is the first slice to reach the database from application code, so it also 
 F-01 landed a complete, RLS-enforced schema plus seed data; **no application code touches it**. There is not a single `.from()` call in `src/`.
 
 What exists:
+
 - 7 applied migrations covering `recruitments`, `kanban_stages`, `candidates`, `candidate_recruitments`, status history, and the security-group tables, with RLS policies and two `stable security definer` helpers.
 - Seed data with three role identities and one `live` recruitment holding 5 candidates across 5 of 6 default stages.
 - An Astro 6 SSR skeleton: one layout, one protected page, three form-POST auth endpoints, `button.tsx` as the only shadcn component.
 
 What is missing, despite CLAUDE.md describing several as established conventions:
+
 - `src/types.ts`, generated `Database` types, `src/lib/services/`, zod (not even a dependency), `src/components/hooks/`, any JSON response envelope, any test framework.
 
 Key constraints discovered:
+
 - **`strictTypeChecked` + an untyped Supabase client is a hard blocker.** [eslint.config.js:15](../../../eslint.config.js:15) enables `no-unsafe-assignment`/`-member-access`/`-call`/`-return`/`-argument` as errors; `createServerClient` is called without a `Database` generic at [src/lib/supabase.ts:9](../../../src/lib/supabase.ts:9). Typed query code is unwritable until types are generated.
 - `PROTECTED_ROUTES = ["/dashboard"]` only, and `/api/*` is entirely unguarded ([src/middleware.ts:4](../../../src/middleware.ts:4)).
 - `createClient` returns `null` when env vars are absent (both are `optional: true`) — every call site must handle it.
@@ -38,7 +41,7 @@ Verify by: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:e2
 
 - The kanban's query pattern is already indexed: `candidate_recruitments` carries indexes on `recruitment_id` and `current_stage_id`, added for exactly this purpose ([20260831182957_recruitment_candidate_schema.sql:88](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:88)).
 - **Board columns come from `kanban_stages where recruitment_id is null order by sort_order`.** The per-recruitment override column exists but has no write policy and no write grant — S-03's job. Read stages from the table regardless, never hardcode, so S-03 stays a pure insert.
-- **A board query needs two operations, not one**: `recruitment.read` on that recruitment (for link rows) *and* org-wide `candidate.read` (for names). `candidates` SELECT is **not** recruitment-scoped ([20260831183457_rls_policies.sql:179](../../../supabase/migrations/20260831183457_rls_policies.sql:179)).
+- **A board query needs two operations, not one**: `recruitment.read` on that recruitment (for link rows) _and_ org-wide `candidate.read` (for names). `candidates` SELECT is **not** recruitment-scoped ([20260831183457_rls_policies.sql:179](../../../supabase/migrations/20260831183457_rls_policies.sql:179)).
 - Candidate status is **not** a column — it is `candidate_recruitments.current_stage_id`. FR-010's date is `added_at`.
 - Recruitment status is `text` + CHECK with lowercase values (`draft`/`live`/`closed`), not an enum — labels are a UI mapping.
 - Seed data provides three ready test identities (`hr.test@`, `hiring-manager.test@`, `admin.test@`, all `password123`) and a genuinely empty `Odrzucony` column. **Ids are sequence-assigned — never hardcode them.**
@@ -57,7 +60,7 @@ Verify by: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:e2
 - **No delete affordances anywhere** — RLS denies DELETE on `recruitments`, `candidates`, `candidate_recruitments` and `kanban_stages`.
 - **No Realtime / live-updating board** — `has_realtime: false` in tech-stack.md.
 - **No 403 handling** — forbidden and missing both return 404 by decision (see Implementation Approach).
-- **No translation of existing Polish `context/**` documents** — the new lessons.md rule binds new artifacts; retrofitting the PRD and roadmap is a separate change.
+- **No translation of existing Polish `context/**` documents\*\* — the new lessons.md rule binds new artifacts; retrofitting the PRD and roadmap is a separate change.
 - **No `locals.supabase`** — endpoints create their own client, matching every existing call site.
 
 ## Implementation Approach
@@ -128,7 +131,7 @@ Rename default stages to English, generate typed database bindings, define share
 
 **Intent**: Define the wire types the endpoints return and the UI consumes — the first entries in the file CLAUDE.md mandates.
 
-**Contract**: `RecruitmentStatus` — **hand-written** as a zod enum (`"draft" | "live" | "closed"`) with the TS union inferred from it. Do **not** try to derive this from the generated types: the column is `text` + CHECK, not a Postgres enum, so the generator emits `status: string` (verified). That zod enum is the single source for the DTO type, the endpoint's query validation, and the UI filter options; the service parses DB rows through it to narrow `string` → union. Because the union can drift from the CHECK constraint, any future migration touching allowed statuses must update it in the same commit. (Contrast: `operation` *is* a real enum and does generate a union — that asymmetry is what makes this easy to get wrong.) Then: `RecruitmentListItemDto` (id, title, department, location, openedAt, status, candidateCount); `KanbanStageDto` (id, name, sortOrder); `CandidateCardDto` (id, fullName, addedAt); `KanbanBoardDto` (recruitment summary + ordered stages, each with its candidates and count); `ApiErrorBody` (`{ error: { code, message } }`). DTO field names are camelCase; mapping from the snake_case DB rows happens in the service layer.
+**Contract**: `RecruitmentStatus` — **hand-written** as a zod enum (`"draft" | "live" | "closed"`) with the TS union inferred from it. Do **not** try to derive this from the generated types: the column is `text` + CHECK, not a Postgres enum, so the generator emits `status: string` (verified). That zod enum is the single source for the DTO type, the endpoint's query validation, and the UI filter options; the service parses DB rows through it to narrow `string` → union. Because the union can drift from the CHECK constraint, any future migration touching allowed statuses must update it in the same commit. (Contrast: `operation` _is_ a real enum and does generate a union — that asymmetry is what makes this easy to get wrong.) Then: `RecruitmentListItemDto` (id, title, department, location, openedAt, status, candidateCount); `KanbanStageDto` (id, name, sortOrder); `CandidateCardDto` (id, fullName, addedAt); `KanbanBoardDto` (recruitment summary + ordered stages, each with its candidates and count); `ApiErrorBody` (`{ error: { code, message } }`). DTO field names are camelCase; mapping from the snake_case DB rows happens in the service layer.
 
 #### 6. Dependencies
 
@@ -197,9 +200,11 @@ Gate `/api`, establish the error contract, and expose the two read endpoints bac
 **Intent**: Hold the queries and the row-to-DTO mapping, so endpoints stay thin and the logic is unit-testable without HTTP.
 
 **Contract**: Two exported functions taking a typed `SupabaseClient` plus arguments:
+
 - `listRecruitments(client, { status })` → `RecruitmentListItemDto[]`, ordered by `opened_at` descending with `created_at` as tiebreaker, filtered by status when provided. Candidate counts come from `candidate_recruitments` (see Critical Implementation Details), not from `candidates`.
 
   **Counts must be a single query — no per-row count calls.** Use PostgREST's embedded aggregate: `select("id, title, department, location, opened_at, status, candidate_recruitments(count)")`. Verified against the running database; it returns the count array-wrapped, e.g. `"candidate_recruitments": [{ "count": 5 }]`, so the mapper reads `row.candidate_recruitments[0]?.count ?? 0`. RLS still applies to the embedded table, so counts stay correctly scoped. Typed inference over embedded aggregates is awkward — declare a narrow local row type for this select rather than widening with a cast.
+
 - `getKanbanBoard(client, recruitmentId)` → `KanbanBoardDto | null`, returning `null` when the recruitment is not visible or does not exist. Stages are read via `recruitment_id is null order by sort_order`; candidates are bucketed by iterating the stage list so empty stages survive.
 
 Both surface Supabase `{ error }` values as thrown errors for the endpoint to convert; neither swallows them.
@@ -336,6 +341,7 @@ Activate the dark token set, install the needed shadcn components, and ship `/re
 **Intent**: Give both islands one typed way to fetch a JSON endpoint and handle its states, so the `res.ok` branch, the `ApiErrorBody` parse and the 401 path exist in a single place. Also establishes `src/components/hooks/`, the directory CLAUDE.md mandates and which does not yet exist.
 
 **Contract**: A generic hook taking a URL and returning discriminated state — loading / success with typed data / not-found / error — refetching when the URL changes. Two behaviors it centralizes:
+
 - **401 → redirect to `/auth/signin`**, not the generic error state. The page is server-protected, but the island fetches afterwards; if the session expires in between, the `/api` guard returns 401 JSON and the user must be sent to sign in rather than shown "failed to load".
 - **404 → a distinct not-found state**, so the board can render its own not-found view instead of a generic error.
 
@@ -531,6 +537,7 @@ Cover US-01's acceptance criteria end to end, including the role cases that unit
 The `<2s` NFR (PRD line 116) has no defined load target — roadmap open questions 1 and 2 (QPS, data volume) are unanswered and non-blocking — so it is verified at seed scale only.
 
 Two known characteristics worth recording rather than optimizing now:
+
 - **`recruitments` has no index beyond its PK.** The list's status filter and ordering are sequential scans. Fine at seed scale; if the list slows once S-02 creates real volume, an index on `(status, opened_at desc)` is the obvious first move.
 - **The client-fetch architecture adds a round-trip after hydration**, so perceived load is hydration + fetch rather than a single server render. Skeletons cover the gap. If the NFR is ever measured under load, this is the first thing to revisit.
 
@@ -576,7 +583,7 @@ The stage rename is a data-only `update` on six rows with `recruitment_id is nul
 #### Automated
 
 - [x] 2.1 Typechecking passes — d9855c8
-- [x] 2.2 Linting passes with no no-unsafe-* or no-floating-promises errors — d9855c8
+- [x] 2.2 Linting passes with no no-unsafe-\* or no-floating-promises errors — d9855c8
 - [x] 2.3 Build passes — d9855c8
 
 #### Manual

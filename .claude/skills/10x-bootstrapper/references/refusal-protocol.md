@@ -92,6 +92,7 @@ Heads-up: this directory already contains scaffold-shaped files: <files>. Bootst
 **Then ask**:
 
 AskUserQuestion:
+
 - question: "Continue scaffolding into this populated directory?"
   header: "Populated cwd"
   options:
@@ -99,7 +100,7 @@ AskUserQuestion:
     description: "Apply the strict conflict policy. Existing files become `.scaffold` siblings; `context/` is preserved."
   - label: "Abort"
     description: "Stop the skill. No files written, no scaffold attempted."
-  multiSelect: false
+    multiSelect: false
 
 The recommended default is "Continue" because the most common path here is a user who legitimately re-runs bootstrapper after fixing a tech-stack pick (e.g., re-ran `/10x-tech-stack-selector` to swap the starter). The conflict policy itself is the safety net — abort is the escape hatch for genuinely unexpected cwd state.
 
@@ -119,6 +120,7 @@ A prior verification log exists at `context/changes/bootstrap-verification/verif
 **Then ask**:
 
 AskUserQuestion:
+
 - question: "Overwrite the existing verification log?"
   header: "Log collision"
   options:
@@ -128,7 +130,7 @@ AskUserQuestion:
     description: "Preserve the prior log. New log lands at the next available verification-vN.md slot."
   - label: "Abort"
     description: "Skill exits without writing the log. Scaffold already happened (this guard runs at Step 4); rerun from a clean cwd if you need a fresh log."
-  multiSelect: false
+    multiSelect: false
 
 The recommended default is "Overwrite" — bootstrapper is a one-shot per project; multiple log versions are usually a sign the user re-ran the whole flow, in which case the prior log is stale.
 

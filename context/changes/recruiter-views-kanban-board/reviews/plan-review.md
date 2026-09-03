@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: Recruitment List & Candidate Kanban Board (S-01)
 
 - **Plan**: `context/changes/recruiter-views-kanban-board/plan.md`
@@ -9,13 +10,13 @@
 
 ## Verdicts
 
-| Dimension | Verdict | After fixes |
-|-----------|---------|-------------|
-| End-State Alignment | PASS | PASS |
-| Lean Execution | PASS | PASS |
-| Architectural Fitness | WARNING | PASS |
-| Blind Spots | WARNING | PASS |
-| Plan Completeness | FAIL | PASS |
+| Dimension             | Verdict | After fixes |
+| --------------------- | ------- | ----------- |
+| End-State Alignment   | PASS    | PASS        |
+| Lean Execution        | PASS    | PASS        |
+| Architectural Fitness | WARNING | PASS        |
+| Blind Spots           | WARNING | PASS        |
+| Plan Completeness     | FAIL    | PASS        |
 
 ## Grounding
 
@@ -29,7 +30,7 @@
 - **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
 - **Dimension**: Plan Completeness
 - **Location**: Phase 1, change #5 (Shared DTOs)
-- **Detail**: The plan instructed that `RecruitmentStatus` be "derived from the generated enum-ish column type rather than hand-written". Running `supabase gen types typescript --local` shows `status: string` — the column is `text` + CHECK, not a Postgres enum, so no union is emitted. The real `operation` enum *does* generate a union, which is the likely source of the error. The implementer would follow an impossible instruction and then improvise a cast that `strictTypeChecked` rejects.
+- **Detail**: The plan instructed that `RecruitmentStatus` be "derived from the generated enum-ish column type rather than hand-written". Running `supabase gen types typescript --local` shows `status: string` — the column is `text` + CHECK, not a Postgres enum, so no union is emitted. The real `operation` enum _does_ generate a union, which is the likely source of the error. The implementer would follow an impossible instruction and then improvise a cast that `strictTypeChecked` rejects.
 - **Fix A ⭐ Recommended**: Hand-write the union as a zod enum; parse at the service boundary
   - Strength: No schema change; one zod enum is the single source for the DTO type, endpoint validation and filter options.
   - Tradeoff: The union can drift from the CHECK constraint — a status added in SQL won't fail typecheck.

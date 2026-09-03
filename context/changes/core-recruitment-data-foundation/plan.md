@@ -38,7 +38,7 @@ Four migrations in dependency order — security/RBAC schema, then domain schema
 
 ## Critical Implementation Details
 
-**RLS write-policy sequencing (chicken-and-egg on INSERT).** A brand-new `recruitments` row has no `recruitment_security_groups` rows yet, so a recruitment-scoped write check (`private.has_recruitment_operation(id, ...)`) would always evaluate false on INSERT — there's nothing to scope against. Both `recruitments` INSERT and `recruitment_security_groups` INSERT/DELETE therefore use the **broad** check (`private.has_operation('recruitment.write')` — "does this user have write access in *any* group they belong to") rather than a recruitment-scoped one. Only SELECT/UPDATE on `recruitments` (and SELECT on `recruitment_security_groups`) are scoped to the specific recruitment's assigned groups. This means a user can assign *any* existing security group to a recruitment they create, not only groups they personally belong to — an accepted simplification; the PRD has no requirement that group assignment be restricted to the assigner's own groups.
+**RLS write-policy sequencing (chicken-and-egg on INSERT).** A brand-new `recruitments` row has no `recruitment_security_groups` rows yet, so a recruitment-scoped write check (`private.has_recruitment_operation(id, ...)`) would always evaluate false on INSERT — there's nothing to scope against. Both `recruitments` INSERT and `recruitment_security_groups` INSERT/DELETE therefore use the **broad** check (`private.has_operation('recruitment.write')` — "does this user have write access in _any_ group they belong to") rather than a recruitment-scoped one. Only SELECT/UPDATE on `recruitments` (and SELECT on `recruitment_security_groups`) are scoped to the specific recruitment's assigned groups. This means a user can assign _any_ existing security group to a recruitment they create, not only groups they personally belong to — an accepted simplification; the PRD has no requirement that group assignment be restricted to the assigner's own groups.
 
 **RLS performance.** Every policy wraps `auth.uid()` as `(select auth.uid())` and every helper function call as `(select private.has_operation(...))` — per Supabase's Postgres best practices, this lets Postgres evaluate the call once per query instead of once per row (5-10x+ difference at scale). Both helper functions must also have their `execute` privilege revoked from `PUBLIC`, `anon`, and `authenticated`... actually granted only to `authenticated` (never revoked-and-left-inaccessible, since policies call them as the querying user) — see Phase 3's exact grants.
 
@@ -57,6 +57,7 @@ Introduces the entities admins will manage in S-07: named security groups, the f
 **Intent**: Create the tables and enum that back RBAC, with every foreign key indexed per Supabase's schema best practices.
 
 **Contract**:
+
 - `create type operation as enum ('recruitment.read', 'recruitment.write', 'candidate.read', 'candidate.write', 'group.manage');` — a fixed, app-defined catalog (not admin-extensible), sized to the three example groups the PRD describes (HR/Rekruter: full recruitment+candidate write; Hiring Manager: read-only both; Administrator: `group.manage` only).
 - `security_groups(id bigint identity pk, name text not null unique, created_at timestamptz not null default now())`.
 - `group_memberships(id bigint identity pk, group_id bigint not null references security_groups(id) on delete cascade, user_id uuid not null references auth.users(id) on delete cascade, created_at timestamptz not null default now(), unique(group_id, user_id))` — explicit index on `user_id` in addition to the unique constraint (which only optimizes lookups by `group_id` as the leading column).
@@ -92,6 +93,7 @@ Introduces the recruiting domain itself: recruitments, which security groups a r
 **Intent**: Create every table F-01's outcome calls for, insert the real default kanban stages (product config, not test data — see Key Discoveries), and add the search index candidate lookup will need in S-06.
 
 **Contract**:
+
 - `create extension if not exists pg_trgm with schema extensions;` — matches `supabase/config.toml`'s existing `extra_search_path = ["public", "extensions"]`.
 - `recruitments(id bigint identity pk, title text not null, location text, department text, employment_type text, opened_at date, status text not null default 'draft' check (status in ('draft','live','closed')), created_at timestamptz not null default now(), updated_at timestamptz not null default now())` — full FR-001/FR-002 metadata + status, even though the create/edit UI is S-02's job; F-01 owns the complete table shape.
 - `recruitment_security_groups(id bigint identity pk, recruitment_id bigint not null references recruitments(id) on delete cascade, group_id bigint not null references security_groups(id) on delete restrict, created_at timestamptz not null default now(), unique(recruitment_id, group_id))` — `on delete restrict` on `group_id` per the group-deletion decision: deleting a group still assigned to a recruitment fails rather than silently orphaning that recruitment (making it invisible to everyone). Explicit index on `group_id`.
@@ -136,8 +138,10 @@ Enables RLS on every table from Phases 1-2 and defines per-operation policies ga
 **Intent**: Lock down every table to the `authenticated` role via policies driven by group membership + granted operations; grant only the privileges each table's policies actually support (no blanket `ALL`), per the least-privilege guidance in Supabase's Postgres best practices.
 
 **Contract**:
+
 - `create schema if not exists private;` (already excluded from the API by `config.toml`'s `schemas = ["public", "graphql_public"]`).
 - Helper functions, both `security definer`, `set search_path = ''`, granted `execute` to `authenticated` only:
+
   ```sql
   create or replace function private.has_operation(check_operation operation)
   returns boolean language sql security definer set search_path = '' as $$
@@ -158,6 +162,7 @@ Enables RLS on every table from Phases 1-2 and defines per-operation policies ga
     );
   $$;
   ```
+
 - `alter table <t> enable row level security;` for all nine tables (`security_groups`, `group_memberships`, `group_operations`, `recruitments`, `recruitment_security_groups`, `kanban_stages`, `candidates`, `candidate_recruitments`, `candidate_recruitment_status_history`).
 - Policies (all `to authenticated`, all wrapping `auth.uid()`/helper calls in `(select ...)` per the RLS performance rule — see Critical Implementation Details):
   - `security_groups`: SELECT `using (true)` — every authenticated user needs the group list to assign one at recruitment-creation time (FR-001a); INSERT/UPDATE/DELETE gated by `private.has_operation('group.manage')`.
@@ -181,7 +186,7 @@ Enables RLS on every table from Phases 1-2 and defines per-operation policies ga
 
 #### Manual Verification:
 
-- Anonymous REST request returns no rows: `curl -s "http://127.0.0.1:54321/rest/v1/recruitments" -H "apikey: <anon key from \`npx supabase status\`>"` returns `[]`, confirming an unauthenticated request sees nothing
+- Anonymous REST request returns no rows: `curl -s "http://127.0.0.1:54321/rest/v1/recruitments" -H "apikey: <anon key from \`npx supabase status\`>"`returns`[]`, confirming an unauthenticated request sees nothing
 
 ---
 

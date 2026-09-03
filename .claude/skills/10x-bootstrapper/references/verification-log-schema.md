@@ -86,10 +86,12 @@ For HARD-STOP (`phase_3_status: failed`):
 **Stderr (last 20 lines)**:
 
 ```
+
 <captured stderr>
 ```
 
 **.bootstrap-scaffold left in place at**: `.bootstrap-scaffold/`
+
 ```
 
 ### `## Post-scaffold audit`
@@ -99,6 +101,7 @@ Findings from Step 3. Three sub-shapes depending on outcome.
 **Audit ran successfully**:
 
 ```
+
 **Tool**: <audit_command>
 **Summary**: <C> CRITICAL, <H> HIGH, <M> MODERATE, <L> LOW
 **Direct vs transitive**: <Cd>/<Hd>/<Md>/<Ld> direct of total <C>/<H>/<M>/<L> (where the tool supports the distinction; "not distinguished by this tool" otherwise)
@@ -136,8 +139,11 @@ Findings from Step 3. Three sub-shapes depending on outcome.
 **Partial output (if any)**:
 
 ```
+
 <captured stdout/stderr>
+
 ```
+
 ```
 
 For the HARD-STOP case (`phase_3_status: failed`), this whole section is replaced by:

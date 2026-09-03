@@ -25,7 +25,7 @@ What does the codebase already provide, and what must change, to let a recruiter
 
 ## Summary
 
-**The roadmap's characterisation of S-03 as "low risk, purely additive, Unknowns: —" ([roadmap.md:125](../../../context/foundation/roadmap.md:125)) is wrong.** The schema slot for overrides does exist and was designed for this slice, so the *insert* half is genuinely easy. But three separate blockers sit on the path, and two of them are data-integrity traps that no prior change document has ever discussed:
+**The roadmap's characterisation of S-03 as "low risk, purely additive, Unknowns: —" ([roadmap.md:125](../../../context/foundation/roadmap.md:125)) is wrong.** The schema slot for overrides does exist and was designed for this slice, so the _insert_ half is genuinely easy. But three separate blockers sit on the path, and two of them are data-integrity traps that no prior change document has ever discussed:
 
 1. **The board read path ignores override rows entirely**, and the moment overrides exist, candidates silently vanish from the UI. Verified empirically: with a 3-stage override set on the seeded recruitment, **5 of 5 candidates became invisible** with no error. S-03 must change S-01's read path — it is not additive.
 
@@ -35,8 +35,8 @@ What does the codebase already provide, and what must change, to let a recruiter
 
 Two claims that a reading of the migrations would suggest are **false**, and I verified both against the live stack:
 
-- **S-03 does *not* need to add `insert`/`delete` grants.** [rls_policies.sql:241](../../../supabase/migrations/20260831183457_rls_policies.sql:241) grants only `select`, and the file's comment implies grants are the gate — but Supabase's bootstrap already grants all DML on public-schema tables to `authenticated`. Adding **only an RLS policy** made the insert succeed. The repo's stated "grant only the verbs with a policy" discipline is not actually load-bearing.
-- **A single `UPDATE ... SET sort_order = CASE ...` does not sidestep the unique index.** Unique *indexes* are enforced per-row and immediately, unlike deferrable unique *constraints*.
+- **S-03 does _not_ need to add `insert`/`delete` grants.** [rls_policies.sql:241](../../../supabase/migrations/20260831183457_rls_policies.sql:241) grants only `select`, and the file's comment implies grants are the gate — but Supabase's bootstrap already grants all DML on public-schema tables to `authenticated`. Adding **only an RLS policy** made the insert succeed. The repo's stated "grant only the verbs with a policy" discipline is not actually load-bearing.
+- **A single `UPDATE ... SET sort_order = CASE ...` does not sidestep the unique index.** Unique _indexes_ are enforced per-row and immediately, unlike deferrable unique _constraints_.
 
 The good news: the write-path shape S-03 needs is almost exactly what S-02 shipped last week (atomic multi-row write behind a `security definer` RPC in `public`, errcode→HTTP mapping, `useMutation`, four-layer tests), so there is a fresh, reviewed template to copy. Authorization needs no new `operation` enum value — the scoped `private.has_recruitment_operation(id, 'recruitment.write')` fits, and the existing `candidate_recruitments_update` policy already permits the candidate re-map (verified).
 
@@ -58,7 +58,7 @@ create unique index kanban_stages_default_sort_order_key on kanban_stages (sort_
 create unique index kanban_stages_recruitment_sort_order_key on kanban_stages (recruitment_id, sort_order) where recruitment_id is not null;
 ```
 
-`recruitment_id IS NULL` = global default row; non-NULL = per-recruitment override. Two *partial* indexes rather than one plain `unique(recruitment_id, sort_order)` because Postgres treats every NULL as distinct, so a plain constraint would not catch duplicate default rows.
+`recruitment_id IS NULL` = global default row; non-NULL = per-recruitment override. Two _partial_ indexes rather than one plain `unique(recruitment_id, sort_order)` because Postgres treats every NULL as distinct, so a plain constraint would not catch duplicate default rows.
 
 F-01 named S-03 as the owner of the write side in three places: [rls_policies.sql:163-167](../../../supabase/migrations/20260831183457_rls_policies.sql:163) ("No INSERT/UPDATE/DELETE policy yet -- that's S-03's job"), [F-01 plan.md:28](../../../context/changes/core-recruitment-data-foundation/plan.md:28), and [F-01 plan-brief.md:22](../../../context/changes/core-recruitment-data-foundation/plan-brief.md:22) ("S-03's per-recruitment override becomes a pure insert, not a schema change").
 
@@ -87,11 +87,11 @@ const { data: stages, error: stagesError } = await client
   .order("sort_order", { ascending: true });
 ```
 
-The board then builds `candidatesByStage` from the candidate rows but only ever *reads* that map through the stage list ([recruitments.ts:162-171](../../../src/lib/services/recruitments.ts:162), `candidatesByStage.get(stage.id) ?? []`). A candidate whose `current_stage_id` is not in the returned stage list is never looked up: **no column, no card, and `candidateCount` silently under-reports.** This is the exact failure mode S-01 warned about from the other direction — [S-01 plan.md](../../../context/changes/recruiter-views-kanban-board/plan.md) requires grouping be driven by the stage list, not the candidate rows, so that empty stages like `Rejected` still render.
+The board then builds `candidatesByStage` from the candidate rows but only ever _reads_ that map through the stage list ([recruitments.ts:162-171](../../../src/lib/services/recruitments.ts:162), `candidatesByStage.get(stage.id) ?? []`). A candidate whose `current_stage_id` is not in the returned stage list is never looked up: **no column, no card, and `candidateCount` silently under-reports.** This is the exact failure mode S-01 warned about from the other direction — [S-01 plan.md](../../../context/changes/recruiter-views-kanban-board/plan.md) requires grouping be driven by the stage list, not the candidate rows, so that empty stages like `Rejected` still render.
 
 Empirically verified (test D/H below): inserting a 3-stage override set for recruitment 1 left **0 of its 5 candidates** on a stage in the resolved set.
 
-S-01's research already flagged the missing piece: *"Nothing in the DB coalesces override rows over defaults — if you want override-aware behavior you write it yourself"* ([S-01 research.md:77](../../../context/changes/recruiter-views-kanban-board/research.md:77)).
+S-01's research already flagged the missing piece: _"Nothing in the DB coalesces override rows over defaults — if you want override-aware behavior you write it yourself"_ ([S-01 research.md:77](../../../context/changes/recruiter-views-kanban-board/research.md:77)).
 
 **Resolution can be done in one round trip** (verified, test D): select both partitions and choose in JS.
 
@@ -100,7 +100,9 @@ S-01's research already flagged the missing piece: *"Nothing in the DB coalesces
 .select("id, name, sort_order, recruitment_id")   // recruitment_id is NOT selected today
 .or(`recruitment_id.is.null,recruitment_id.eq.${recruitmentId}`)
 ```
+
 then `overrides.length > 0 ? overrides : defaults`. Notes:
+
 - `recruitment_id` must be added to the `select` to partition on it.
 - A single `.order("sort_order")` interleaves both sets — sort per partition after the split.
 - RLS-safe: the existing select policy already permits both partitions, and the board's first query has already proven read access to the recruitment.
@@ -128,19 +130,20 @@ Follow the file's convention of wrapping the helper in `(select ...)` so the `st
 
 Three FKs point at `kanban_stages`:
 
-| Column | Clause | Effective behavior |
-|---|---|---|
-| `candidate_recruitments.current_stage_id` ([:83](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:83)) | `not null ... on delete restrict` | Blocks delete while any candidate sits on the stage |
-| `candidate_recruitment_status_history.from_stage_id` ([:97](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:97)) | nullable, **no clause** → `NO ACTION` | Blocks delete (does *not* set null) |
-| `candidate_recruitment_status_history.to_stage_id` ([:98](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:98)) | `not null`, **no clause** → `NO ACTION` | Blocks delete, forever |
+| Column                                                                                                                                        | Clause                                  | Effective behavior                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| `candidate_recruitments.current_stage_id` ([:83](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:83))            | `not null ... on delete restrict`       | Blocks delete while any candidate sits on the stage |
+| `candidate_recruitment_status_history.from_stage_id` ([:97](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:97)) | nullable, **no clause** → `NO ACTION`   | Blocks delete (does _not_ set null)                 |
+| `candidate_recruitment_status_history.to_stage_id` ([:98](../../../supabase/migrations/20260831182957_recruitment_candidate_schema.sql:98))   | `not null`, **no clause** → `NO ACTION` | Blocks delete, forever                              |
 
 History is append-only by design with no UPDATE/DELETE policy ever ([rls_policies.sql:207-209](../../../supabase/migrations/20260831183457_rls_policies.sql:207)). Therefore **once a candidate has ever moved through a stage, that stage row can never be deleted by anyone.** Verified:
 
 - **B1** — delete a stage holding a candidate → `23503`, blocked on `candidate_recruitments_current_stage_id_fkey`.
 - **B2** — delete an unreferenced stage (`Rejected`, no candidates, no history) → succeeded.
-- **B3** — move every candidate off the stage *first*, then delete → **still blocked**, `23503` on `candidate_recruitment_status_history_to_stage_id_fkey`.
+- **B3** — move every candidate off the stage _first_, then delete → **still blocked**, `23503` on `candidate_recruitment_status_history_to_stage_id_fkey`.
 
 **Consequence for the design.** "Replace this recruitment's stage set" cannot be delete-and-reinsert once history exists. The viable shapes are:
+
 - **Update-in-place** — rename/reorder existing override rows, insert net additions, delete only rows that are provably unreferenced (see §5 for the reorder mechanics).
 - **Soft-delete** — add `archived_at`/`is_active`, filter it out of the board. Keeps history intact and is the only shape that supports "remove a stage that has been used".
 - **Configure-before-use** — only permit customization while the recruitment has no candidates. Simplest, and see §9 for why the current sequencing makes this cheaper than it sounds.
@@ -156,8 +159,8 @@ There is also **no index on `from_stage_id`/`to_stage_id`**, so FK enforcement a
 - **E1** — a single set-based swap, `update ... set sort_order = 4 - sort_order where sort_order in (1,3)` → **`23505` duplicate key**. This is the workaround the accumulated docs would suggest ([C5 in the prior-decision digest](#historical-context-from-prior-changes)) and it does not work.
 - **E2** — row-by-row renumber, first statement already → `23505`.
 - **F1** — **two-phase renumber works**: `update ... set sort_order = -sort_order` to park every row in negative space, then assign each target value. No schema change required. (Negative values are legal — there is no `check (sort_order > 0)`.)
-- **F2** — a `deferrable initially deferred` unique **constraint** *can* be added, but Postgres unique constraints cannot be partial, so `unique(recruitment_id, sort_order)` would cover NULL rows too — and since NULLs compare distinct, it would silently **lose** the duplicate-default protection the two partial indexes exist to provide. Swapping to it is a downgrade.
-- **E3** — delete-all-then-reinsert works fine *when no candidate or history references the override rows*, which is the common case for a recruitment being customised before use.
+- **F2** — a `deferrable initially deferred` unique **constraint** _can_ be added, but Postgres unique constraints cannot be partial, so `unique(recruitment_id, sort_order)` would cover NULL rows too — and since NULLs compare distinct, it would silently **lose** the duplicate-default protection the two partial indexes exist to provide. Swapping to it is a downgrade.
+- **E3** — delete-all-then-reinsert works fine _when no candidate or history references the override rows_, which is the common case for a recruitment being customised before use.
 
 ### 6. Missing constraints and two open integrity holes
 
@@ -168,7 +171,7 @@ Absent from `kanban_stages` (confirmed — no `check` and no other index on this
 - No `check (sort_order > 0)`, no contiguity, no upper bound on stage count.
 - No way to express "a recruitment has either zero override rows or a complete set" — must be enforced in the RPC, exactly as `create_recruitment` enforces "at least one group" in-transaction ([20260901150000:30-32](../../../supabase/migrations/20260901150000_create_recruitment_returns_row.sql:30)).
 
-The duplicate-name gap has a live coupling: [seed.sql:119-143](../../../supabase/seed.sql:119) looks stages up **by name**, e.g. `(select id from kanban_stages where recruitment_id is null and name = 'New')`. Every lookup correctly includes `recruitment_id is null`, so per-recruitment rows sharing a name are harmless — but a duplicated *global* name would make these `= (select ...)` subqueries fail with "more than one row returned". A unique index on `name where recruitment_id is null` would make that structural.
+The duplicate-name gap has a live coupling: [seed.sql:119-143](../../../supabase/seed.sql:119) looks stages up **by name**, e.g. `(select id from kanban_stages where recruitment_id is null and name = 'New')`. Every lookup correctly includes `recruitment_id is null`, so per-recruitment rows sharing a name are harmless — but a duplicated _global_ name would make these `= (select ...)` subqueries fail with "more than one row returned". A unique index on `name where recruitment_id is null` would make that structural.
 
 **Integrity hole (verified, test C): nothing ties `current_stage_id` to the candidate's own recruitment.** I successfully pointed a candidate in recruitment 1 at recruitment 2's override stage. No constraint prevents it, and the board would then drop that candidate. S-03 is the first slice where this becomes reachable, so it may be worth closing (a composite FK or a trigger) or at least documenting.
 
@@ -177,6 +180,7 @@ The duplicate-name gap has a live coupling: [seed.sql:119-143](../../../supabase
 S-02 shipped an atomic multi-row write one week ago and it survived plan review and impl review — copy it rather than inventing.
 
 **RPC hardening contract**, [20260901150000_create_recruitment_returns_row.sql](../../../supabase/migrations/20260901150000_create_recruitment_returns_row.sql):
+
 - Lives in **`public`, not `private`** — PostgREST only exposes `public`/`graphql_public` ([config.toml:13](../../../supabase/config.toml:13)), so a `private` function is unreachable from `.rpc()`. This was an impl-review finding on S-02 ([S-02 impl-review.md F1](../../../context/changes/recruiter-creates-recruitment/reviews/impl-review.md:33)).
 - `language plpgsql` / `security definer` / `set search_path = ''`, therefore **every** identifier schema-qualified.
 - **Permission re-check as the first statement**, because `security definer` bypasses RLS.
@@ -184,7 +188,7 @@ S-02 shipped an atomic multi-row write one week ago and it survived plan review 
 - **Returns the full row**, not a bare id — S-02's impl review (F3) removed a second untransacted `select` that left a window where the row was committed but the client got a 500 with no id.
 - `drop function if exists` with the full signature first when the return type changes; trailing `revoke ... from public, anon` + `grant execute ... to authenticated`.
 
-**Errcode → HTTP mapping** to clone, [recruitments/index.ts:71-88](../../../src/pages/api/recruitments/index.ts:71): `42501`→403, `22023`→422 with `fields`, `23503`→422 with `fields`, else `console.error` + 500. Note `23503` is *already* mapped for a different cause (nonexistent group) — S-03's stage-delete-blocked case raises the same code and needs a different message, so the mapping must disambiguate.
+**Errcode → HTTP mapping** to clone, [recruitments/index.ts:71-88](../../../src/pages/api/recruitments/index.ts:71): `42501`→403, `22023`→422 with `fields`, `23503`→422 with `fields`, else `console.error` + 500. Note `23503` is _already_ mapped for a different cause (nonexistent group) — S-03's stage-delete-blocked case raises the same code and needs a different message, so the mapping must disambiguate.
 
 **Endpoint skeleton** (identical across [index.ts](../../../src/pages/api/recruitments/index.ts), [[id]/index.ts](../../../src/pages/api/recruitments/[id]/index.ts), [security-groups.ts](../../../src/pages/api/security-groups.ts)): `export const prerender = false` → module-scope zod → JSON-parse guard → `safeParse` → 422 with `fields` built by `issue.path.join(".") || "root"` → `createClient` null-guard → 500 → try/catch → `jsonOk(dto, status)`. Helpers: `jsonOk(data, status = 200)` / `jsonError(status, code, message, fields?)` ([api-response.ts:3,10](../../../src/lib/api-response.ts:3)).
 
@@ -200,9 +204,10 @@ Hooks: `useApiResource<T>(url)` returns a `loading | success | not-found | error
 
 Routing: `src/pages/recruitments/` holds a **flat** `[id].astro`, so a `[id]/stages.astro` page would first require converting it to `[id]/index.astro` (Astro rejects both). A dialog inside the existing board avoids that migration and matches the in-place `StatusControl` precedent. API side, `src/pages/api/recruitments/[id]/` already contains `index.ts` and `board.ts`, so a sibling `stages.ts` is the natural shape — and a prior plan review established that dynamic API routes use the directory form ([S-02 plan-review.md F4](../../../context/changes/recruiter-creates-recruitment/reviews/plan-review.md:65)). [middleware.ts:5](../../../src/middleware.ts:5) prefix-matches `/recruitments`, so any new page is auto-protected and any new `/api/**` route gets 401 handling free.
 
-Stage names are rendered **raw** from the DB — `{stage.name}` at [KanbanBoard.tsx:145](../../../src/components/recruitments/KanbanBoard.tsx:145) is the only render site. [recruitment-status.ts](../../../src/lib/recruitment-status.ts) maps only *recruitment status* (`draft|live|closed`), not stages, so there is no hardcoded presentation map to update; free-text names already flow through correctly.
+Stage names are rendered **raw** from the DB — `{stage.name}` at [KanbanBoard.tsx:145](../../../src/components/recruitments/KanbanBoard.tsx:145) is the only render site. [recruitment-status.ts](../../../src/lib/recruitment-status.ts) maps only _recruitment status_ (`draft|live|closed`), not stages, so there is no hardcoded presentation map to update; free-text names already flow through correctly.
 
 **What's new in this codebase** (no precedent — worth planning explicitly):
+
 1. **A variable-length list form** (add/remove/reorder rows). Every existing form has a fixed field set; the only variable-length UI is the read-only group checkbox list. Needs stable React keys for unsaved rows, per-row `sortOrder` recomputation, and — because `FormField` requires a unique `id` that doubles as `name`, and tests select by label — **distinct accessible labels per row** (`Stage 1 name`, not a repeated `Stage name`).
 2. **Zod validation of an array of objects**, producing dotted field keys like `stages.0.name`. Only flat scalar arrays exist today (`z.array(z.number().int().positive()).min(1)`).
 3. **Actually consuming `useMutation`'s `fieldErrors`** — `CreateRecruitmentForm` renders only `error` and never reads `fieldErrors`, so no component maps 422 field errors onto inputs yet.
@@ -211,6 +216,7 @@ Stage names are rendered **raw** from the DB — `{stage.name}` at [KanbanBoard.
 ### 9. Tests, CI, and a sequencing opportunity
 
 Four layers, all with templates:
+
 - **Unit** — hand-rolled `FakeQueryBuilder` in [recruitments.test.ts:24-65](../../../src/lib/services/recruitments.test.ts:24); `makeBoardClient` maps table name → fake. If the read path switches to `.or()`, the fake needs that method and must return mixed default/override rows. An RPC-only write needs no new fake methods beyond the `makeCreateClient` `{rpc: () => Promise.resolve(...)}` shape (note its fake error carries `code?: string` so errcode propagation is asserted).
 - **Component** — `@testing-library/react` + `user-event`, `vi.stubGlobal("fetch", mockFetch({...}))` where `mockFetch` **throws on any unexpected URL** ([CreateRecruitmentForm.test.tsx:11-26](../../../src/components/recruitments/CreateRecruitmentForm.test.tsx:11)) — a new endpoint must be registered there.
 - **Integration** — [integration-client.ts](../../../src/lib/test-support/integration-client.ts) signs in through the real `/api/auth/signin` with an explicit `Origin` header (Astro CSRF) and replays the session cookie. Roles `hr | hiringManager | admin`; **HR is the only role with `recruitment.write`** ([seed.sql:15-21](../../../supabase/seed.sql:15)). Requires a running Supabase **and** Astro server — documented in the file header.
@@ -219,30 +225,30 @@ Four layers, all with templates:
 
 CI ([ci.yml](../../../.github/workflows/ci.yml)): the `ci` job is DB-free (unit tests must stay infra-free); the `e2e` job enforces **`db:types` drift** (`npm run db:types` then `git diff --exit-code src/db/database.types.ts`), then runs integration tests, then **resets the DB before e2e** because integration tests leave real rows behind. S-03 adds a migration, so the types file must be regenerated and committed in the same commit.
 
-**Sequencing opportunity.** S-04 (add/move candidates) has not shipped, so there is currently **no way in the app to create or move a candidate** — the only `candidate_recruitments` and history rows are the 5+5 from `seed.sql`, and `override_stages = 0`. If S-03 lands before S-04, every real recruitment a user creates has zero candidates, which makes "configure stages before use" (§4, option 3) far cheaper than it sounds and defers the whole re-map/history question. The roadmap places S-03 before S-04 in Stream A ([roadmap.md:59](../../../context/foundation/roadmap.md:59)) but *also* marks them "parallel with" each other ([roadmap.md:134](../../../context/foundation/roadmap.md:134)) — that parallelism is the risky reading, since both slices write `current_stage_id` and S-04 owns the note-gate contract.
+**Sequencing opportunity.** S-04 (add/move candidates) has not shipped, so there is currently **no way in the app to create or move a candidate** — the only `candidate_recruitments` and history rows are the 5+5 from `seed.sql`, and `override_stages = 0`. If S-03 lands before S-04, every real recruitment a user creates has zero candidates, which makes "configure stages before use" (§4, option 3) far cheaper than it sounds and defers the whole re-map/history question. The roadmap places S-03 before S-04 in Stream A ([roadmap.md:59](../../../context/foundation/roadmap.md:59)) but _also_ marks them "parallel with" each other ([roadmap.md:134](../../../context/foundation/roadmap.md:134)) — that parallelism is the risky reading, since both slices write `current_stage_id` and S-04 owns the note-gate contract.
 
 ## Empirical Verification Log
 
 Everything below was run against the live local stack at commit `897e96a`, each inside `begin ... rollback`. This section exists because a prior plan review noted that findings which "read as plausible under inspection alone" were sometimes wrong ([S-01 plan-review.md:116](../../../context/changes/recruiter-views-kanban-board/reviews/plan-review.md:116)).
 
-| # | Test | Result |
-|---|---|---|
-| — | Effective grants on `kanban_stages` | `authenticated` holds SELECT, **INSERT, UPDATE, DELETE**, REFERENCES, TRIGGER, TRUNCATE — contradicting the `grant select`-only reading |
-| — | HR inserts an override row, **no** policy added | Blocked, `42501 new row violates row-level security policy` (a *policy* error, not a privilege error) |
-| A1 | HR inserts an override row with **only a policy** added, no grant change | **Succeeded** → the grant was never the blocker |
-| A2 | HR inserts a **global default** row (`recruitment_id = null`) under a `recruitment_id is not null` policy | Blocked, `42501` → defaults stay immutable, as desired |
-| B1 | Delete a stage that has a candidate on it | Blocked, `23503` on `candidate_recruitments_current_stage_id_fkey` |
-| B2 | Delete an unreferenced stage (`Rejected`) | Succeeded |
-| B3 | Move all candidates off a stage, **then** delete it | **Still blocked**, `23503` on `candidate_recruitment_status_history_to_stage_id_fkey` → used stages are permanently undeletable |
-| C | Point a candidate in recruitment 1 at recruitment 2's override stage | **Allowed** → no constraint ties `current_stage_id` to the candidate's own recruitment |
-| D | One-query override resolution (`recruitment_id is null or recruitment_id = 1`) | Returns 8 rows with overrides present, 6 with none → partitioning in JS works |
-| H | With a 3-stage override set on recruitment 1, how many of its 5 candidates sit on a stage in the resolved set? | **0 of 5** → all candidates silently vanish from the board |
-| E1 | Reorder via a single set-based `update ... set sort_order = 4 - sort_order` | Failed, `23505` → the "single UPDATE" workaround does **not** work |
-| E2 | Reorder row-by-row | Failed, `23505` on the first statement |
-| E3 | Delete-all-then-reinsert an override set with no candidate/history references | Succeeded |
-| F1 | Two-phase renumber (negate all, then assign targets) | **Succeeded**, no schema change needed |
-| F2 | Add a `deferrable initially deferred` unique constraint | Succeeded — but cannot be partial, so it would cover NULL rows and lose duplicate-default protection |
-| G | HR re-maps all 5 candidates onto a new override stage under **existing** RLS | **Succeeded** (5 rows) → `candidate_recruitments_update` already suffices; no new policy needed for the re-map |
+| #   | Test                                                                                                           | Result                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| —   | Effective grants on `kanban_stages`                                                                            | `authenticated` holds SELECT, **INSERT, UPDATE, DELETE**, REFERENCES, TRIGGER, TRUNCATE — contradicting the `grant select`-only reading |
+| —   | HR inserts an override row, **no** policy added                                                                | Blocked, `42501 new row violates row-level security policy` (a _policy_ error, not a privilege error)                                   |
+| A1  | HR inserts an override row with **only a policy** added, no grant change                                       | **Succeeded** → the grant was never the blocker                                                                                         |
+| A2  | HR inserts a **global default** row (`recruitment_id = null`) under a `recruitment_id is not null` policy      | Blocked, `42501` → defaults stay immutable, as desired                                                                                  |
+| B1  | Delete a stage that has a candidate on it                                                                      | Blocked, `23503` on `candidate_recruitments_current_stage_id_fkey`                                                                      |
+| B2  | Delete an unreferenced stage (`Rejected`)                                                                      | Succeeded                                                                                                                               |
+| B3  | Move all candidates off a stage, **then** delete it                                                            | **Still blocked**, `23503` on `candidate_recruitment_status_history_to_stage_id_fkey` → used stages are permanently undeletable         |
+| C   | Point a candidate in recruitment 1 at recruitment 2's override stage                                           | **Allowed** → no constraint ties `current_stage_id` to the candidate's own recruitment                                                  |
+| D   | One-query override resolution (`recruitment_id is null or recruitment_id = 1`)                                 | Returns 8 rows with overrides present, 6 with none → partitioning in JS works                                                           |
+| H   | With a 3-stage override set on recruitment 1, how many of its 5 candidates sit on a stage in the resolved set? | **0 of 5** → all candidates silently vanish from the board                                                                              |
+| E1  | Reorder via a single set-based `update ... set sort_order = 4 - sort_order`                                    | Failed, `23505` → the "single UPDATE" workaround does **not** work                                                                      |
+| E2  | Reorder row-by-row                                                                                             | Failed, `23505` on the first statement                                                                                                  |
+| E3  | Delete-all-then-reinsert an override set with no candidate/history references                                  | Succeeded                                                                                                                               |
+| F1  | Two-phase renumber (negate all, then assign targets)                                                           | **Succeeded**, no schema change needed                                                                                                  |
+| F2  | Add a `deferrable initially deferred` unique constraint                                                        | Succeeded — but cannot be partial, so it would cover NULL rows and lose duplicate-default protection                                    |
+| G   | HR re-maps all 5 candidates onto a new override stage under **existing** RLS                                   | **Succeeded** (5 rows) → `candidate_recruitments_update` already suffices; no new policy needed for the re-map                          |
 
 ## Code References
 
@@ -283,7 +289,7 @@ Everything below was run against the live local stack at commit `897e96a`, each 
 - [S-01 plan.md:40](../../../context/changes/recruiter-views-kanban-board/plan.md:40) — "Read stages from the table regardless, never hardcode, so S-03 stays a pure insert." Honoured, but the query itself was still hardcoded to defaults.
 - [S-02 research.md:49](../../../context/changes/recruiter-creates-recruitment/research.md:49) / [:154](../../../context/changes/recruiter-creates-recruitment/research.md:154) — re-verified the boundary and stayed out of `kanban_stages`.
 - [S-02 impl-review.md](../../../context/changes/recruiter-creates-recruitment/reviews/impl-review.md) — F1 (RPCs must live in `public`), F3 (return the full row, not a bare id), F7 (no client-side gating; read-only roles see affordances and must get a clean denial). All three apply directly.
-- [lessons.md:5-10](../../../context/foundation/lessons.md:5) — the English-only-artifacts rule, whose *Problem* paragraph is literally the Polish-kanban-stage-names incident. Relevant twist for S-03: the rule binds **files**, not runtime input. Nothing currently prohibits a user typing a Polish stage name into the editor, and no prior doc addresses whether that's acceptable.
+- [lessons.md:5-10](../../../context/foundation/lessons.md:5) — the English-only-artifacts rule, whose _Problem_ paragraph is literally the Polish-kanban-stage-names incident. Relevant twist for S-03: the rule binds **files**, not runtime input. Nothing currently prohibits a user typing a Polish stage name into the editor, and no prior doc addresses whether that's acceptable.
 - **The rename-migration guarantee expires with S-03.** S-01's Migration Notes justified the English rename as safe because "no per-recruitment override rows can exist (no write grant)". After S-03 that is false: a future rename migration cannot enumerate user-created override rows.
 - **No prior document has ever discussed** stage deletion, stage migration, re-mapping candidates between stages, or what happens when a stage set changes while candidates exist. I grepped all of `context/` for each. S-03 is the first slice to face it.
 - `context/archive/` is empty; the archived `shape-notes-2026-05-27-1200.md` describes a **superseded product concept** — [S-01 research.md:224](../../../context/changes/recruiter-views-kanban-board/research.md:224) warns explicitly not to mine it for requirements.
@@ -298,12 +304,12 @@ Everything below was run against the live local stack at commit `897e96a`, each 
 
 Decisions the plan must make explicitly. None are answered by the PRD, which says nothing about stage limits, renaming vs reordering vs deleting, or whether the default set itself is editable.
 
-1. **What operations does "customize" include?** Rename only? Reorder? Add? Remove? Removal is the expensive one (§4) and the only one that forces a soft-delete column or a "before first use" restriction. *Owner: user/product.*
-2. **What happens to candidates already on default stages when overrides are first adopted?** Verified: they vanish from the board unless re-mapped (test H). Options: block customization once candidates exist; auto-map by position/name; require the recruiter to choose a target stage per candidate. *Owner: user/product.*
-3. **Does an S-03-driven re-map write `candidate_recruitment_status_history` rows, and with what `changed_by`?** And is it exempt from the PRD's hard "no note, no move" rule ([prd.md:123-125](../../../context/foundation/prd.md:123)), which S-04 owns? Nothing in either slice's docs addresses a config-driven bulk move. *Owner: user/product.* **This is the S-03/S-04 boundary question and the strongest argument against running them in parallel.**
-4. **Is the global default set itself editable, and by whom?** FR-004 says only that it can be overridden; the roadmap narrows S-03 to the override part; the defaults ship as migration-managed product config with no write policy. Leaving them immutable (§3) is the low-risk default but should be a stated choice, and may belong to S-07's admin surface. *Owner: user/product.*
-5. **Validation rules for user-entered stage names** — max length, trimming, empty rejection, duplicates within a recruitment (currently all legal, §6), and whether non-English names are acceptable at runtime. No prior guidance exists for free-text domain strings; the repo's zod-enum precedent doesn't apply. *Owner: team, at plan time.*
-6. **Minimum and maximum stage count.** The RPC must enforce ≥1 in-transaction (nothing in the schema can). Is there an upper bound? The board is a horizontal scroll container, so a very wide set degrades but does not break. *Owner: team, at plan time.*
-7. **Should the two integrity holes be closed in this slice?** (a) `current_stage_id` not tied to the candidate's own recruitment (verified reachable, test C); (b) `from_stage_id` missing `on delete set null`, the same bug class already fixed for `changed_by`. Both are pre-existing, neither is strictly S-03's, but S-03 is what makes (a) reachable. *Owner: team, at plan time.*
-8. **`STAGE_ORDER` in the e2e suite** ([recruitments.spec.ts:4](../../../tests/e2e/recruitments.spec.ts:4)) currently asserts the seeded board's headings. Does S-03's e2e customise the seeded recruitment (breaking S-01's assertions) or create its own? *Owner: team, at plan time.*
+1. **What operations does "customize" include?** Rename only? Reorder? Add? Remove? Removal is the expensive one (§4) and the only one that forces a soft-delete column or a "before first use" restriction. _Owner: user/product._
+2. **What happens to candidates already on default stages when overrides are first adopted?** Verified: they vanish from the board unless re-mapped (test H). Options: block customization once candidates exist; auto-map by position/name; require the recruiter to choose a target stage per candidate. _Owner: user/product._
+3. **Does an S-03-driven re-map write `candidate_recruitment_status_history` rows, and with what `changed_by`?** And is it exempt from the PRD's hard "no note, no move" rule ([prd.md:123-125](../../../context/foundation/prd.md:123)), which S-04 owns? Nothing in either slice's docs addresses a config-driven bulk move. _Owner: user/product._ **This is the S-03/S-04 boundary question and the strongest argument against running them in parallel.**
+4. **Is the global default set itself editable, and by whom?** FR-004 says only that it can be overridden; the roadmap narrows S-03 to the override part; the defaults ship as migration-managed product config with no write policy. Leaving them immutable (§3) is the low-risk default but should be a stated choice, and may belong to S-07's admin surface. _Owner: user/product._
+5. **Validation rules for user-entered stage names** — max length, trimming, empty rejection, duplicates within a recruitment (currently all legal, §6), and whether non-English names are acceptable at runtime. No prior guidance exists for free-text domain strings; the repo's zod-enum precedent doesn't apply. _Owner: team, at plan time._
+6. **Minimum and maximum stage count.** The RPC must enforce ≥1 in-transaction (nothing in the schema can). Is there an upper bound? The board is a horizontal scroll container, so a very wide set degrades but does not break. _Owner: team, at plan time._
+7. **Should the two integrity holes be closed in this slice?** (a) `current_stage_id` not tied to the candidate's own recruitment (verified reachable, test C); (b) `from_stage_id` missing `on delete set null`, the same bug class already fixed for `changed_by`. Both are pre-existing, neither is strictly S-03's, but S-03 is what makes (a) reachable. _Owner: team, at plan time._
+8. **`STAGE_ORDER` in the e2e suite** ([recruitments.spec.ts:4](../../../tests/e2e/recruitments.spec.ts:4)) currently asserts the seeded board's headings. Does S-03's e2e customise the seeded recruitment (breaking S-01's assertions) or create its own? _Owner: team, at plan time._
 9. **Stale roadmap statuses.** F-01/S-01/S-02 are all `impl_reviewed` in their own `change.md`, while [roadmap.md:44-46](../../../context/foundation/roadmap.md:44) still shows them `in-progress`, [:184](../../../context/foundation/roadmap.md:184) gates S-03 on them, and "Done" is empty. Flagged twice before and still unfixed — worth a cleanup pass independent of this slice.

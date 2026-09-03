@@ -28,18 +28,18 @@ atomically. A hiring manager sees the same controls and gets a clean permission 
 
 ## Key Decisions Made
 
-| Decision | Choice | Why | Source |
-|---|---|---|---|
-| Note model | One note per candidate-per-recruitment-**per-stage**, editable | Supersedes the earlier single-note reading; makes the gate strong — each move needs a note for the stage being left | Plan |
-| Gate semantics | The **source** stage must have a note | "Note after the interview" means recording the stage you just finished | Plan |
-| Where the gate lives | Inside a `SECURITY DEFINER` RPC | RLS already permits a bare PostgREST `UPDATE` of `current_stage_id`, so a route- or UI-level check is decorative | Research |
-| Note + move | One RPC takes stage and an optional note | One round trip, and the gate cannot race a concurrent note edit | Plan |
-| Email match, different name | Reject with a 422 (`PA003`) | Forces the recruiter to resolve the ambiguity rather than silently renaming or mislinking | Plan |
-| Card contents | Unchanged — no note info on the card | Board payload stays small; notes live on the detail page | Plan |
-| Detail page scope | Identity + notes only | FR-011/FR-012 belong to S-05; this gives notes a home without pre-empting it | Plan |
-| Move targets | Any stage in the resolved set, forward or backward | Satisfies FR-009 with no special case | Plan |
-| Note authorship | `created_by` + timestamps; any `recruitment.write` holder may edit | Matches the repo's per-recruitment (never per-row) authorization posture | Plan |
-| Note editing path | Plain RLS-covered table upsert, not an RPC | Single-table write, no atomicity need, no gate to enforce | Plan |
+| Decision                    | Choice                                                             | Why                                                                                                                 | Source   |
+| --------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | -------- |
+| Note model                  | One note per candidate-per-recruitment-**per-stage**, editable     | Supersedes the earlier single-note reading; makes the gate strong — each move needs a note for the stage being left | Plan     |
+| Gate semantics              | The **source** stage must have a note                              | "Note after the interview" means recording the stage you just finished                                              | Plan     |
+| Where the gate lives        | Inside a `SECURITY DEFINER` RPC                                    | RLS already permits a bare PostgREST `UPDATE` of `current_stage_id`, so a route- or UI-level check is decorative    | Research |
+| Note + move                 | One RPC takes stage and an optional note                           | One round trip, and the gate cannot race a concurrent note edit                                                     | Plan     |
+| Email match, different name | Reject with a 422 (`PA003`)                                        | Forces the recruiter to resolve the ambiguity rather than silently renaming or mislinking                           | Plan     |
+| Card contents               | Unchanged — no note info on the card                               | Board payload stays small; notes live on the detail page                                                            | Plan     |
+| Detail page scope           | Identity + notes only                                              | FR-011/FR-012 belong to S-05; this gives notes a home without pre-empting it                                        | Plan     |
+| Move targets                | Any stage in the resolved set, forward or backward                 | Satisfies FR-009 with no special case                                                                               | Plan     |
+| Note authorship             | `created_by` + timestamps; any `recruitment.write` holder may edit | Matches the repo's per-recruitment (never per-row) authorization posture                                            | Plan     |
+| Note editing path           | Plain RLS-covered table upsert, not an RPC                         | Single-table write, no atomicity need, no gate to enforce                                                           | Plan     |
 
 ## Scope
 
@@ -68,18 +68,18 @@ candidate_stage_notes  ──gate──►  move_candidate_stage (SECURITY DEFIN
 
 The move RPC captures `current_stage_id` **before** writing, upserts the supplied note against that captured
 source stage, evaluates the gate, then updates and logs history. Doing it in the other order would attach the
-note to the target stage and unblock the *next* move instead of this one.
+note to the target stage and unblock the _next_ move instead of this one.
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-|---|---|---|
-| 1. Notes schema | `candidate_stage_notes` + RLS + grants; extended `PA002` guard | Forgetting the guard lets a note-referenced stage be deleted, surfacing as an opaque 500 |
-| 2. Domain RPCs | Both writes behind `SECURITY DEFINER`; `PA003`/`PA004`; SQL assertions | Assertions that pass vacuously — the exact S-03 impl-review F1 failure |
-| 3. Service + API | `candidates.ts`, four routes, `handleCandidateRpcError`, integration tests | An unmapped errcode falling through to a generic 500 (happened twice before) |
-| 4. Board interaction | Textarea, add and move dialogs, card links, refetch wiring | Blocked-move UX becoming a dead end instead of fixable in place |
-| 5. Detail page | Identity + per-stage note list with inline editing | Drifting into S-05's profile scope |
-| 6. E2E | Full path plus a hiring-manager denial; CI readiness probe | New specs polluting fixtures `recruitments.spec.ts` asserts on |
+| Phase                | What it delivers                                                           | Key risk                                                                                 |
+| -------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1. Notes schema      | `candidate_stage_notes` + RLS + grants; extended `PA002` guard             | Forgetting the guard lets a note-referenced stage be deleted, surfacing as an opaque 500 |
+| 2. Domain RPCs       | Both writes behind `SECURITY DEFINER`; `PA003`/`PA004`; SQL assertions     | Assertions that pass vacuously — the exact S-03 impl-review F1 failure                   |
+| 3. Service + API     | `candidates.ts`, four routes, `handleCandidateRpcError`, integration tests | An unmapped errcode falling through to a generic 500 (happened twice before)             |
+| 4. Board interaction | Textarea, add and move dialogs, card links, refetch wiring                 | Blocked-move UX becoming a dead end instead of fixable in place                          |
+| 5. Detail page       | Identity + per-stage note list with inline editing                         | Drifting into S-05's profile scope                                                       |
+| 6. E2E               | Full path plus a hiring-manager denial; CI readiness probe                 | New specs polluting fixtures `recruitments.spec.ts` asserts on                           |
 
 **Prerequisites:** F-01, S-01, S-02, S-03 shipped (all `impl_reviewed`); local Supabase running; seeded test users.
 **Estimated effort:** ~4-6 sessions across 6 phases, with a manual-confirmation pause after each.

@@ -27,6 +27,7 @@ What's missing: the actual write endpoints, the atomic create mechanism, and all
 ## Desired End State
 
 A recruiter (member of a group with `recruitment.write`) can:
+
 1. Navigate to `/recruitments/new`, fill in title, department, location, employment type (fixed list), opened date, and pick one or more security groups, and submit.
 2. On success, the recruitment exists in the DB, is immediately visible to the creator (via the atomic RPC), and the recruitor is redirected to the recruitment's board/detail view.
 3. On validation failure, per-field errors render inline on the form.
@@ -59,7 +60,7 @@ Ship the atomic create as a `security definer` Postgres function (new migration)
 
 ### Timing & lifecycle
 
-The RPC is the *only* place the recruitment insert and the group-link inserts may happen together. Any code path that inserts a recruitment without inserting at least one `recruitment_security_groups` row in the same transaction reproduces the deadlock. The RPC must `raise exception` (causing an automatic rollback of the recruitment insert too) if the caller-supplied group id array is empty or if `has_operation('recruitment.write')` is false — do not rely on the RLS INSERT policy alone, since `security definer` bypasses it.
+The RPC is the _only_ place the recruitment insert and the group-link inserts may happen together. Any code path that inserts a recruitment without inserting at least one `recruitment_security_groups` row in the same transaction reproduces the deadlock. The RPC must `raise exception` (causing an automatic rollback of the recruitment insert too) if the caller-supplied group id array is empty or if `has_operation('recruitment.write')` is false — do not rely on the RLS INSERT policy alone, since `security definer` bypasses it.
 
 ## Phase 1: Atomic create RPC (migration)
 

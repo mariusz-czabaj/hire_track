@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+
+const { candidateId } = Astro.params;
+---
+
+<Layout title="Candidate profile">
+  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
+    <div class="mx-auto max-w-3xl">
+      <a href="/recruitments" class="mb-4 inline-block text-sm text-blue-100/60 hover:text-blue-100">
+        &larr; Back to recruitments
+      </a>
+      <!-- The profile island (identity fields, recruitments list, CV panel) lands in Phase 4. -->
+      <p class="text-blue-100/70">Candidate profile #{candidateId}</p>
+    </div>
+  </div>
+</Layout>

@@ -19,11 +19,11 @@ echo "$OSTYPE" 2>/dev/null || echo "win32"
 
 Use the result to tailor path separators, shell syntax, and clipboard commands throughout your answers:
 
-| OS | Shell | Home var | Clipboard | Temp dir |
-|----|-------|----------|-----------|----------|
-| macOS (`darwin*`) | zsh / bash | `$HOME` | `pbcopy` | `$TMPDIR` |
-| Linux (`linux-gnu*`) | bash / zsh | `$HOME` | `xclip -selection clipboard` or `xsel --clipboard` | `/tmp` |
-| Windows (`win32` / MSYS / Git Bash) | PowerShell / cmd | `%USERPROFILE%` | `clip.exe` | `%TEMP%` |
+| OS                                  | Shell            | Home var        | Clipboard                                          | Temp dir  |
+| ----------------------------------- | ---------------- | --------------- | -------------------------------------------------- | --------- |
+| macOS (`darwin*`)                   | zsh / bash       | `$HOME`         | `pbcopy`                                           | `$TMPDIR` |
+| Linux (`linux-gnu*`)                | bash / zsh       | `$HOME`         | `xclip -selection clipboard` or `xsel --clipboard` | `/tmp`    |
+| Windows (`win32` / MSYS / Git Bash) | PowerShell / cmd | `%USERPROFILE%` | `clip.exe`                                         | `%TEMP%`  |
 
 ### Active AI tool
 
@@ -75,13 +75,13 @@ The primary daily command. Fetches a lesson bundle from the API and writes skill
 
 **Where artifacts land** (depends on the active tool profile):
 
-| Tool | Skills | Prompts | Rules file | Config templates |
-|------|--------|---------|------------|------------------|
-| Claude Code | `.claude/skills/<name>/SKILL.md` | `.claude/prompts/<name>.md` | `CLAUDE.md` | `.claude/config-templates/<name>` |
-| Cursor | `.cursor/skills/<name>/SKILL.md` | `.cursor/prompts/<name>.md` | `.cursor/rules/10x-course.mdc` | `.cursor/config-templates/<name>` |
+| Tool           | Skills                           | Prompts                     | Rules file                        | Config templates                  |
+| -------------- | -------------------------------- | --------------------------- | --------------------------------- | --------------------------------- |
+| Claude Code    | `.claude/skills/<name>/SKILL.md` | `.claude/prompts/<name>.md` | `CLAUDE.md`                       | `.claude/config-templates/<name>` |
+| Cursor         | `.cursor/skills/<name>/SKILL.md` | `.cursor/prompts/<name>.md` | `.cursor/rules/10x-course.mdc`    | `.cursor/config-templates/<name>` |
 | GitHub Copilot | `.github/skills/<name>/SKILL.md` | `.github/prompts/<name>.md` | `.github/copilot-instructions.md` | `.github/config-templates/<name>` |
-| Codex CLI | `.agents/skills/<name>/SKILL.md` | `.agents/prompts/<name>.md` | `AGENTS.md` | `.agents/config-templates/<name>` |
-| Generic | `.ai/skills/<name>/SKILL.md` | `.ai/prompts/<name>.md` | `AGENTS.md` | `.ai/config-templates/<name>` |
+| Codex CLI      | `.agents/skills/<name>/SKILL.md` | `.agents/prompts/<name>.md` | `AGENTS.md`                       | `.agents/config-templates/<name>` |
+| Generic        | `.ai/skills/<name>/SKILL.md`     | `.ai/prompts/<name>.md`     | `AGENTS.md`                       | `.ai/config-templates/<name>`     |
 
 **Re-applying a lesson** overwrites skills and prompts if content changed, updates the rules sentinel block, but never overwrites config templates (they may contain user edits).
 
@@ -172,16 +172,16 @@ This catches the most common issues. Read the output and address each failing ch
 
 ### 2. Common problems and fixes
 
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| "You're not signed in" | No auth or expired session | `10x auth` |
-| "Session expired" | Token past expiry and auto-refresh failed | `10x auth` (re-login) |
-| API unreachable / timeout | Network issue or API outage | Check internet; retry in a few minutes |
-| "Module is locked" | Content not yet released | `10x list` to see unlock date |
+| Symptom                            | Likely cause                                       | Fix                                                                          |
+| ---------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| "You're not signed in"             | No auth or expired session                         | `10x auth`                                                                   |
+| "Session expired"                  | Token past expiry and auto-refresh failed          | `10x auth` (re-login)                                                        |
+| API unreachable / timeout          | Network issue or API outage                        | Check internet; retry in a few minutes                                       |
+| "Module is locked"                 | Content not yet released                           | `10x list` to see unlock date                                                |
 | `.claude/` not found (doctor fail) | Running from wrong directory or wrong tool profile | `cd` to project root; check `10x doctor --json` for which tool is configured |
-| "403 Forbidden" on `10x get` | Module locked or no membership | Check `10x list` for module state; verify enrollment |
-| Orphaned artifact prompt on `get` | Switching tools mid-lesson | Choose "migrate" to move files, or "delete" to clean up |
-| Permission denied writing files | Directory not writable | Check directory permissions; on POSIX: `chmod u+w <dir>` |
+| "403 Forbidden" on `10x get`       | Module locked or no membership                     | Check `10x list` for module state; verify enrollment                         |
+| Orphaned artifact prompt on `get`  | Switching tools mid-lesson                         | Choose "migrate" to move files, or "delete" to clean up                      |
+| Permission denied writing files    | Directory not writable                             | Check directory permissions; on POSIX: `chmod u+w <dir>`                     |
 
 ### 3. Verbose mode for deeper debugging
 
@@ -197,12 +197,14 @@ This prints request/response diagnostics to stderr, useful for diagnosing API or
 If config is corrupted:
 
 On macOS/Linux:
+
 ```bash
 rm -rf ~/.config/10x-cli
 10x auth
 ```
 
 On Windows (PowerShell):
+
 ```powershell
 Remove-Item -Recurse -Force "$env:APPDATA\10x-cli"
 10x auth

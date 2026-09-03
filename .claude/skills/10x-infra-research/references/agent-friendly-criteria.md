@@ -57,6 +57,7 @@ Five criteria for evaluating whether a deployment platform suits AI-agent-driven
 **Definition**: the platform provides an MCP (Model Context Protocol) server, a published Claude/agent connector, or a well-maintained GitHub Actions / CI integration. This enables structured tool-use over platform operations rather than string-parsing CLI output.
 
 **Examples that pass**:
+
 - Netlify — official Netlify MCP Server, explicitly recommended alongside Netlify CLI.
 - Vercel — Vercel MCP, OAuth-backed (beta as of 2026 — record status during research).
 - Cloudflare — MCP servers across docs, Workers, observability.
@@ -74,10 +75,10 @@ Five criteria for evaluating whether a deployment platform suits AI-agent-driven
 
 Each criterion is scored Pass / Partial / Fail per platform. No criterion is a hard blocker on its own — a platform with four passes and one partial can still be the right choice. The criteria are heuristics for conscious decision-making, not gates.
 
-| Criterion | Weight guidance |
-|---|---|
-| CLI-first maintenance | Critical for agent-driven ops — weight heavily |
-| Managed over raw infra | Critical for MVP scope — weight heavily |
-| Agent-accessible docs | Important quality signal — medium weight |
-| Stable deployment API | Critical for iterative development — weight heavily |
+| Criterion                     | Weight guidance                                                                                            |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| CLI-first maintenance         | Critical for agent-driven ops — weight heavily                                                             |
+| Managed over raw infra        | Critical for MVP scope — weight heavily                                                                    |
+| Agent-accessible docs         | Important quality signal — medium weight                                                                   |
+| Stable deployment API         | Critical for iterative development — weight heavily                                                        |
 | MCP / first-class integration | Differentiating signal at MVP — light weight overall, but heavier when two top picks tie on the other four |

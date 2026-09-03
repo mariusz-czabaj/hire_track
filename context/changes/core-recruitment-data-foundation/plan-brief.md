@@ -16,17 +16,17 @@ Build the Postgres schema + RLS security model that every recruiting slice (S-01
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) |
-| --- | --- | --- |
-| Status history | Dedicated `candidate_recruitment_status_history` table from day one | S-06 needs a full log; adding it later means a migration + a decision about unrecoverable pre-existing history |
-| Kanban stages | Lookup table (`recruitment_id` nullable: null = default, set = override) | S-03's per-recruitment override becomes a pure insert, not a schema change |
-| Operations catalog | Fixed Postgres enum, per-entity CRUD (5 values) | Matches the PRD's 3 example groups exactly; no admin-editable operation set is requested anywhere |
-| RLS write sequencing | Full operation-gated RLS now, with seed grants for the PRD's example groups | Avoids a real security gap (any group member could write) during the gap before S-07 ships an admin UI |
-| Candidate dedup | Unique email (case-insensitive); app-layer "add candidate" links to existing row on match | Directly required by FR-007's shared-profile model; without it S-06's history search silently fragments |
-| Seed data | Shipped in this change (`supabase/seed.sql`) | S-01's plan already assumes seeded test data exists; F-01 owns the schema being seeded |
-| Group deletion | `ON DELETE RESTRICT` — blocks deleting a group still assigned to a recruitment | Prevents a recruitment silently becoming invisible to everyone |
-| Candidate search index | Trigram GIN index added now, in the same migration that creates the column | One migration instead of two; avoids a slow scan the moment S-06 ships |
-| RLS verification | Automated SQL script simulating multiple users, not manual Studio clicking | Repeatable regression safety net for a security-critical policy set; no test framework exists yet to build on instead |
+| Decision               | Choice                                                                                    | Why (1 sentence)                                                                                                      |
+| ---------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Status history         | Dedicated `candidate_recruitment_status_history` table from day one                       | S-06 needs a full log; adding it later means a migration + a decision about unrecoverable pre-existing history        |
+| Kanban stages          | Lookup table (`recruitment_id` nullable: null = default, set = override)                  | S-03's per-recruitment override becomes a pure insert, not a schema change                                            |
+| Operations catalog     | Fixed Postgres enum, per-entity CRUD (5 values)                                           | Matches the PRD's 3 example groups exactly; no admin-editable operation set is requested anywhere                     |
+| RLS write sequencing   | Full operation-gated RLS now, with seed grants for the PRD's example groups               | Avoids a real security gap (any group member could write) during the gap before S-07 ships an admin UI                |
+| Candidate dedup        | Unique email (case-insensitive); app-layer "add candidate" links to existing row on match | Directly required by FR-007's shared-profile model; without it S-06's history search silently fragments               |
+| Seed data              | Shipped in this change (`supabase/seed.sql`)                                              | S-01's plan already assumes seeded test data exists; F-01 owns the schema being seeded                                |
+| Group deletion         | `ON DELETE RESTRICT` — blocks deleting a group still assigned to a recruitment            | Prevents a recruitment silently becoming invisible to everyone                                                        |
+| Candidate search index | Trigram GIN index added now, in the same migration that creates the column                | One migration instead of two; avoids a slow scan the moment S-06 ships                                                |
+| RLS verification       | Automated SQL script simulating multiple users, not manual Studio clicking                | Repeatable regression safety net for a security-critical policy set; no test framework exists yet to build on instead |
 
 ## Scope
 
@@ -40,12 +40,12 @@ Four migrations in dependency order: (1) security/RBAC tables, (2) recruitment/c
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Security & RBAC Schema | Groups, operations enum, membership | Low — no RLS yet, pure schema |
-| 2. Recruitment & Candidate Domain Schema | All 6 domain tables + default stages + search index | Medium — schema choices here (stage shape, status history) are the ones costly to reverse |
-| 3. RLS Policies | Helper functions + policies + grants on all 9 tables | High — the security-critical phase; the INSERT chicken-and-egg sequencing must be right |
-| 4. Seed Data + RLS Verification | Local fixtures + automated proof the policies work | Medium — verification script correctness determines whether Phase 3 bugs get caught |
+| Phase                                    | What it delivers                                     | Key risk                                                                                  |
+| ---------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1. Security & RBAC Schema                | Groups, operations enum, membership                  | Low — no RLS yet, pure schema                                                             |
+| 2. Recruitment & Candidate Domain Schema | All 6 domain tables + default stages + search index  | Medium — schema choices here (stage shape, status history) are the ones costly to reverse |
+| 3. RLS Policies                          | Helper functions + policies + grants on all 9 tables | High — the security-critical phase; the INSERT chicken-and-egg sequencing must be right   |
+| 4. Seed Data + RLS Verification          | Local fixtures + automated proof the policies work   | Medium — verification script correctness determines whether Phase 3 bugs get caught       |
 
 **Prerequisites:** none beyond local Supabase running (`npx supabase start`).
 **Estimated effort:** ~1-2 sessions across 4 phases.

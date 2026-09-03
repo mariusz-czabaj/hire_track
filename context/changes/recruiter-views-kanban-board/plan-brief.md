@@ -17,22 +17,22 @@ F-01 landed a complete, RLS-enforced schema plus seed data — and **no applicat
 
 ## Key Decisions Made
 
-| Decision | Choice | Why | Source |
-| --- | --- | --- | --- |
-| Status filter semantics | Three filters (Draft/Live/Closed) + All | FR-003's two buckets don't map onto three stored values; keeps drafts reachable for S-02 | Plan |
-| List row contents | Title, dept, location, status, opened date, candidate count | The count makes the list scannable and is cheap given the existing index | Plan |
-| Data access shape | JSON endpoints + client-side fetch | Establishes the API contract S-04's mutations need | Plan |
-| Polish stage names | Rename to English via migration in this slice | Required by the new `lessons.md` rule; safe now — data only, nothing references the names | Plan |
-| Routing & protection | `/recruitments` pages; `/api` guarded centrally with 401 JSON | Closes a blanket hole for all six later slices rather than per endpoint | Plan |
-| Error contract | Bare payload on success; `{ error: { code, message } }` + real status codes | No envelope unwrapping on every read; machine-readable codes | Plan |
-| Forbidden vs missing | 404 for both | RLS hides them identically; distinguishing them would need an RLS-bypass credential and would leak existence | Plan |
-| Theming | Activate `.dark` on `<html>` | One line makes the existing shadcn token set match the established dark glassmorphism | Plan |
-| Testing | Vitest (services) + Playwright (E2E), plus CI branch fix | Locks in logic six slices reuse and verifies US-01's actual acceptance criteria | Plan |
-| Typed DB access | Generate and commit `Database` types first | `strictTypeChecked` makes `no-unsafe-*` fire on every untyped query field — a blocker, not a preference | Research |
-| Stage source | Always read `kanban_stages`, never hardcode | Keeps S-03's per-recruitment override a pure insert | Research |
-| `RecruitmentStatus` type | Hand-written zod enum, parsed at the service boundary | Verified: the generator emits `status: string` because the column is text+CHECK, not an enum — it cannot be derived | Plan review |
-| Island fetch state | Shared `useApiResource` hook in `src/components/hooks/` | One home for the `res.ok` branch, error parse and 401-redirect across two islands and four later slices | Plan review |
-| Candidate count query | Single query via PostgREST embedded aggregate | Verified working and RLS-scoped; prevents a per-row N+1 the plan would otherwise invite | Plan review |
+| Decision                 | Choice                                                                      | Why                                                                                                                 | Source      |
+| ------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Status filter semantics  | Three filters (Draft/Live/Closed) + All                                     | FR-003's two buckets don't map onto three stored values; keeps drafts reachable for S-02                            | Plan        |
+| List row contents        | Title, dept, location, status, opened date, candidate count                 | The count makes the list scannable and is cheap given the existing index                                            | Plan        |
+| Data access shape        | JSON endpoints + client-side fetch                                          | Establishes the API contract S-04's mutations need                                                                  | Plan        |
+| Polish stage names       | Rename to English via migration in this slice                               | Required by the new `lessons.md` rule; safe now — data only, nothing references the names                           | Plan        |
+| Routing & protection     | `/recruitments` pages; `/api` guarded centrally with 401 JSON               | Closes a blanket hole for all six later slices rather than per endpoint                                             | Plan        |
+| Error contract           | Bare payload on success; `{ error: { code, message } }` + real status codes | No envelope unwrapping on every read; machine-readable codes                                                        | Plan        |
+| Forbidden vs missing     | 404 for both                                                                | RLS hides them identically; distinguishing them would need an RLS-bypass credential and would leak existence        | Plan        |
+| Theming                  | Activate `.dark` on `<html>`                                                | One line makes the existing shadcn token set match the established dark glassmorphism                               | Plan        |
+| Testing                  | Vitest (services) + Playwright (E2E), plus CI branch fix                    | Locks in logic six slices reuse and verifies US-01's actual acceptance criteria                                     | Plan        |
+| Typed DB access          | Generate and commit `Database` types first                                  | `strictTypeChecked` makes `no-unsafe-*` fire on every untyped query field — a blocker, not a preference             | Research    |
+| Stage source             | Always read `kanban_stages`, never hardcode                                 | Keeps S-03's per-recruitment override a pure insert                                                                 | Research    |
+| `RecruitmentStatus` type | Hand-written zod enum, parsed at the service boundary                       | Verified: the generator emits `status: string` because the column is text+CHECK, not an enum — it cannot be derived | Plan review |
+| Island fetch state       | Shared `useApiResource` hook in `src/components/hooks/`                     | One home for the `res.ok` branch, error parse and 401-redirect across two islands and four later slices             | Plan review |
+| Candidate count query    | Single query via PostgREST embedded aggregate                               | Verified working and RLS-scoped; prevents a per-row N+1 the plan would otherwise invite                             | Plan review |
 
 ## Scope
 
@@ -48,14 +48,14 @@ Authorization stays in the database: endpoints run as the signed-in user via the
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Data & type foundation | English stages, generated types, DTOs, zod, typecheck + CI fix | Generated types drifting from migrations; committed output must stay in sync |
-| 2. API endpoints & service layer | `/api` gating, error helpers, two GET endpoints | The `/api` guard must not break `/api/auth/*`, and must return JSON not a redirect |
-| 3. Vitest & service tests | Unit coverage of mapping and grouping | `strictTypeChecked` fighting test stubs; resist disabling rules repo-wide |
-| 4. UI foundation & list | `.dark`, shadcn primitives, filterable list | `.dark` activation changing existing pages' appearance |
-| 5. Kanban board view | The north-star board screen | Empty `Rejected` column silently omitted if grouping is candidate-driven |
-| 6. Playwright E2E | Role-based end-to-end coverage | Provisioning Supabase in CI; documented fallback if unreliable |
+| Phase                            | What it delivers                                               | Key risk                                                                           |
+| -------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 1. Data & type foundation        | English stages, generated types, DTOs, zod, typecheck + CI fix | Generated types drifting from migrations; committed output must stay in sync       |
+| 2. API endpoints & service layer | `/api` gating, error helpers, two GET endpoints                | The `/api` guard must not break `/api/auth/*`, and must return JSON not a redirect |
+| 3. Vitest & service tests        | Unit coverage of mapping and grouping                          | `strictTypeChecked` fighting test stubs; resist disabling rules repo-wide          |
+| 4. UI foundation & list          | `.dark`, shadcn primitives, filterable list                    | `.dark` activation changing existing pages' appearance                             |
+| 5. Kanban board view             | The north-star board screen                                    | Empty `Rejected` column silently omitted if grouping is candidate-driven           |
+| 6. Playwright E2E                | Role-based end-to-end coverage                                 | Provisioning Supabase in CI; documented fallback if unreliable                     |
 
 **Prerequisites:** F-01 migrations applied (done); local Supabase running (confirmed, CLI v2.98.2); seed data loaded, providing `hr.test@`, `hiring-manager.test@` and `admin.test@` (all `password123`).
 **Estimated effort:** ~4-6 sessions across 6 phases. Phases 1-2 are foundation-heavy; 4-5 are the visible feature; 3 and 6 add the two test frameworks.

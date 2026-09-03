@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Recruiter Customizes Kanban Stages Implementation Plan
 
 - **Plan**: context/changes/recruiter-customizes-kanban-stages/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | WARNING |
-| Safety & Quality | PASS |
-| Architecture | PASS |
-| Pattern Consistency | PASS |
-| Success Criteria | WARNING |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | WARNING |
+| Safety & Quality    | PASS    |
+| Architecture        | PASS    |
+| Pattern Consistency | PASS    |
+| Success Criteria    | WARNING |
 
 ## Findings
 
@@ -48,7 +49,7 @@
 - **Location**: supabase/migrations/20260901162000_kanban_stage_rpcs.sql (lines 114–228)
 - **Detail**: Per the plan's explicit scope ("No admin UI for the global defaults... the screen belongs to S-07"), this RPC intentionally has no app-facing caller yet, and Phase 2's Automated success criteria never required a test file for it (only migration-applies / db:types-clean / lint). I manually verified its two-phase renumber and referenced-removal refusal via `psql` during Phase 2's manual gate, but that verification isn't captured as a repeatable automated test — so a future refactor of this RPC has no regression safety net until S-07 wires it up.
 - **Fix**: Optional now; when S-07 builds the admin surface, add integration coverage for `update_default_stages` at that time (or add a lightweight `rls_verification.sql`-style script now if the team wants a safety net sooner).
-- **Decision**: FIXED — added `rls_verification.sql` assertions (16)-(18) covering rename-in-place + two-phase renumber, the PA002 referenced-removal refusal, and a net removal+addition in one call. **Assertion (18) caught a real bug**: net additions were being inserted *before* the removal-cleanup delete, and a freshly inserted row's auto-generated id was never in the submitted-id list, so the cleanup step immediately deleted every row the same call had just inserted. Fixed via a new migration, `supabase/migrations/20260901180501_fix_update_default_stages_delete_order.sql` (CREATE OR REPLACE, reordering delete-before-insert), following this repo's convention of never editing an already-merged migration. Re-verified: all 18 RLS assertions pass, full local CI (lint/db:types/unit/build) clean.
+- **Decision**: FIXED — added `rls_verification.sql` assertions (16)-(18) covering rename-in-place + two-phase renumber, the PA002 referenced-removal refusal, and a net removal+addition in one call. **Assertion (18) caught a real bug**: net additions were being inserted _before_ the removal-cleanup delete, and a freshly inserted row's auto-generated id was never in the submitted-id list, so the cleanup step immediately deleted every row the same call had just inserted. Fixed via a new migration, `supabase/migrations/20260901180501_fix_update_default_stages_delete_order.sql` (CREATE OR REPLACE, reordering delete-before-insert), following this repo's convention of never editing an already-merged migration. Re-verified: all 18 RLS assertions pass, full local CI (lint/db:types/unit/build) clean.
 
 ### F4 — `PA002` (stage_referenced) errcode is unmapped in the stages endpoint
 

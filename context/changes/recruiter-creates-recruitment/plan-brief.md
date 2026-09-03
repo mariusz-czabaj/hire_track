@@ -17,25 +17,27 @@ A recruiter member of a group with `recruitment.write` fills in a form at `/recr
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-| --- | --- | --- | --- |
-| Create mechanism | Atomic `security definer` RPC | Two-statement client-orchestrated create deadlocks — a freshly inserted recruitment is invisible to its own creator until linked, and by then its id is unrecoverable | Research |
-| Error contract | Extend `ApiErrorBody` with optional `fields` | Six-field form needs per-field errors; small additive contract change beats duplicating validation client-side | Plan |
-| "New recruitment" affordance | Always shown, denial handled gracefully | Matches the inherited "authorization stays in the database" rule — no UI-level permission logic | Plan |
-| `employment_type` | Fixed list (zod enum) | Consistent data for future filtering, matches the `recruitmentStatusSchema` drift-discipline precedent | Plan |
-| Status transitions | Any transition legal, including reopening Closed | FR-002 states no restriction; inventing a one-way flow would be unrequested business logic | Plan |
-| Group auto-assignment | None — creator picks explicitly | Matches FR-001a as written; the self-inflicted invisible-recruitment case is real but discoverable and out of spec | Plan |
-| Test coverage | RPC + API integration tests, form component tests | Matches F-01/S-01 precedent, directly exercises the deadlock this slice exists to prevent regressing | Plan |
+| Decision                     | Choice                                            | Why (1 sentence)                                                                                                                                                      | Source   |
+| ---------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Create mechanism             | Atomic `security definer` RPC                     | Two-statement client-orchestrated create deadlocks — a freshly inserted recruitment is invisible to its own creator until linked, and by then its id is unrecoverable | Research |
+| Error contract               | Extend `ApiErrorBody` with optional `fields`      | Six-field form needs per-field errors; small additive contract change beats duplicating validation client-side                                                        | Plan     |
+| "New recruitment" affordance | Always shown, denial handled gracefully           | Matches the inherited "authorization stays in the database" rule — no UI-level permission logic                                                                       | Plan     |
+| `employment_type`            | Fixed list (zod enum)                             | Consistent data for future filtering, matches the `recruitmentStatusSchema` drift-discipline precedent                                                                | Plan     |
+| Status transitions           | Any transition legal, including reopening Closed  | FR-002 states no restriction; inventing a one-way flow would be unrequested business logic                                                                            | Plan     |
+| Group auto-assignment        | None — creator picks explicitly                   | Matches FR-001a as written; the self-inflicted invisible-recruitment case is real but discoverable and out of spec                                                    | Plan     |
+| Test coverage                | RPC + API integration tests, form component tests | Matches F-01/S-01 precedent, directly exercises the deadlock this slice exists to prevent regressing                                                                  | Plan     |
 
 ## Scope
 
 **In scope:**
+
 - Atomic create RPC (migration) + `POST /api/recruitments`
 - `PATCH /api/recruitments/[id]` for status changes
 - Create form UI at `/recruitments/new`, group picker, status control on the board/detail view
 - RPC-level, API-level, component-level, and E2E test coverage
 
 **Out of scope:**
+
 - `kanban_stages` customization (S-03)
 - Recruitment status-history/audit trail (no requirement, no table)
 - Restricting status transitions
@@ -49,12 +51,12 @@ A new Postgres `security definer` function (`private.create_recruitment`) insert
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
+| Phase                | What it delivers                                                      | Key risk                                                                                                                    |
+| -------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | 1. Atomic create RPC | New migration with the `security definer` function, regenerated types | First multi-step write function in the codebase — no prior pattern to copy verbatim, must get the RLS-bypass re-check right |
-| 2. API endpoints | POST create + PATCH status, new schemas/DTOs, extended error contract | Mapping RPC exceptions to the right HTTP status (403 vs generic 500) |
-| 3. Frontend | Create form, group picker, status control | Form is fetch-driven so can't reuse `useFormStatus`; needs its own pending-state handling |
-| 4. Tests | RPC/API/component/E2E coverage | Integration tests must exercise all 3 seeded role fixtures to catch RLS regressions |
+| 2. API endpoints     | POST create + PATCH status, new schemas/DTOs, extended error contract | Mapping RPC exceptions to the right HTTP status (403 vs generic 500)                                                        |
+| 3. Frontend          | Create form, group picker, status control                             | Form is fetch-driven so can't reuse `useFormStatus`; needs its own pending-state handling                                   |
+| 4. Tests             | RPC/API/component/E2E coverage                                        | Integration tests must exercise all 3 seeded role fixtures to catch RLS regressions                                         |
 
 **Prerequisites:** F-01 and S-01 merged (both already `in-progress`/further along per their own `change.md`, ahead of the roadmap's stale snapshot).
 **Estimated effort:** ~4 phases, roughly one focused session per phase.

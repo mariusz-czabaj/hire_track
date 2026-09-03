@@ -121,6 +121,30 @@ export interface CandidateDetailDto {
   notes: CandidateNoteDto[];
 }
 
+export interface UpdateCandidateProfileCommand {
+  fullName: string;
+  phone?: string;
+}
+
+export interface CandidateRecruitmentSummaryDto {
+  recruitmentId: number;
+  candidateRecruitmentId: number;
+  title: string;
+  stageName: string;
+  addedAt: string;
+}
+
+// `cv` is always null until Phase 3 (CV upload) adds `CandidateCvDto`.
+export interface CandidateProfileDto {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  createdAt: string;
+  recruitments: CandidateRecruitmentSummaryDto[];
+  cv: null;
+}
+
 export interface ApiErrorBody {
   error: {
     code: string;

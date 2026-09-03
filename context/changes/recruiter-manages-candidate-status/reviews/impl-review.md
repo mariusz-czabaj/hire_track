@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Recruiter Manages Candidate Status Implementation Plan
 
 - **Plan**: context/changes/recruiter-manages-candidate-status/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts (as originally reviewed, before triage fixes)
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | WARNING |
-| Scope Discipline | WARNING |
-| Safety & Quality | FAIL |
-| Architecture | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | WARNING |
+| Scope Discipline    | WARNING |
+| Safety & Quality    | FAIL    |
+| Architecture        | PASS    |
 | Pattern Consistency | WARNING |
-| Success Criteria | PASS |
+| Success Criteria    | PASS    |
 
 ## Post-triage status
 
@@ -49,7 +50,7 @@ confirmation pass before the next deploy.
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Plan Adherence
 - **Location**: src/components/recruitments/CandidateDetail.tsx:188-213
-- **Detail**: Plan Phase 5 §2 contract: "Notes render in stage order — one entry per stage in the resolved set... with an empty-state line for stages not yet noted." The actual code filters `candidate.notes` down to `note.body !== null` and renders only stages that already have a note; a single blanket "No notes yet." only appears when *every* stage is un-noted. A candidate partially through the pipeline (some stages noted, some not) shows no indication that the un-noted stages exist at all.
+- **Detail**: Plan Phase 5 §2 contract: "Notes render in stage order — one entry per stage in the resolved set... with an empty-state line for stages not yet noted." The actual code filters `candidate.notes` down to `note.body !== null` and renders only stages that already have a note; a single blanket "No notes yet." only appears when _every_ stage is un-noted. A candidate partially through the pipeline (some stages noted, some not) shows no indication that the un-noted stages exist at all.
 - **Fix**: Render every entry in `candidate.notes` (drop the `.filter`), and inside `NoteCard` (or a small variant) show a muted "No note yet" placeholder when `note.body === null` instead of the note body.
 - **Decision**: FIXED — `CandidateDetail.tsx` now maps over every resolved stage and `NoteCard` shows a "No note yet" placeholder when `body` is null; updated the component test accordingly.
 

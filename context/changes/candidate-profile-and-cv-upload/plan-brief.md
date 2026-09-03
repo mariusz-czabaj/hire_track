@@ -30,20 +30,20 @@ and superseded files.
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-| --- | --- | --- | --- |
-| Upload path | Browser-direct via signed URL | Proxying bytes through the Worker silently drops files above ~5MB; pre-decided at platform selection. | Research |
-| Object store | Keep Supabase Storage | Store-side TTL cannot deliver the access guarantee anywhere, so switching buys little and costs size enforcement, reviewable config and CI coverage. | Plan |
-| Access cutoff | Derived at read time from a generated `expires_at` | Makes the 12-month cutoff exact and automatic, independent of whether any job ever runs. | Plan |
-| Byte deletion | Manually triggered endpoint, no scheduler | Explicit scope decision; removes the untestable-scheduler problem and the need for any service-role key. | Plan |
-| Privileged identity | None — the logged-in user | A user-triggered purge means RLS and `private.has_operation` remain the only gate throughout. | Plan |
-| Purge authorisation | `candidate.write` OR `group.manage` | Lets both HR and Administrator run it using operations that already exist, avoiding an enum change. | Plan |
-| Profile route | New candidate-scoped `/candidates/:id` | Matches FR-007's shared semantics and what the DB already permits; S-06 inherits the resource instead of reworking it. | Plan |
-| CV cardinality | One active CV per candidate, tombstone retained | Gives the two-phase upload a pending state, a per-file clock, and something to explain the absence after deletion. | Plan |
-| Editable fields | Name and phone; email read-only | Email is the `lower(email)` dedup key that the shared profile depends on. | Plan |
-| Max file size | 5 MiB, enforced at the bucket | Bucket config is the only server-side enforcement available on a direct upload. | Plan |
-| Download | Stream through an API route | Re-authorises every request and creates no shareable bearer URL, unlike a signed URL. | Plan |
-| Purge ordering | Delete object, then mark the row | Reversing it loses the storage path while the bytes survive, orphaning the file permanently. | Plan |
+| Decision            | Choice                                             | Why (1 sentence)                                                                                                                                     | Source   |
+| ------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Upload path         | Browser-direct via signed URL                      | Proxying bytes through the Worker silently drops files above ~5MB; pre-decided at platform selection.                                                | Research |
+| Object store        | Keep Supabase Storage                              | Store-side TTL cannot deliver the access guarantee anywhere, so switching buys little and costs size enforcement, reviewable config and CI coverage. | Plan     |
+| Access cutoff       | Derived at read time from a generated `expires_at` | Makes the 12-month cutoff exact and automatic, independent of whether any job ever runs.                                                             | Plan     |
+| Byte deletion       | Manually triggered endpoint, no scheduler          | Explicit scope decision; removes the untestable-scheduler problem and the need for any service-role key.                                             | Plan     |
+| Privileged identity | None — the logged-in user                          | A user-triggered purge means RLS and `private.has_operation` remain the only gate throughout.                                                        | Plan     |
+| Purge authorisation | `candidate.write` OR `group.manage`                | Lets both HR and Administrator run it using operations that already exist, avoiding an enum change.                                                  | Plan     |
+| Profile route       | New candidate-scoped `/candidates/:id`             | Matches FR-007's shared semantics and what the DB already permits; S-06 inherits the resource instead of reworking it.                               | Plan     |
+| CV cardinality      | One active CV per candidate, tombstone retained    | Gives the two-phase upload a pending state, a per-file clock, and something to explain the absence after deletion.                                   | Plan     |
+| Editable fields     | Name and phone; email read-only                    | Email is the `lower(email)` dedup key that the shared profile depends on.                                                                            | Plan     |
+| Max file size       | 5 MiB, enforced at the bucket                      | Bucket config is the only server-side enforcement available on a direct upload.                                                                      | Plan     |
+| Download            | Stream through an API route                        | Re-authorises every request and creates no shareable bearer URL, unlike a signed URL.                                                                | Plan     |
+| Purge ordering      | Delete object, then mark the row                   | Reversing it loses the storage path while the bytes survive, orphaning the file permanently.                                                         | Plan     |
 
 ## Scope
 
@@ -69,13 +69,13 @@ Storage API, and only then marks the row — making it idempotent and self-heali
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Bucket and CV schema | Private bucket, `candidate_cvs` with generated expiry, RLS on both tables, SQL assertions | Getting `storage.objects` RLS wrong makes the mint endpoint decorative |
-| 2. Profile service and routes | `/api/candidates/:id` GET+PATCH, DTO split, `/candidates` protected | Forgetting `PROTECTED_ROUTES` leaves the page unauthenticated |
-| 3. CV upload, download, purge | Mint/confirm/stream/purge, `PA005`, full error mapping | Signed-URL TTL is not configurable and differs local vs hosted |
-| 4. Profile page UI | Identity editing plus the three-state CV panel | `useMutation` cannot carry bytes, so the upload needs its own hook |
-| 5. End-to-end coverage | Playwright spec and CI readiness probe | New specs polluting fixtures other specs assert on |
+| Phase                         | What it delivers                                                                          | Key risk                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 1. Bucket and CV schema       | Private bucket, `candidate_cvs` with generated expiry, RLS on both tables, SQL assertions | Getting `storage.objects` RLS wrong makes the mint endpoint decorative |
+| 2. Profile service and routes | `/api/candidates/:id` GET+PATCH, DTO split, `/candidates` protected                       | Forgetting `PROTECTED_ROUTES` leaves the page unauthenticated          |
+| 3. CV upload, download, purge | Mint/confirm/stream/purge, `PA005`, full error mapping                                    | Signed-URL TTL is not configurable and differs local vs hosted         |
+| 4. Profile page UI            | Identity editing plus the three-state CV panel                                            | `useMutation` cannot carry bytes, so the upload needs its own hook     |
+| 5. End-to-end coverage        | Playwright spec and CI readiness probe                                                    | New specs polluting fixtures other specs assert on                     |
 
 **Prerequisites:** S-04 shipped (it is); local Docker + `npx supabase start`; a fixture PDF for e2e. The hosted
 project needs its bucket created once before the feature works in production.

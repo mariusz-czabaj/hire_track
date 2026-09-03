@@ -187,6 +187,12 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
             Added {formatDateTime(candidate.addedAt)}
           </span>
         </div>
+        <a
+          href={`/candidates/${candidate.candidateId}`}
+          className="mt-2 inline-block text-sm text-purple-300 hover:underline"
+        >
+          View full profile &rarr;
+        </a>
       </div>
 
       <div className="flex flex-col gap-3">

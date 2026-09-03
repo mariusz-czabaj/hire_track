@@ -6,12 +6,12 @@ Read this file only when Step 0 of SKILL.md determined the invocation touches th
 
 State is **derived, never stored separately**. The only persistence is `context/foundation/roadmap.md` (frontmatter + item statuses). Detection is a pure read — no sidecar state file, ever (repo convention: the legacy `.implement-state.json` sidecar was killed for exactly this failure mode).
 
-| State            | Detection rule                                                                                     |
-| ---------------- | -------------------------------------------------------------------------------------------------- |
+| State            | Detection rule                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ |
 | `NO_MILESTONE`   | `context/foundation/roadmap.md` absent, OR present without a `milestone_id` frontmatter key (legacy roadmap) |
-| `ACTIVE`         | `milestone_status: open` AND at least one `F-NN`/`S-NN` item is not `done`                         |
-| `READY_TO_CLOSE` | `milestone_status: open` AND every `F-NN`/`S-NN` item is `done`                                    |
-| `CLOSED`         | `milestone_status: done` (closure recorded, next milestone not yet opened)                         |
+| `ACTIVE`         | `milestone_status: open` AND at least one `F-NN`/`S-NN` item is not `done`                                   |
+| `READY_TO_CLOSE` | `milestone_status: open` AND every `F-NN`/`S-NN` item is `done`                                              |
+| `CLOSED`         | `milestone_status: done` (closure recorded, next milestone not yet opened)                                   |
 
 **Legacy roadmap** (file exists, no `milestone_id`): treat as `NO_MILESTONE`, but before regenerating offer **adoption** — wrap the existing roadmap as `M-01` by adding the milestone frontmatter keys and a `## Milestone` section in place, preserving all item statuses. Adoption is the Recommended option; regeneration archives the legacy file first per SKILL.md Step 9.
 
@@ -56,5 +56,5 @@ On invocation while a milestone is active with open items:
 - **One milestone open at a time.** Opening a new milestone while `milestone_status: open` requires closing it first — or explicitly abandoning it (user's call, recorded in `## Milestone History` as `abandoned <date>` with a one-line reason).
 - **Milestones are outcome-scoped, never time-boxed.** No sprint semantics, no target dates. The only dates are factual open/close records in history entries.
 - **State lives in `roadmap.md` alone.** Frontmatter + item statuses are the whole machine. Anything else is drift.
-- **Downstream skills are untouched.** `/10x-plan`, `/10x-implement`, `/10x-archive` keep flipping item `Status` by `Change ID` exactly as before, milestone-blind. Milestone closure is *detected* by this skill on its next invocation — never pushed by `/10x-archive`.
+- **Downstream skills are untouched.** `/10x-plan`, `/10x-implement`, `/10x-archive` keep flipping item `Status` by `Change ID` exactly as before, milestone-blind. Milestone closure is _detected_ by this skill on its next invocation — never pushed by `/10x-archive`.
 - **History is append-only** and carried forward verbatim into each successor roadmap, so the current file always tells the full milestone story.
