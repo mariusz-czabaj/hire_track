@@ -19,6 +19,11 @@ const SEEDED_CREDENTIALS = {
   hr: "hr.test@example.com",
   hiringManager: "hiring-manager.test@example.com",
   admin: "admin.test@example.com",
+  // Authorization test fixtures (testing-authorization-tenancy-contract,
+  // Phase 1) -- see supabase/seed.sql for what each principal proves.
+  tenantPeer: "tenant-peer.test@example.com",
+  noGroup: "no-group.test@example.com",
+  multiGroup: "multi-group.test@example.com",
 } as const;
 
 export type SeededRole = keyof typeof SEEDED_CREDENTIALS;

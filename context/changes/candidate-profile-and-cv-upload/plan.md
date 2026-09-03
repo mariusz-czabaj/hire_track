@@ -722,18 +722,18 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [x] 1.1 Migrations apply cleanly
-- [x] 1.2 Bucket exists after reset with declared limits
-- [x] 1.3 RLS/RPC assertions pass
-- [x] 1.4 Types are in sync
-- [x] 1.5 Linting passes
-- [x] 1.6 Type checking passes
+- [x] 1.1 Migrations apply cleanly — b7e44a1
+- [x] 1.2 Bucket exists after reset with declared limits — b7e44a1
+- [x] 1.3 RLS/RPC assertions pass — b7e44a1
+- [x] 1.4 Types are in sync — b7e44a1
+- [x] 1.5 Linting passes — b7e44a1
+- [x] 1.6 Type checking passes — b7e44a1
 
 #### Manual
 
-- [x] 1.7 Each new assertion observed to fail when its guard is removed
-- [x] 1.8 Upload without candidate.write rejected at mint time
-- [x] 1.9 Oversized file and wrong MIME rejected by the storage server
+- [x] 1.7 Each new assertion observed to fail when its guard is removed — b7e44a1
+- [x] 1.8 Upload without candidate.write rejected at mint time — b7e44a1
+- [x] 1.9 Oversized file and wrong MIME rejected by the storage server — b7e44a1
 
 ### Phase 2: Candidate profile service and routes
 

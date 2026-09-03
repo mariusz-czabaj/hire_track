@@ -10,17 +10,32 @@
  *      http://localhost:4321), e.g. `npm run dev` in a separate terminal.
  */
 import { describe, expect, it } from "vitest";
-import { signInIntegrationClient } from "@/lib/test-support/integration-client";
-import type { ApiErrorBody } from "@/types";
+import { signInIntegrationClient, type IntegrationClient } from "@/lib/test-support/integration-client";
+import type { ApiErrorBody, SecurityGroupDto } from "@/types";
 
-function validCreateBody(overrides: Record<string, unknown> = {}) {
+// Looks a seeded group up by name rather than assuming an ordinal id --
+// seed.sql only guarantees "HR/Rekruter" is a group that exists, never
+// that it is group 1. Any authenticated principal can read the list
+// (security_groups_select is `using (true)`), so the caller identity
+// doesn't matter here.
+async function groupIdByName(client: IntegrationClient, name: string): Promise<number> {
+  const response = await client.fetch("/api/security-groups");
+  const groups = (await response.json()) as SecurityGroupDto[];
+  const match = groups.find((group) => group.name === name);
+  if (!match) {
+    throw new Error(`groupIdByName: no seeded security group named "${name}"`);
+  }
+  return match.id;
+}
+
+function validCreateBody(hrRekruterGroupId: number, overrides: Record<string, unknown> = {}) {
   return {
     title: "Integration Test Role",
     department: "Engineering",
     location: "Remote",
     employmentType: "full-time",
     openedAt: "2026-01-01",
-    groupIds: [1],
+    groupIds: [hrRekruterGroupId],
     ...overrides,
   };
 }
@@ -28,10 +43,11 @@ function validCreateBody(overrides: Record<string, unknown> = {}) {
 describe("POST /api/recruitments", () => {
   it("HR can create a recruitment and it is immediately visible", async () => {
     const hr = await signInIntegrationClient("hr");
+    const hrRekruterGroupId = await groupIdByName(hr, "HR/Rekruter");
 
     const createResponse = await hr.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody()),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId)),
     });
     expect(createResponse.status).toBe(201);
     const created = (await createResponse.json()) as { id: number; status: string };
@@ -45,10 +61,11 @@ describe("POST /api/recruitments", () => {
 
   it("Hiring Manager is denied with 403", async () => {
     const hiringManager = await signInIntegrationClient("hiringManager");
+    const hrRekruterGroupId = await groupIdByName(hiringManager, "HR/Rekruter");
 
     const response = await hiringManager.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody()),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId)),
     });
 
     expect(response.status).toBe(403);
@@ -58,10 +75,11 @@ describe("POST /api/recruitments", () => {
 
   it("Admin is denied with 403", async () => {
     const admin = await signInIntegrationClient("admin");
+    const hrRekruterGroupId = await groupIdByName(admin, "HR/Rekruter");
 
     const response = await admin.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody()),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId)),
     });
 
     expect(response.status).toBe(403);
@@ -69,10 +87,11 @@ describe("POST /api/recruitments", () => {
 
   it("rejects an empty groupIds array with a 422 and a field-level error", async () => {
     const hr = await signInIntegrationClient("hr");
+    const hrRekruterGroupId = await groupIdByName(hr, "HR/Rekruter");
 
     const response = await hr.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody({ groupIds: [] })),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId, { groupIds: [] })),
     });
 
     expect(response.status).toBe(422);
@@ -82,7 +101,8 @@ describe("POST /api/recruitments", () => {
 
   it("rejects a missing required field with a 422 and a field-level error", async () => {
     const hr = await signInIntegrationClient("hr");
-    const { title: _title, ...rest } = validCreateBody();
+    const hrRekruterGroupId = await groupIdByName(hr, "HR/Rekruter");
+    const { title: _title, ...rest } = validCreateBody(hrRekruterGroupId);
 
     const response = await hr.fetch("/api/recruitments", {
       method: "POST",
@@ -98,10 +118,11 @@ describe("POST /api/recruitments", () => {
 describe("PATCH /api/recruitments/[id]", () => {
   it("HR can change status and it persists", async () => {
     const hr = await signInIntegrationClient("hr");
+    const hrRekruterGroupId = await groupIdByName(hr, "HR/Rekruter");
 
     const createResponse = await hr.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody()),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId)),
     });
     const created = (await createResponse.json()) as { id: number };
 
@@ -117,9 +138,10 @@ describe("PATCH /api/recruitments/[id]", () => {
 
   it("Hiring Manager is denied with 404 (scoped-write, not authorized)", async () => {
     const hr = await signInIntegrationClient("hr");
+    const hrRekruterGroupId = await groupIdByName(hr, "HR/Rekruter");
     const createResponse = await hr.fetch("/api/recruitments", {
       method: "POST",
-      body: JSON.stringify(validCreateBody()),
+      body: JSON.stringify(validCreateBody(hrRekruterGroupId)),
     });
     const created = (await createResponse.json()) as { id: number };
 
