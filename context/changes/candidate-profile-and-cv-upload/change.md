@@ -1,7 +1,7 @@
 ---
 change_id: candidate-profile-and-cv-upload
 title: Candidate profile page and CV upload with 12-month retention
-status: implementing
+status: implemented
 created: 2026-09-01
 updated: 2026-09-03
 archived_at: null

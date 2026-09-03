@@ -750,9 +750,9 @@ which the profile renders as the no-CV state.
 
 #### Manual
 
-- [ ] 2.6 /candidates/:id requires a session
-- [ ] 2.7 Name and phone persist; email not editable
-- [ ] 2.8 Hiring manager reads profile, gets clean denial on save
+- [x] 2.6 /candidates/:id requires a session — d5eb3df
+- [x] 2.7 Name and phone persist; email not editable — d5eb3df
+- [x] 2.8 Hiring manager reads profile, gets clean denial on save — d5eb3df
 
 ### Phase 3: CV upload, download, and purge
 
@@ -794,12 +794,12 @@ which the profile renders as the no-CV state.
 
 #### Automated
 
-- [x] 5.1 Full suite passes from a clean database
-- [x] 5.2 Linting passes
-- [x] 5.3 Type checking passes
-- [x] 5.4 Build succeeds
+- [x] 5.1 Full suite passes from a clean database — d5eb3df
+- [x] 5.2 Linting passes — d5eb3df
+- [x] 5.3 Type checking passes — d5eb3df
+- [x] 5.4 Build succeeds — d5eb3df
 
 #### Manual
 
-- [ ] 5.5 E2E passes twice without a DB reset between runs
-- [ ] 5.6 CI passes on a pushed branch
+- [x] 5.5 E2E passes twice without a DB reset between runs — d5eb3df
+- [x] 5.6 CI passes on a pushed branch — d5eb3df
