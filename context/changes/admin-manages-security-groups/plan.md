@@ -707,18 +707,18 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npm run typecheck`
-- [ ] 4.2 Unit tests pass: `npm run test`
-- [ ] 4.3 Linting passes: `npm run lint`
-- [ ] 4.4 Build succeeds: `npm run build`
+- [x] 4.1 Type checking passes: `npm run typecheck`
+- [x] 4.2 Unit tests pass: `npm run test`
+- [x] 4.3 Linting passes: `npm run lint`
+- [x] 4.4 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 4.5 Full admin lifecycle works in the UI without a manual refresh
-- [ ] 4.6 Non-admin sees no Admin link and a not-authorized state at `/admin/groups`
-- [ ] 4.7 Signed out, `/admin/groups` redirects to `/auth/signin`
-- [ ] 4.8 Last-administrator refusal renders inline
-- [ ] 4.9 Layout holds at narrow widths
+- [x] 4.5 Full admin lifecycle works in the UI without a manual refresh
+- [x] 4.6 Non-admin sees no Admin link and a not-authorized state at `/admin/groups`
+- [x] 4.7 Signed out, `/admin/groups` redirects to `/auth/signin`
+- [x] 4.8 Last-administrator refusal renders inline
+- [x] 4.9 Layout holds at narrow widths
 
 ### Phase 5: Integration tests on the security boundary
 

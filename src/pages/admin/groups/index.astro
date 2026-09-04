@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { SecurityGroupList } from "@/components/admin/SecurityGroupList";
+
+const isAdmin = Astro.locals.operations.includes("group.manage");
+---
+
+<Layout title="Admin - Security Groups">
+  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
+    <div class="mx-auto max-w-4xl">
+      <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+        Security groups
+      </h1>
+      {
+        isAdmin ? (
+          <SecurityGroupList client:load />
+        ) : (
+          <p class="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-blue-100/70">
+            You are not authorized to view this page.
+          </p>
+        )
+      }
+    </div>
+  </div>
+</Layout>
