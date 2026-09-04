@@ -128,11 +128,13 @@ describe("GET /api/candidates/[candidateId]", () => {
     const hrProfile = (await hrResponse.json()) as CandidateProfileDto;
 
     const backendEngineer = hrProfile.recruitments.find((r) => r.title === BACKEND_ENGINEER_TITLE);
-    expect(backendEngineer).toBeDefined();
-    expect(backendEngineer?.history.length).toBeGreaterThanOrEqual(3);
-    expect(backendEngineer?.history[0].fromStageName).toBeNull();
-    for (let i = 1; i < (backendEngineer?.history.length ?? 0); i++) {
-      expect(backendEngineer?.history[i].changedAt >= backendEngineer.history[i - 1].changedAt).toBe(true);
+    if (!backendEngineer) {
+      throw new Error(`Expected a "${BACKEND_ENGINEER_TITLE}" recruitment on the candidate profile`);
+    }
+    expect(backendEngineer.history.length).toBeGreaterThanOrEqual(3);
+    expect(backendEngineer.history[0].fromStageName).toBeNull();
+    for (let i = 1; i < backendEngineer.history.length; i++) {
+      expect(backendEngineer.history[i].changedAt >= backendEngineer.history[i - 1].changedAt).toBe(true);
     }
 
     // Paired read-back: the legitimate HR principal still sees the candidate

@@ -730,7 +730,14 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Manual
 
-- [x] 5.4 Suite passes from a clean reset and leaves no residual test groups — 8149b4b
+- [x] 5.4 Suite passes from a clean reset; test groups persist until the next reset — 8149b4b
+  - Corrected during implementation review: the original wording ("leaves no
+    residual test groups behind") was not achievable as scoped. Group delete is
+    out of scope this slice, so the suite has no teardown mechanism and
+    `lifecycle-group-*` / `duplicate-*-probe-*` rows accumulate per run. Run
+    `npx supabase db reset` before `npm run test:rls` — residual state from the
+    integration suite makes the RLS verification fail. Revisit when a delete
+    capability lands.
 - [x] 5.5 Removing the function guard makes the direct PostgREST test fail — 8149b4b
 
 ### Phase 6: Rename seeded group names to English

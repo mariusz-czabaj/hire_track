@@ -38,7 +38,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
   const [members, setMembers] = useState<SecurityGroupDetailDto["members"]>([]);
   const [renameError, setRenameError] = useState<string | null>(null);
   const [renaming, setRenaming] = useState(false);
-  const [pendingOperation, setPendingOperation] = useState<Operation | null>(null);
+  const [pendingOperations, setPendingOperations] = useState<ReadonlySet<Operation>>(new Set());
   const [operationError, setOperationError] = useState<string | null>(null);
   const [pendingMemberId, setPendingMemberId] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
@@ -74,10 +74,20 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
   }
 
   async function handleToggleOperation(operation: Operation, checked: boolean) {
-    const previous = operations;
-    setPendingOperation(operation);
+    // Functional updates throughout: two checkboxes can be in flight at once,
+    // so neither the optimistic apply nor the revert may close over the
+    // render-scoped `operations` value -- the second settler would otherwise
+    // undo the first's successful change.
+    const applyToggle = (list: Operation[], on: boolean) =>
+      on ? (list.includes(operation) ? list : [...list, operation]) : list.filter((op) => op !== operation);
+
+    setPendingOperations((prev) => new Set(prev).add(operation));
     setOperationError(null);
-    setOperations(checked ? [...previous, operation] : previous.filter((op) => op !== operation));
+    setOperations((prev) => applyToggle(prev, checked));
+
+    const revert = () => {
+      setOperations((prev) => applyToggle(prev, !checked));
+    };
 
     try {
       const response = await fetch(`/api/security-groups/${groupId}/operations`, {
@@ -86,17 +96,21 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
         body: JSON.stringify({ operation }),
       });
       if (!response.ok) {
-        setOperations(previous);
+        revert();
         setOperationError(await readErrorMessage(response));
         return;
       }
       const body = (await response.json()) as { operations: Operation[] };
       setOperations(body.operations);
     } catch {
-      setOperations(previous);
+      revert();
       setOperationError("Something went wrong. Please try again.");
     } finally {
-      setPendingOperation(null);
+      setPendingOperations((prev) => {
+        const next = new Set(prev);
+        next.delete(operation);
+        return next;
+      });
     }
   }
 
@@ -193,7 +207,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
               <input
                 type="checkbox"
                 checked={operations.includes(operation)}
-                disabled={pendingOperation === operation}
+                disabled={pendingOperations.has(operation)}
                 onChange={(e) => {
                   void handleToggleOperation(operation, e.target.checked);
                 }}

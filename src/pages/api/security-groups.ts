@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase";
 import { jsonError, jsonOk } from "@/lib/api-response";
 import { handleSecurityGroupError } from "@/lib/api/security-group-errors";
 import { createSecurityGroup, listSecurityGroups } from "@/lib/services/security-groups";
+import { requireGroupManage } from "@/lib/api/group-manage-guard";
 
 export const prerender = false;
 
@@ -27,6 +28,9 @@ export const GET: APIRoute = async (context) => {
 };
 
 export const POST: APIRoute = async (context) => {
+  const denied = requireGroupManage(context.locals);
+  if (denied) return denied;
+
   let body: unknown;
   try {
     body = await context.request.json();

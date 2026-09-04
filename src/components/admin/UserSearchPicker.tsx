@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
 import { useDebouncedValue } from "@/components/hooks/useDebouncedValue";
 import { ServerError } from "@/components/auth/ServerError";
@@ -25,10 +25,14 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
   const belowMinimum = trimmedQuery.length < MIN_QUERY_LENGTH;
   const [fetchState, setFetchState] = useState<FetchState>({ status: "loading" });
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
-  const ignoreRef = useRef(false);
-
   useEffect(() => {
-    ignoreRef.current = false;
+    // Per-run controller, not a shared ref: a ref reset at the top of each
+    // effect run is un-set again before the previous run's in-flight request
+    // settles, so a slow response for an older query could overwrite a newer
+    // one. Aborting on cleanup makes the stale run unable to write state at
+    // all, and cancels the request instead of just ignoring its result.
+    const controller = new AbortController();
+
     if (belowMinimum) {
       return;
     }
@@ -36,20 +40,26 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
     void (async () => {
       setFetchState({ status: "loading" });
       try {
-        const response = await fetch(`/api/admin/users?q=${encodeURIComponent(trimmedQuery)}`);
+        const response = await fetch(`/api/admin/users?q=${encodeURIComponent(trimmedQuery)}`, {
+          signal: controller.signal,
+        });
         if (!response.ok) {
-          if (!ignoreRef.current) setFetchState({ status: "error", message: "Failed to search users." });
+          setFetchState({ status: "error", message: "Failed to search users." });
           return;
         }
         const data = (await response.json()) as UserSearchResultDto[];
-        if (!ignoreRef.current) setFetchState({ status: "success", data });
-      } catch {
-        if (!ignoreRef.current) setFetchState({ status: "error", message: "Failed to search users." });
+        setFetchState({ status: "success", data });
+      } catch (error) {
+        // An aborted request is a superseded query, not a failure to report.
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        setFetchState({ status: "error", message: "Failed to search users." });
       }
     })();
 
     return () => {
-      ignoreRef.current = true;
+      controller.abort();
     };
   }, [belowMinimum, trimmedQuery]);
 

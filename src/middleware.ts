@@ -44,7 +44,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
     } = await supabase.auth.getUser();
     context.locals.user = user ?? null;
 
-    context.locals.operations = user && !isAuthRoute ? await resolveCallerOperations(supabase, user.id) : [];
+    // A failure here must not take the whole app down: this signal only
+    // drives rendering (nav entries, not-authorized states), and every route
+    // and RPC keeps its own server-side gate. Falling back to an empty set
+    // fails closed for permissions while leaving the page renderable.
+    let operations: Operation[] = [];
+    if (user && !isAuthRoute) {
+      try {
+        operations = await resolveCallerOperations(supabase, user.id);
+      } catch (error) {
+        console.error("Failed to resolve caller operations", error);
+      }
+    }
+    context.locals.operations = operations;
   } else {
     context.locals.user = null;
     context.locals.operations = [];
