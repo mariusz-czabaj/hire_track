@@ -508,6 +508,13 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      get_group_member_emails: {
+        Args: { target_group_id: number };
+        Returns: {
+          email: string;
+          id: string;
+        }[];
+      };
       get_user_emails_for_candidate: {
         Args: { target_candidate_recruitment_id: number; user_ids: string[] };
         Returns: {

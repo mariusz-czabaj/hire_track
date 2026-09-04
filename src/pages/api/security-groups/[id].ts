@@ -3,30 +3,44 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { jsonError, jsonOk } from "@/lib/api-response";
 import { handleSecurityGroupError } from "@/lib/api/security-group-errors";
-import { createSecurityGroup, listSecurityGroups } from "@/lib/services/security-groups";
+import { getSecurityGroupDetail, renameSecurityGroup } from "@/lib/services/security-groups";
 
 export const prerender = false;
 
-const createGroupSchema = z.object({
+const idParamSchema = z.coerce.number().int().positive();
+
+const renameGroupSchema = z.object({
   name: z.string().trim().min(1).max(100),
 });
 
 export const GET: APIRoute = async (context) => {
+  const parsedId = idParamSchema.safeParse(context.params.id);
+  if (!parsedId.success) {
+    return jsonError(422, "invalid_request", "Invalid security group id");
+  }
+
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
     return jsonError(500, "supabase_unconfigured", "Supabase is not configured");
   }
 
   try {
-    const groups = await listSecurityGroups(supabase);
-    return jsonOk(groups);
+    const group = await getSecurityGroupDetail(supabase, parsedId.data);
+    if (!group) {
+      return jsonError(404, "not_found", "Security group not found");
+    }
+    return jsonOk(group);
   } catch (error) {
-    console.error(error);
-    return jsonError(500, "internal", "Failed to load security groups");
+    return handleSecurityGroupError(error);
   }
 };
 
-export const POST: APIRoute = async (context) => {
+export const PATCH: APIRoute = async (context) => {
+  const parsedId = idParamSchema.safeParse(context.params.id);
+  if (!parsedId.success) {
+    return jsonError(422, "invalid_request", "Invalid security group id");
+  }
+
   let body: unknown;
   try {
     body = await context.request.json();
@@ -34,7 +48,7 @@ export const POST: APIRoute = async (context) => {
     return jsonError(422, "invalid_request", "Request body must be valid JSON");
   }
 
-  const parsed = createGroupSchema.safeParse(body);
+  const parsed = renameGroupSchema.safeParse(body);
   if (!parsed.success) {
     const fields: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
@@ -50,8 +64,8 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
-    const group = await createSecurityGroup(supabase, parsed.data.name);
-    return jsonOk(group, 201);
+    const group = await renameSecurityGroup(supabase, parsedId.data, parsed.data.name);
+    return jsonOk(group);
   } catch (error) {
     return handleSecurityGroupError(error);
   }

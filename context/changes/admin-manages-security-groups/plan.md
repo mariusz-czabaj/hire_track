@@ -691,17 +691,17 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run typecheck`
-- [ ] 3.2 Unit tests pass: `npm run test`
-- [ ] 3.3 Linting passes: `npm run lint`
-- [ ] 3.4 Build succeeds: `npm run build`
+- [x] 3.1 Type checking passes: `npm run typecheck`
+- [x] 3.2 Unit tests pass: `npm run test`
+- [x] 3.3 Linting passes: `npm run lint`
+- [x] 3.4 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 3.5 Every route succeeds as `admin.test@example.com`
-- [ ] 3.6 Every write route returns 403 as `hr.test@example.com`
-- [ ] 3.7 Duplicate group name returns 422, not 500
-- [ ] 3.8 Revoking the last `group.manage` grant returns 422 with `last_admin_required`
+- [x] 3.5 Every route succeeds as `admin.test@example.com`
+- [x] 3.6 Every write route returns 403 as `hr.test@example.com`
+- [x] 3.7 Duplicate group name returns 422, not 500
+- [x] 3.8 Revoking the last `group.manage` grant returns 422 with `last_admin_required`
 
 ### Phase 4: Admin UI
 
