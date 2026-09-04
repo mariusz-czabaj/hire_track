@@ -583,6 +583,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      remove_group_member: {
+        Args: { target_group_id: number; target_user_id: string };
+        Returns: undefined;
+      };
       replace_recruitment_stages: {
         Args: { stage_names: string[]; target_recruitment_id: number };
         Returns: {
@@ -614,6 +618,20 @@ export type Database = {
           isOneToOne: false;
           isSetofReturn: true;
         };
+      };
+      revoke_group_operation: {
+        Args: {
+          target_group_id: number;
+          target_operation: Database["public"]["Enums"]["operation"];
+        };
+        Returns: undefined;
+      };
+      search_users_for_group_management: {
+        Args: { search_term: string };
+        Returns: {
+          email: string;
+          id: string;
+        }[];
       };
       update_default_stages: {
         Args: { stages: Json };
