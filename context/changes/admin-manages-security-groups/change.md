@@ -3,7 +3,7 @@ change_id: admin-manages-security-groups
 title: Administrator manages security groups and users
 roadmap_id: S-07
 milestone_id: first-recruiter-workflow-mvp
-status: implementing
+status: implemented
 created: 2026-09-04
 updated: 2026-09-04
 prd_refs: [FR-017, FR-018]

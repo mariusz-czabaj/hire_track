@@ -737,14 +737,14 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [x] 6.1 Database reseeds cleanly: `npx supabase db reset`
-- [x] 6.2 RLS verification passes: `npm run test:rls`
-- [x] 6.3 Unit tests pass: `npm run test`
-- [x] 6.4 Integration tests pass: `npm run test:integration`
-- [x] 6.5 Linting passes: `npm run lint`
-- [x] 6.6 `grep -r "Rekruter" supabase src` returns nothing
+- [x] 6.1 Database reseeds cleanly: `npx supabase db reset` — 5a598d8
+- [x] 6.2 RLS verification passes: `npm run test:rls` — 5a598d8
+- [x] 6.3 Unit tests pass: `npm run test` — 5a598d8
+- [x] 6.4 Integration tests pass: `npm run test:integration` — 5a598d8
+- [x] 6.5 Linting passes: `npm run lint` — 5a598d8
+- [x] 6.6 `grep -r "Rekruter" supabase src` returns nothing — 5a598d8
 
 #### Manual
 
-- [ ] 6.7 Recruitment form group picker shows the English name
-- [ ] 6.8 A non-reset local database still functions with the old name
+- [x] 6.7 Recruitment form group picker shows the English name — 5a598d8
+- [x] 6.8 A non-reset local database still functions with the old name — 5a598d8
