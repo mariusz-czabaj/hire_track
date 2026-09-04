@@ -1,9 +1,9 @@
 ---
 change_id: candidate-history-search
 title: Candidate database — list, search by name, and cross-recruitment status history
-status: implementing
+status: implemented
 created: 2026-09-03
-updated: 2026-09-03
+updated: 2026-09-04
 archived_at: null
 ---
 

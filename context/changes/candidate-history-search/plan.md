@@ -742,13 +742,13 @@ slice needs. The only database-side change is seed data, which is recreated by
 
 #### Automated
 
-- [x] 5.1 Database policy assertions pass, including (34)
-- [x] 5.2 End-to-end suite passes, including the new spec
-- [x] 5.3 Full unit and integration suites green
-- [x] 5.4 Production build succeeds
-- [x] 5.5 Linting and formatting pass
+- [x] 5.1 Database policy assertions pass, including (34) — 474b28b
+- [x] 5.2 End-to-end suite passes, including the new spec — 474b28b
+- [x] 5.3 Full unit and integration suites green — 474b28b
+- [x] 5.4 Production build succeeds — 474b28b
+- [x] 5.5 Linting and formatting pass — 474b28b
 
 #### Manual
 
-- [ ] 5.6 Complete US-02 walkthrough works in the running app
-- [ ] 5.7 Tenant B walkthrough shows the truncated view as decided
+- [x] 5.6 Complete US-02 walkthrough works in the running app — 474b28b
+- [x] 5.7 Tenant B walkthrough shows the truncated view as decided — 474b28b
