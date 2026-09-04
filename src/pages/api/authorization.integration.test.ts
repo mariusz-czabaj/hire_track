@@ -286,19 +286,28 @@ describe("the unfiltered group list, pinned", () => {
   // security_groups_select is `using (true)` -- any authenticated
   // principal, including one in no group at all, sees the full list.
   // FR-001a needs the list at recruitment-creation time
-  // (core-recruitment-data-foundation/plan.md:163). Asserting the exact
-  // set (not just "it returns something") means an *unintentional*
-  // widening elsewhere is caught, since this exposure is organisational
-  // metadata (group names), not tenant data.
+  // (core-recruitment-data-foundation/plan.md:163). Asserting the four
+  // seeded names as a subset (not exact set equality) means an
+  // *unintentional* widening of who can see the list is still caught,
+  // while tolerating the groups S-07's admin surface creates and cannot
+  // delete (deletion is explicitly out of scope, plan.md's "What We're
+  // NOT Doing") -- exact equality would fail permanently after the first
+  // `POST /api/security-groups` any test or manual session ever runs
+  // against this database.
   it("returns the full group list, including to the no-group principal", async () => {
     const noGroup = await signInIntegrationClient("noGroup");
     const response = await noGroup.fetch("/api/security-groups");
 
     expect(response.status).toBe(200);
     const groups = (await response.json()) as SecurityGroupDto[];
-    const names = groups.map((group) => group.name).sort();
+    const names = groups.map((group) => group.name);
     expect(names).toEqual(
-      ["Administrator", "HR/Rekruter", "Hiring Manager", "Test Fixture -- Tenant B (HR-equivalent)"].sort(),
+      expect.arrayContaining([
+        "Administrator",
+        "HR/Rekruter",
+        "Hiring Manager",
+        "Test Fixture -- Tenant B (HR-equivalent)",
+      ]),
     );
   });
 });

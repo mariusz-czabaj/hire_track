@@ -707,31 +707,31 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run typecheck`
-- [x] 4.2 Unit tests pass: `npm run test`
-- [x] 4.3 Linting passes: `npm run lint`
-- [x] 4.4 Build succeeds: `npm run build`
+- [x] 4.1 Type checking passes: `npm run typecheck` — de9100a
+- [x] 4.2 Unit tests pass: `npm run test` — de9100a
+- [x] 4.3 Linting passes: `npm run lint` — de9100a
+- [x] 4.4 Build succeeds: `npm run build` — de9100a
 
 #### Manual
 
-- [x] 4.5 Full admin lifecycle works in the UI without a manual refresh
-- [x] 4.6 Non-admin sees no Admin link and a not-authorized state at `/admin/groups`
-- [x] 4.7 Signed out, `/admin/groups` redirects to `/auth/signin`
-- [x] 4.8 Last-administrator refusal renders inline
-- [x] 4.9 Layout holds at narrow widths
+- [x] 4.5 Full admin lifecycle works in the UI without a manual refresh — de9100a
+- [x] 4.6 Non-admin sees no Admin link and a not-authorized state at `/admin/groups` — de9100a
+- [x] 4.7 Signed out, `/admin/groups` redirects to `/auth/signin` — de9100a
+- [x] 4.8 Last-administrator refusal renders inline — de9100a
+- [x] 4.9 Layout holds at narrow widths — de9100a
 
 ### Phase 5: Integration tests on the security boundary
 
 #### Automated
 
-- [ ] 5.1 Integration tests pass: `npm run test:integration`
-- [ ] 5.2 Unit tests still pass: `npm run test`
-- [ ] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 Integration tests pass: `npm run test:integration`
+- [x] 5.2 Unit tests still pass: `npm run test`
+- [x] 5.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 5.4 Suite passes from a clean reset and leaves no residual test groups
-- [ ] 5.5 Removing the function guard makes the direct PostgREST test fail
+- [x] 5.4 Suite passes from a clean reset and leaves no residual test groups
+- [x] 5.5 Removing the function guard makes the direct PostgREST test fail
 
 ### Phase 6: Rename seeded group names to English
 
