@@ -676,16 +676,16 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run typecheck`
-- [x] 2.2 Unit tests pass: `npm run test`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Type checking passes: `npm run typecheck` — 7a34c73
+- [x] 2.2 Unit tests pass: `npm run test` — 7a34c73
+- [x] 2.3 Linting passes: `npm run lint` — 7a34c73
 
 #### Manual
 
-- [x] 2.4 `admin.test@example.com` locals contain `group.manage`
-- [x] 2.5 `hr.test@example.com` locals exclude `group.manage`
-- [x] 2.6 `no-group.test@example.com` locals are empty
-- [x] 2.7 No measurable added latency on ordinary page loads
+- [x] 2.4 `admin.test@example.com` locals contain `group.manage` — 7a34c73
+- [x] 2.5 `hr.test@example.com` locals exclude `group.manage` — 7a34c73
+- [x] 2.6 `no-group.test@example.com` locals are empty — 7a34c73
+- [x] 2.7 No measurable added latency on ordinary page loads — 7a34c73
 
 ### Phase 3: Admin API routes and service layer
 
