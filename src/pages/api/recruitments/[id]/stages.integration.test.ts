@@ -71,7 +71,7 @@ describe("GET/PUT/DELETE /api/recruitments/[id]/stages", () => {
   });
 
   it("Hiring Manager (can see the board) is denied with a clean 403", async () => {
-    // group 2 = Hiring Manager -- assigned alongside HR/Rekruter so this
+    // group 2 = Hiring Manager -- assigned alongside HR Recruiter so this
     // recruitment is actually visible (recruitment.read) to the Hiring
     // Manager, exercising the visible-but-no-write 403 path rather than
     // the caller-cannot-see 404 path.

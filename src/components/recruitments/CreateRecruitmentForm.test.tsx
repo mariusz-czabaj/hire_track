@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { CreateRecruitmentForm } from "@/components/recruitments/CreateRecruitmentForm";
 
 const SECURITY_GROUPS = [
-  { id: 1, name: "HR/Rekruter" },
+  { id: 1, name: "HR Recruiter" },
   { id: 2, name: "Hiring Manager" },
 ];
 
@@ -76,7 +76,7 @@ describe("CreateRecruitmentForm", () => {
 
     await fillValidFields(user);
     await waitFor(() => {
-      expect(screen.getByText("HR/Rekruter")).toBeInTheDocument();
+      expect(screen.getByText("HR Recruiter")).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("button", { name: /create recruitment/i }));
@@ -100,9 +100,9 @@ describe("CreateRecruitmentForm", () => {
 
     await fillValidFields(user);
     await waitFor(() => {
-      expect(screen.getByText("HR/Rekruter")).toBeInTheDocument();
+      expect(screen.getByText("HR Recruiter")).toBeInTheDocument();
     });
-    await user.click(screen.getByLabelText("HR/Rekruter"));
+    await user.click(screen.getByLabelText("HR Recruiter"));
 
     await user.click(screen.getByRole("button", { name: /create recruitment/i }));
 

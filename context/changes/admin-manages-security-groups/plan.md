@@ -724,25 +724,25 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [x] 5.1 Integration tests pass: `npm run test:integration`
-- [x] 5.2 Unit tests still pass: `npm run test`
-- [x] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 Integration tests pass: `npm run test:integration` — 8149b4b
+- [x] 5.2 Unit tests still pass: `npm run test` — 8149b4b
+- [x] 5.3 Linting passes: `npm run lint` — 8149b4b
 
 #### Manual
 
-- [x] 5.4 Suite passes from a clean reset and leaves no residual test groups
-- [x] 5.5 Removing the function guard makes the direct PostgREST test fail
+- [x] 5.4 Suite passes from a clean reset and leaves no residual test groups — 8149b4b
+- [x] 5.5 Removing the function guard makes the direct PostgREST test fail — 8149b4b
 
 ### Phase 6: Rename seeded group names to English
 
 #### Automated
 
-- [ ] 6.1 Database reseeds cleanly: `npx supabase db reset`
-- [ ] 6.2 RLS verification passes: `npm run test:rls`
-- [ ] 6.3 Unit tests pass: `npm run test`
-- [ ] 6.4 Integration tests pass: `npm run test:integration`
-- [ ] 6.5 Linting passes: `npm run lint`
-- [ ] 6.6 `grep -r "Rekruter" supabase src` returns nothing
+- [x] 6.1 Database reseeds cleanly: `npx supabase db reset`
+- [x] 6.2 RLS verification passes: `npm run test:rls`
+- [x] 6.3 Unit tests pass: `npm run test`
+- [x] 6.4 Integration tests pass: `npm run test:integration`
+- [x] 6.5 Linting passes: `npm run lint`
+- [x] 6.6 `grep -r "Rekruter" supabase src` returns nothing
 
 #### Manual
 

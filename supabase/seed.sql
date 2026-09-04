@@ -10,26 +10,26 @@
 -- appended below the PRD's three example groups. Appended, not
 -- interleaved, so every pre-existing ordinal group-id reference (e.g.
 -- `groupIds: [1]`, `groupIds: [1, 2]` in integration tests and e2e
--- specs) keeps working unchanged -- HR/Rekruter=1, Hiring Manager=2,
+-- specs) keeps working unchanged -- HR Recruiter=1, Hiring Manager=2,
 -- Administrator=3, the new group=4.
 
 -- Security groups (PRD Access Control: "Przykładowe grupy"), plus one
 -- authorization test fixture appended last (see note above).
 insert into security_groups (name) values
-  ('HR/Rekruter'),
+  ('HR Recruiter'),
   ('Hiring Manager'),
   ('Administrator'),
   ('Test Fixture -- Tenant B (HR-equivalent)');
 
 -- Operation grants per group. The fixture group holds the *same*
--- operations as HR/Rekruter -- it exists to prove tenancy isolation
+-- operations as HR Recruiter -- it exists to prove tenancy isolation
 -- (same powers, different recruitment), not privilege isolation, which
 -- the Administrator's `group.manage`-only grant already covers below.
 insert into group_operations (group_id, operation) values
-  ((select id from security_groups where name = 'HR/Rekruter'), 'recruitment.read'),
-  ((select id from security_groups where name = 'HR/Rekruter'), 'recruitment.write'),
-  ((select id from security_groups where name = 'HR/Rekruter'), 'candidate.read'),
-  ((select id from security_groups where name = 'HR/Rekruter'), 'candidate.write'),
+  ((select id from security_groups where name = 'HR Recruiter'), 'recruitment.read'),
+  ((select id from security_groups where name = 'HR Recruiter'), 'recruitment.write'),
+  ((select id from security_groups where name = 'HR Recruiter'), 'candidate.read'),
+  ((select id from security_groups where name = 'HR Recruiter'), 'candidate.write'),
   ((select id from security_groups where name = 'Hiring Manager'), 'recruitment.read'),
   ((select id from security_groups where name = 'Hiring Manager'), 'candidate.read'),
   ((select id from security_groups where name = 'Administrator'), 'group.manage'),
@@ -82,7 +82,7 @@ insert into auth.users (
     now(), '{"provider":"email","providers":["email"]}', '{}',
     now(), now(), '', '', '', ''
   ),
-  -- Tenant-peer principal: same operations as HR/Rekruter, but its only
+  -- Tenant-peer principal: same operations as HR Recruiter, but its only
   -- group membership is the Tenant B fixture group, which is attached
   -- to a *different* recruitment. Denials this principal receives on
   -- the Backend Engineer recruitment are attributable to tenancy alone,
@@ -172,7 +172,7 @@ values
   );
 
 insert into group_memberships (group_id, user_id) values
-  ((select id from security_groups where name = 'HR/Rekruter'), '11111111-1111-1111-1111-111111111111'),
+  ((select id from security_groups where name = 'HR Recruiter'), '11111111-1111-1111-1111-111111111111'),
   ((select id from security_groups where name = 'Hiring Manager'), '22222222-2222-2222-2222-222222222222'),
   ((select id from security_groups where name = 'Administrator'), '33333333-3333-3333-3333-333333333333'),
   ((select id from security_groups where name = 'Test Fixture -- Tenant B (HR-equivalent)'), '44444444-4444-4444-4444-444444444444'),
@@ -180,7 +180,7 @@ insert into group_memberships (group_id, user_id) values
   ((select id from security_groups where name = 'Hiring Manager'), '66666666-6666-6666-6666-666666666666'),
   ((select id from security_groups where name = 'Test Fixture -- Tenant B (HR-equivalent)'), '66666666-6666-6666-6666-666666666666');
 
--- One seeded recruitment, visible to both HR/Rekruter (full access) and
+-- One seeded recruitment, visible to both HR Recruiter (full access) and
 -- Hiring Manager (read-only) -- a hiring manager overseeing an HR-run
 -- recruitment is the realistic scenario the RLS verification exercises.
 insert into recruitments (title, location, department, employment_type, opened_at, status) values
@@ -189,7 +189,7 @@ insert into recruitments (title, location, department, employment_type, opened_a
 insert into recruitment_security_groups (recruitment_id, group_id) values
   (
     (select id from recruitments where title = 'Backend Engineer'),
-    (select id from security_groups where name = 'HR/Rekruter')
+    (select id from security_groups where name = 'HR Recruiter')
   ),
   (
     (select id from recruitments where title = 'Backend Engineer'),

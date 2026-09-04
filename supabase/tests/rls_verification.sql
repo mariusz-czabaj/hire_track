@@ -128,7 +128,7 @@ declare
   v_group_id bigint;
   v_recruitment public.recruitments;
 begin
-  select id into v_group_id from security_groups where name = 'HR/Rekruter';
+  select id into v_group_id from security_groups where name = 'HR Recruiter';
   select * into v_recruitment from public.create_recruitment(
     'RLS Test Recruitment',
     'Engineering',
@@ -222,7 +222,7 @@ end $$;
 rollback;
 
 -- (10) S-03: the seeded HR user inserts an override stage row on the
--- seeded recruitment (which they are linked to via HR/Rekruter) -- allowed.
+-- seeded recruitment (which they are linked to via HR Recruiter) -- allowed.
 begin;
 select set_config(
   'request.jwt.claims',
@@ -675,7 +675,7 @@ begin
   returning id into v_new_recruitment_id;
 
   insert into recruitment_security_groups (recruitment_id, group_id)
-  values (v_new_recruitment_id, (select id from security_groups where name = 'HR/Rekruter'));
+  values (v_new_recruitment_id, (select id from security_groups where name = 'HR Recruiter'));
 
   perform set_config(
     'request.jwt.claims',
@@ -720,7 +720,7 @@ begin
   returning id into v_new_recruitment_id;
 
   insert into recruitment_security_groups (recruitment_id, group_id)
-  values (v_new_recruitment_id, (select id from security_groups where name = 'HR/Rekruter'));
+  values (v_new_recruitment_id, (select id from security_groups where name = 'HR Recruiter'));
 
   perform set_config(
     'request.jwt.claims',

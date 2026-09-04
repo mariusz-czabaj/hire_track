@@ -304,7 +304,7 @@ describe("the unfiltered group list, pinned", () => {
     expect(names).toEqual(
       expect.arrayContaining([
         "Administrator",
-        "HR/Rekruter",
+        "HR Recruiter",
         "Hiring Manager",
         "Test Fixture -- Tenant B (HR-equivalent)",
       ]),
@@ -473,7 +473,7 @@ describe("#5 write surface: non-member denial across all seven write verbs", () 
     const backendEngineerId = await recruitmentIdByTitle(hr, "Backend Engineer");
     const annaId = await candidateRecruitmentIdByName(hr, backendEngineerId, "Anna Kowalska");
     const newStageId = await stageIdByName(hr, backendEngineerId, "New");
-    const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+    const hrGroupId = await securityGroupIdByName(hr, "HR Recruiter");
     const probeMarker = `write-denial-probe-${Math.random().toString(36).slice(2)}`;
 
     const principal = await signInIntegrationClient(testCase.principal);
@@ -657,7 +657,7 @@ describe("#5 write surface: service-layer pre-checks (HTTP-only, invisible to SQ
 
   it("PUT notes 422s with a stageId from another recruitment's resolved stage set", async () => {
     const hr = await signInIntegrationClient("hr");
-    const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+    const hrGroupId = await securityGroupIdByName(hr, "HR Recruiter");
 
     // A throwaway, test-created recruitment (never a seeded one -- see
     // plan.md Phase 4's discipline, applied here too since it also
@@ -737,7 +737,7 @@ describe("#5 write surface: service-layer pre-checks (HTTP-only, invisible to SQ
   describe("known gap: move_candidate_stage's to_stage_id is not scoped to the recruitment's own stage set", () => {
     it("moving to a foreign recruitment's override stage is rejected by the consistency trigger", async () => {
       const hr = await signInIntegrationClient("hr");
-      const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+      const hrGroupId = await securityGroupIdByName(hr, "HR Recruiter");
 
       const createA = await hr.fetch("/api/recruitments", {
         method: "POST",
@@ -808,7 +808,7 @@ describe("#5 write surface: service-layer pre-checks (HTTP-only, invisible to SQ
 
     it("moving to a global default stage id is accepted unconditionally, regardless of the recruitment's own override set", async () => {
       const hr = await signInIntegrationClient("hr");
-      const hrGroupId = await securityGroupIdByName(hr, "HR/Rekruter");
+      const hrGroupId = await securityGroupIdByName(hr, "HR Recruiter");
 
       const createResponse = await hr.fetch("/api/recruitments", {
         method: "POST",
@@ -895,7 +895,7 @@ describe("characterization (not a specification): unscoped recruitment_security_
     // recruitment doesn't exist yet, so the caller cannot already be scoped
     // to it.
     const tenantPeer = await signInIntegrationClient("tenantPeer");
-    const hrGroupId = await securityGroupIdByName(tenantPeer, "HR/Rekruter");
+    const hrGroupId = await securityGroupIdByName(tenantPeer, "HR Recruiter");
 
     const response = await tenantPeer.fetch("/api/recruitments", {
       method: "POST",
