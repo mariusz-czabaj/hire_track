@@ -15,6 +15,38 @@ export type RecruitmentStatus = z.infer<typeof recruitmentStatusSchema>;
 export const employmentTypeSchema = z.enum(["full-time", "part-time", "contract", "internship"]);
 export type EmploymentType = z.infer<typeof employmentTypeSchema>;
 
+// `operation` is a genuine Postgres enum (`operation` type), but the
+// generated Database type does not surface enum members as a reusable list
+// for zod/UI consumption. This enum is the single source of truth for the
+// five values across DTO typing, endpoint validation, and UI checkboxes.
+// Any migration altering the `operation` enum must update this in the same
+// commit.
+export const operationSchema = z.enum([
+  "recruitment.read",
+  "recruitment.write",
+  "candidate.read",
+  "candidate.write",
+  "group.manage",
+]);
+export type Operation = z.infer<typeof operationSchema>;
+
+export interface SecurityGroupMemberDto {
+  userId: string;
+  email: string;
+}
+
+export interface SecurityGroupDetailDto {
+  id: number;
+  name: string;
+  operations: Operation[];
+  members: SecurityGroupMemberDto[];
+}
+
+export interface UserSearchResultDto {
+  id: string;
+  email: string;
+}
+
 export interface CreateRecruitmentCommand {
   title: string;
   department: string;

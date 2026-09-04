@@ -661,31 +661,31 @@ data is involved, since these groups are seed fixtures rather than user data.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly: `npx supabase db reset`
-- [ ] 1.2 Regenerated types compile: `npm run db:types && npm run typecheck`
-- [x] 1.3 Existing RLS verification still passes: `npm run test:rls`
-- [x] 1.4 Linting passes: `npm run lint`
+- [x] 1.1 Migration applies cleanly: `npx supabase db reset` — 156c875
+- [x] 1.2 Regenerated types compile: `npm run db:types && npm run typecheck` — 156c875
+- [x] 1.3 Existing RLS verification still passes: `npm run test:rls` — 156c875
+- [x] 1.4 Linting passes: `npm run lint` — 156c875
 
 #### Manual
 
-- [x] 1.5 Non-admin PostgREST call to the search function returns 42501
-- [x] 1.6 Short or empty search term returns no rows
-- [x] 1.7 Revoking `group.manage` from the Administrator group is refused with PA006
+- [x] 1.5 Non-admin PostgREST call to the search function returns 42501 — 156c875
+- [x] 1.6 Short or empty search term returns no rows — 156c875
+- [x] 1.7 Revoking `group.manage` from the Administrator group is refused with PA006 — 156c875
 
 ### Phase 2: Caller-operations signal
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run typecheck`
-- [ ] 2.2 Unit tests pass: `npm run test`
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Type checking passes: `npm run typecheck`
+- [x] 2.2 Unit tests pass: `npm run test`
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 `admin.test@example.com` locals contain `group.manage`
-- [ ] 2.5 `hr.test@example.com` locals exclude `group.manage`
-- [ ] 2.6 `no-group.test@example.com` locals are empty
-- [ ] 2.7 No measurable added latency on ordinary page loads
+- [x] 2.4 `admin.test@example.com` locals contain `group.manage`
+- [x] 2.5 `hr.test@example.com` locals exclude `group.manage`
+- [x] 2.6 `no-group.test@example.com` locals are empty
+- [x] 2.7 No measurable added latency on ordinary page loads
 
 ### Phase 3: Admin API routes and service layer
 

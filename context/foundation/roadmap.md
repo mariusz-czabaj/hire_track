@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 1
 status: draft
 created: 2026-08-27
-updated: 2026-09-03
+updated: 2026-09-04
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -48,7 +48,7 @@ Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia 
 | S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu)           | S-01, S-02    | FR-006, FR-008, FR-009, FR-013, Business Logic                      | in-progress |
 | S-05 | candidate-profile-and-cv-upload    | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach               | S-04          | FR-011, FR-012, FR-013a, NFR-retencja                               | in-progress |
 | S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01    | US-02, FR-014, FR-015, FR-016                                       | in-progress |
-| S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | F-01          | FR-017, FR-018                                                      | proposed    |
+| S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | F-01          | FR-017, FR-018                                                      | in-progress |
 
 ## Streams
 
@@ -172,7 +172,7 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Nie blokuje głównej pętli rekrutera (S-01…S-06 działają na grupach zasianych ręcznie/manualnie przez F-01), więc przy celu `speed` i blokerze `time` jest sekwencjonowany później — ale to wciąż wycinek must-have, nie Parked, i może być dowożony równolegle przez osobnego agenta/branch od razu po F-01.
-- **Status:** proposed
+- **Status:** in-progress
 
 ## Backlog Handoff
 
