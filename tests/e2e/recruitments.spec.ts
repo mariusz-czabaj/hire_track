@@ -118,7 +118,7 @@ test.describe("HR creates a recruitment and manages its status", () => {
     const departmentInput = page.getByLabel("Department");
     const locationInput = page.getByLabel("Location");
     const openedAtInput = page.getByLabel("Opened date");
-    const groupCheckbox = page.getByLabel("HR/Rekruter");
+    const groupCheckbox = page.getByLabel("HR Recruiter");
 
     // CreateRecruitmentForm is a client:load island -- same hydration race
     // as SignInForm (see support/auth.ts): retry until values actually

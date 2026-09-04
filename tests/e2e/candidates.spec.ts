@@ -6,7 +6,7 @@ let recruitmentId: number;
 test.beforeAll(async ({ browser }) => {
   // Seed a dedicated recruitment so this spec never touches S-01's seeded
   // "Backend Engineer" recruitment (whose board STAGE_ORDER and 5-candidate
-  // count recruitments.spec.ts asserts on). Group 1 is "HR/Rekruter" and
+  // count recruitments.spec.ts asserts on). Group 1 is "HR Recruiter" and
   // group 2 is "Hiring Manager" (seed.sql insertion order) -- both are
   // needed so the hiring-manager case below can see this recruitment at all.
   const context = await browser.newContext();

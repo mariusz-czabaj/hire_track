@@ -20,7 +20,7 @@ test.describe("Candidates history search", () => {
     await page.getByTestId("candidate-list").getByText("Julia Wojcik").click();
     await expect(page).toHaveURL(/\/candidates\/\d+$/);
 
-    // HR/Rekruter (Tenant A) is not a member of the Tenant B fixture group
+    // HR Recruiter (Tenant A) is not a member of the Tenant B fixture group
     // that Data Analyst is scoped to -- this is the truncation boundary
     // itself, not an oversight: only Backend Engineer is visible here.
     await expect(page.getByText("Backend Engineer")).toBeVisible();
