@@ -16,7 +16,7 @@ Earlier slices built ahead for this one. The `candidate_recruitment_status_histo
 existed since F-01 with a read index annotated "S-06's per-candidate history query", a trigram
 index sits on `candidates.full_name` tagged for S-06, and S-05 shipped `/candidates/:candidateId`
 explicitly so this slice would inherit rather than rework it. `getCandidateProfile` already
-returns each recruitment with its *current* stage — so FR-016 is roughly half-built. But no
+returns each recruitment with its _current_ stage — so FR-016 is roughly half-built. But no
 application code has ever read the history table, there is no candidates list or search endpoint,
 and the repo has never had pagination or a debounce hook.
 
@@ -29,16 +29,16 @@ group sees the same candidate's identity but none of that recruitment's stages, 
 
 ## Key Decisions Made
 
-| Decision | Choice | Why | Source |
-| --- | --- | --- | --- |
-| FR-016 vs RLS scope | Silent truncation — show only visible recruitments, no count, no notice | Strictest reading of the PRD guardrail; a withheld count is itself a disclosure and would need a `SECURITY DEFINER` function, this repo's most repeated defect class | Plan |
-| Bounding the global list | Result cap plus a "refine your search" signal | Honours the 2s NFR with no new UI component and no cursor contract; search-first UX means users narrow rather than page | Plan |
-| Search strategy | Case-insensitive substring on `full_name`, two-character floor | Exactly what FR-015 asks; rides the trigram index F-01 planted; no migration | Plan |
-| Actor attribution | Deferred, with the widening scoped as a follow-up | FR-016 requires the log, not the actor; showing it re-touches the RPC whose predecessor leaked every account's email | Plan |
-| History delivery | Extend the existing profile GET with `history[]` | One round-trip, one authorization surface; S-05 built this route for S-06 to inherit | Plan |
-| Fixtures | One cross-tenant candidate in both tenants with multi-step history | A single fixture proves the multi-recruitment log *and* serves as the Risk #4 truncation probe from both sides | Plan |
-| List sort order | Alphabetical by `full_name`, `id` as tiebreak | Deterministic, so tests assert order without global counts | Plan |
-| Authorization | Inherited entirely from existing RLS; no migration, no new RPC | `candidate.read` and the current policies already express this visibility exactly | Research |
+| Decision                 | Choice                                                                  | Why                                                                                                                                                                  | Source   |
+| ------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| FR-016 vs RLS scope      | Silent truncation — show only visible recruitments, no count, no notice | Strictest reading of the PRD guardrail; a withheld count is itself a disclosure and would need a `SECURITY DEFINER` function, this repo's most repeated defect class | Plan     |
+| Bounding the global list | Result cap plus a "refine your search" signal                           | Honours the 2s NFR with no new UI component and no cursor contract; search-first UX means users narrow rather than page                                              | Plan     |
+| Search strategy          | Case-insensitive substring on `full_name`, two-character floor          | Exactly what FR-015 asks; rides the trigram index F-01 planted; no migration                                                                                         | Plan     |
+| Actor attribution        | Deferred, with the widening scoped as a follow-up                       | FR-016 requires the log, not the actor; showing it re-touches the RPC whose predecessor leaked every account's email                                                 | Plan     |
+| History delivery         | Extend the existing profile GET with `history[]`                        | One round-trip, one authorization surface; S-05 built this route for S-06 to inherit                                                                                 | Plan     |
+| Fixtures                 | One cross-tenant candidate in both tenants with multi-step history      | A single fixture proves the multi-recruitment log _and_ serves as the Risk #4 truncation probe from both sides                                                       | Plan     |
+| List sort order          | Alphabetical by `full_name`, `id` as tiebreak                           | Deterministic, so tests assert order without global counts                                                                                                           | Plan     |
+| Authorization            | Inherited entirely from existing RLS; no migration, no new RPC          | `candidate.read` and the current policies already express this visibility exactly                                                                                    | Research |
 
 ## Scope
 
@@ -65,13 +65,13 @@ and the URL.
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Cross-tenant seed fixture | A candidate in both tenants with multi-step history | Seed changes affect every existing suite — sequenced first so blast radius surfaces immediately |
-| 2. Status history on the profile | `history[]` on the profile DTO, read for the first time | Extends a shipped DTO; the two stage joins need disambiguated aliases |
-| 3. Candidates list and search API | `GET /api/candidates?q=` with cap and ordering | Unescaped wildcards in user input would turn a search into a full scan |
-| 4. Candidates UI | `/candidates` page, debounced search island, log rendering | No `input` component and no debounce hook exist yet; both are new ground |
-| 5. Gate closure | RLS assertion (34), e2e spec, cookbook, decision record | Easy to under-deliver on tests once the feature visibly works |
+| Phase                             | What it delivers                                           | Key risk                                                                                        |
+| --------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 1. Cross-tenant seed fixture      | A candidate in both tenants with multi-step history        | Seed changes affect every existing suite — sequenced first so blast radius surfaces immediately |
+| 2. Status history on the profile  | `history[]` on the profile DTO, read for the first time    | Extends a shipped DTO; the two stage joins need disambiguated aliases                           |
+| 3. Candidates list and search API | `GET /api/candidates?q=` with cap and ordering             | Unescaped wildcards in user input would turn a search into a full scan                          |
+| 4. Candidates UI                  | `/candidates` page, debounced search island, log rendering | No `input` component and no debounce hook exist yet; both are new ground                        |
+| 5. Gate closure                   | RLS assertion (34), e2e spec, cookbook, decision record    | Easy to under-deliver on tests once the feature visibly works                                   |
 
 **Prerequisites:** F-01 and S-04 shipped (both are); a local Supabase stack for integration, RLS
 and e2e runs. S-05 is parallel, not blocking, though its route family is what Phase 2 extends.

@@ -1032,4 +1032,81 @@ begin
 end $$;
 rollback;
 
+-- (34) S-06: candidate_recruitment_status_history SELECT is scoped per
+-- security group, not org-wide like candidates. For the Julia Wojcik
+-- cross-tenant fixture, the Tenant A (HR) principal sees only the
+-- Backend Engineer history rows and the Tenant B principal sees only
+-- the Data Analyst history rows -- proved in both directions.
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '11111111-1111-1111-1111-111111111111', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_backend_count int;
+  v_data_analyst_count int;
+begin
+  select count(*) into v_backend_count
+  from candidate_recruitment_status_history h
+  join candidate_recruitments cr on cr.id = h.candidate_recruitment_id
+  join recruitments r on r.id = cr.recruitment_id
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'julia.wojcik@example.com' and r.title = 'Backend Engineer';
+
+  select count(*) into v_data_analyst_count
+  from candidate_recruitment_status_history h
+  join candidate_recruitments cr on cr.id = h.candidate_recruitment_id
+  join recruitments r on r.id = cr.recruitment_id
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'julia.wojcik@example.com' and r.title = 'Data Analyst';
+
+  if v_backend_count = 0 then
+    raise exception 'FAIL: Tenant A principal sees no Backend Engineer history rows for the cross-tenant candidate';
+  end if;
+
+  if v_data_analyst_count <> 0 then
+    raise exception 'FAIL: Tenant A principal sees % Data Analyst history rows it should not', v_data_analyst_count;
+  end if;
+end $$;
+rollback;
+
+begin;
+select set_config(
+  'request.jwt.claims',
+  json_build_object('sub', '44444444-4444-4444-4444-444444444444', 'role', 'authenticated')::text,
+  true
+);
+set local role authenticated;
+do $$
+declare
+  v_backend_count int;
+  v_data_analyst_count int;
+begin
+  select count(*) into v_backend_count
+  from candidate_recruitment_status_history h
+  join candidate_recruitments cr on cr.id = h.candidate_recruitment_id
+  join recruitments r on r.id = cr.recruitment_id
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'julia.wojcik@example.com' and r.title = 'Backend Engineer';
+
+  select count(*) into v_data_analyst_count
+  from candidate_recruitment_status_history h
+  join candidate_recruitments cr on cr.id = h.candidate_recruitment_id
+  join recruitments r on r.id = cr.recruitment_id
+  join candidates c on c.id = cr.candidate_id
+  where c.email = 'julia.wojcik@example.com' and r.title = 'Data Analyst';
+
+  if v_data_analyst_count = 0 then
+    raise exception 'FAIL: Tenant B principal sees no Data Analyst history rows for the cross-tenant candidate';
+  end if;
+
+  if v_backend_count <> 0 then
+    raise exception 'FAIL: Tenant B principal sees % Backend Engineer history rows it should not', v_backend_count;
+  end if;
+end $$;
+rollback;
+
 select 'RLS verification passed' as result;

@@ -78,19 +78,20 @@ context/foundation/test-plan.md (§3 Phased Rollout)
 
 ### Task Router — Where to start
 
-| Skill / Prompt | Use it when |
-| --- | --- |
-| `/10x-research` | Before writing any test for a risk. Research produces the oracle — what behaviour a test must prove — from sources (PRD, tech-stack, docs), not from the implementation shape. Also reveals whether a risk is already covered or has two separate faces (one safe, one real). |
-| `/10x-plan` | Research is done. Plan decomposes the risk into ordered phases: environment setup first, then rules that depend on it, then hermetic stubs for failures that real infra cannot trigger, then cookbook update. Each phase names the behaviour it asserts and the regression it catches. |
-| `/10x-implement` | Default executor for plan phases. Use for environment setup, existing code, scaffolding, and any phase where you cannot define a red test before writing code. |
-| `/10x-tdd` | Optional. Use instead of `/10x-implement` for a phase where you can name the first red test in one sentence. Agent writes the failing test first, then the minimal code to green it, then refactors. Stops at the assertion before touching the implementation — that pause is the point. |
+| Skill / Prompt               | Use it when                                                                                                                                                                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/10x-research`              | Before writing any test for a risk. Research produces the oracle — what behaviour a test must prove — from sources (PRD, tech-stack, docs), not from the implementation shape. Also reveals whether a risk is already covered or has two separate faces (one safe, one real).                     |
+| `/10x-plan`                  | Research is done. Plan decomposes the risk into ordered phases: environment setup first, then rules that depend on it, then hermetic stubs for failures that real infra cannot trigger, then cookbook update. Each phase names the behaviour it asserts and the regression it catches.            |
+| `/10x-implement`             | Default executor for plan phases. Use for environment setup, existing code, scaffolding, and any phase where you cannot define a red test before writing code.                                                                                                                                    |
+| `/10x-tdd`                   | Optional. Use instead of `/10x-implement` for a phase where you can name the first red test in one sentence. Agent writes the failing test first, then the minimal code to green it, then refactors. Stops at the assertion before touching the implementation — that pause is the point.         |
 | `m3l2-ad-hoc-testing` prompt | You have a single file and want tests now, without the full research→plan→implement cycle. The prompt forces oracle-from-sources (reads PRD + TECH_STACK before asserting), behavioural assertions, edge cases from risk, and a regression table. Use it knowing you are trading depth for speed. |
 
 ### When to use `/10x-tdd` vs `/10x-implement`
 
-The deciding question: *Can you name the first red test in one sentence?*
+The deciding question: _Can you name the first red test in one sentence?_
 
 Good conditions for `/10x-tdd`:
+
 - "promuje wyłącznie drafty w stanie `accepted`, a `pending`/`rejected` nigdy nie trafiają do talii"
 - "zwraca `ok: true` i loguje `orphan_review_state`, gdy upsert stanu powtórek padnie w trakcie zapisu"
 - "zwraca 401, gdy użytkownik nie ma dostępu do kursu"
@@ -115,33 +116,34 @@ Both write progress to the same `## Progress` section in `plan.md`.
 
 For each risk, pick the **cheapest test that gives a real signal**. Do not default to e2e "because it's safest", and do not chase coverage percentage.
 
-| Layer | When to use | When NOT to use |
-| --- | --- | --- |
+| Layer                              | When to use                                                                                              | When NOT to use                                                                                          |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Integration (real DB / real infra) | The rule involves DB constraints, cascades, real SQL, or unique constraints that a mock would lie about. | Auth flows gated by RLS that belong to a separate phase; anything where setup cost exceeds signal value. |
-| Hermetic (stub client) | Partial failures that real infra cannot trigger easily (e.g. second operation in a sequence fails). | Rules that depend on actual DB state — a stub will lie about constraint violations and cascades. |
+| Hermetic (stub client)             | Partial failures that real infra cannot trigger easily (e.g. second operation in a sequence fails).      | Rules that depend on actual DB state — a stub will lie about constraint violations and cascades.         |
 
 A non-atomic save sequence (multiple independent operations without a transaction) means: write hermetic tests for partial-failure branches, not integration tests that force a mid-sequence error.
 
 ### Oracle rules
 
-- The oracle — what the code *should* do — must come from sources: PRD, docs, tech-stack constraints, domain knowledge. It must **not** come from reading the implementation.
+- The oracle — what the code _should_ do — must come from sources: PRD, docs, tech-stack constraints, domain knowledge. It must **not** come from reading the implementation.
 - If the implementation has a bug, copying its output as the expected value produces a mirror test that passes against the bug.
 - When sources do not resolve the expected behaviour unambiguously, **stop and ask** rather than guessing.
 - Research's job is to surface the oracle before any test is written.
 
 ### Vibe-testing anti-patterns to avoid
 
-| Anti-pattern | How it looks | What to do instead |
-| --- | --- | --- |
+| Anti-pattern          | How it looks                                                                  | What to do instead                                                                               |
+| --------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Mirror implementation | Assertion computes the expected value with the same logic as the tested code. | Assert against a value derived from the oracle (PRD / domain rule), not from the implementation. |
-| Happy paths only | Tests only pass valid inputs; edge cases absent. | Add at least one edge case per risk: `null`, empty, dependency error, invalid input. |
-| Redundant copies | Six nearly identical tests checking the same absence of a sentinel. | One parameterised test (`it.each`) per property; each test catches a different regression. |
+| Happy paths only      | Tests only pass valid inputs; edge cases absent.                              | Add at least one edge case per risk: `null`, empty, dependency error, invalid input.             |
+| Redundant copies      | Six nearly identical tests checking the same absence of a sentinel.           | One parameterised test (`it.each`) per property; each test catches a different regression.       |
 
 ### Mutation testing (Stryker) — selective quality gate
 
 Coverage says "this line was executed". Mutation score says "would a test fail if I broke this line?" Use Stryker as a **selective gate** after a risk phase, not as a CI gate on every commit.
 
 Workflow:
+
 1. Tests pass for the risk phase.
 2. Run `npx stryker run --mutate "path/to/file.ts"` (narrow scope to the changed module).
 3. Open the HTML report; find survived mutants.

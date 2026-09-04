@@ -43,7 +43,7 @@ one history row, so nothing currently demonstrates the behaviour FR-016 exists f
 
 A signed-in user holding `candidate.read` can open **Candidates** from the app, type part of a
 name, and see matching candidates ordered alphabetically. Opening one shows their profile with
-every recruitment they took part in *that the viewer's security groups permit*, and under each,
+every recruitment they took part in _that the viewer's security groups permit_, and under each,
 the complete ordered log of stage transitions with dates. A viewer in a different security group
 sees the same candidate's identity but none of that recruitment's stages, dates, or history.
 
@@ -57,7 +57,7 @@ all green, plus manual walkthrough of search → profile → history in the runn
   (`supabase/migrations/20260831183457_rls_policies.sql:179`), while `candidate_recruitments` and
   the history table are scoped per security group (`:194`, `:210`). F-01's plan justified the
   org-wide scope by citing FR-015/FR-016 directly. So FR-016's "all recruitments" is necessarily
-  the *visible subset*, and that is the test oracle — never "every row".
+  the _visible subset_, and that is the test oracle — never "every row".
 - **History stage names must be joined directly** from `kanban_stages` on `from_stage_id` /
   `to_stage_id`, not re-resolved through `resolveKanbanStages`. A recruitment's stage set may
   have been replaced since a transition; the referenced-stage guard
@@ -66,7 +66,7 @@ all green, plus manual walkthrough of search → profile → history in the runn
 - **`from_stage_id` is null on the initial add** (`add_candidate_to_recruitment`,
   `supabase/migrations/20260901210500_candidate_write_rpcs.sql:103`), so the first log entry has
   no source stage and must render as an "added" event.
-- **A history row's note is keyed on the stage being *left*.** S-04's gate requires a note on the
+- **A history row's note is keyed on the stage being _left_.** S-04's gate requires a note on the
   source stage, so a history row joins its note by `(candidate_recruitment_id, from_stage_id)`.
   This plan does not surface notes, but the pairing is recorded so a future reader does not join
   on `to_stage_id`.
@@ -320,7 +320,7 @@ total and assertable. Fetches `cap + 1` rows to detect truncation, returns at mo
 sets the truncation flag accordingly — this avoids a separate count query.
 
 The per-candidate recruitment count comes from the caller's RLS-scoped view, so it is the
-*visible* count and is consistent with the profile's silent truncation. Escape `%` and `_` in the
+_visible_ count and is consistent with the profile's silent truncation. Escape `%` and `_` in the
 user-supplied query before interpolating it into the pattern, or the input becomes a wildcard
 injection that turns a search into a full scan.
 
@@ -361,7 +361,7 @@ cookbook's §6.2 carve-out requires — so a missing endpoint stays visible by i
 
 **Contract**: Under the existing `#4 shared candidate profile` risk grouping, `it` titles phrased
 as claims about a principal: a principal holding `candidate.read` finds the cross-tenant
-candidate by name regardless of group (the org-wide half); a principal *without* `candidate.read`
+candidate by name regardless of group (the org-wide half); a principal _without_ `candidate.read`
 receives no rows (the denial half), paired with a read-back by a legitimate principal proving the
 candidate still exists. Assert the effect, not a specific SQLSTATE.
 
@@ -372,7 +372,7 @@ candidate still exists. Assert the effect, not a specific SQLSTATE.
 **Intent**: Prove search and bounding against a live database.
 
 **Contract**: A search for a distinctive fragment of the Phase 1 candidate's surname returns that
-candidate; a search matching a first-name fragment returns them too (FR-015 says first *or* last
+candidate; a search matching a first-name fragment returns them too (FR-015 says first _or_ last
 name and the column is a single `full_name`); a nonsense query returns an empty list with a 200,
 not a 404; results are alphabetically ordered. Create any additional fixtures locally with
 randomised names, and **assert on the presence and relative order of known candidates, never on
@@ -725,28 +725,28 @@ slice needs. The only database-side change is seed data, which is recreated by
 
 #### Automated
 
-- [x] 4.1 Types check
-- [x] 4.2 Unit and component tests pass
-- [x] 4.3 Linting passes, including the jsx-a11y rules
-- [x] 4.4 Formatting is clean
+- [x] 4.1 Types check — 70b5a1b
+- [x] 4.2 Unit and component tests pass — 70b5a1b
+- [x] 4.3 Linting passes, including the jsx-a11y rules — 70b5a1b
+- [x] 4.4 Formatting is clean — 70b5a1b
 
 #### Manual
 
-- [x] 4.5 Candidates reachable from app navigation; alphabetical list renders
-- [x] 4.6 Search narrows, address bar updates, reload restores the filtered view
-- [x] 4.7 Fast typing issues roughly one request, not one per keystroke
-- [x] 4.8 Candidate profile shows ordered transitions with a leading "Added to …" entry
-- [x] 4.9 Renders correctly at mobile width and in the dark theme
+- [x] 4.5 Candidates reachable from app navigation; alphabetical list renders — 70b5a1b
+- [x] 4.6 Search narrows, address bar updates, reload restores the filtered view — 70b5a1b
+- [x] 4.7 Fast typing issues roughly one request, not one per keystroke — 70b5a1b
+- [x] 4.8 Candidate profile shows ordered transitions with a leading "Added to …" entry — 70b5a1b
+- [x] 4.9 Renders correctly at mobile width and in the dark theme — 70b5a1b
 
 ### Phase 5: Gate closure and documentation
 
 #### Automated
 
-- [ ] 5.1 Database policy assertions pass, including (34)
-- [ ] 5.2 End-to-end suite passes, including the new spec
-- [ ] 5.3 Full unit and integration suites green
-- [ ] 5.4 Production build succeeds
-- [ ] 5.5 Linting and formatting pass
+- [x] 5.1 Database policy assertions pass, including (34)
+- [x] 5.2 End-to-end suite passes, including the new spec
+- [x] 5.3 Full unit and integration suites green
+- [x] 5.4 Production build succeeds
+- [x] 5.5 Linting and formatting pass
 
 #### Manual
 

@@ -46,11 +46,11 @@ Three things were built ahead of time, explicitly and by name, for this slice:
    S-06 to swap to full-text search instead, at S-06's own cost.
 3. **The candidate-scoped route family exists.** S-05 shipped `/candidates/:candidateId`,
    `GET|PATCH /api/candidates/[candidateId]`, `candidate-profile.ts`, and `CandidateProfileDto`
-   — and did so partly *so that S-06 would inherit rather than rework it*. `/candidates` is
+   — and did so partly _so that S-06 would inherit rather than rework it_. `/candidates` is
    already in `PROTECTED_ROUTES`.
 
 Because `getCandidateProfile` already returns each recruitment the candidate is in with its
-*current* stage, **FR-016 is roughly half-built**. The missing half is the per-recruitment
+_current_ stage, **FR-016 is roughly half-built**. The missing half is the per-recruitment
 status log.
 
 The three things S-06 must actually resolve:
@@ -58,7 +58,7 @@ The three things S-06 must actually resolve:
 - **A product decision (blocking):** FR-016 promises "all recruitments they participated in",
   but RLS scopes `candidate_recruitments` and the history table per security group while
   `candidates` is deliberately org-wide. A viewer who is not in every group will silently see a
-  *truncated* list. Whether to truncate silently or disclose a withheld count is unresolved
+  _truncated_ list. Whether to truncate silently or disclose a withheld count is unresolved
   anywhere in the docs, and a disclosure is itself a small information leak. This is the same
   boundary as test-plan Risk #4.
 - **An engineering first (pagination):** FR-014 is a global, unbounded list. The repo has no
@@ -96,7 +96,7 @@ create index candidate_recruitment_status_history_cr_id_idx on ... (candidate_re
 
 - **It carries no note text.** Notes live in `candidate_stage_notes`, keyed
   `(candidate_recruitment_id, stage_id)` ([candidate_stage_notes.sql:7](supabase/migrations/20260901210000_candidate_stage_notes.sql:7)).
-  Because S-04's gate requires a note on the stage *being left*, a history row joins to its note
+  Because S-04's gate requires a note on the stage _being left_, a history row joins to its note
   by `(candidate_recruitment_id, from_stage_id)` — not `to_stage_id`. Getting this backwards
   would attach the wrong note to every transition.
 - **Append-only forever.** No UPDATE/DELETE policy exists or is intended, and the grant is
@@ -113,7 +113,7 @@ create index candidate_recruitment_status_history_cr_id_idx on ... (candidate_re
   deletion via the referenced-stage guard
   ([extend_stage_referenced_guard.sql:63-75](supabase/migrations/20260901210100_extend_stage_referenced_guard.sql:63)).
   **Correctness note:** the log must resolve stage names by joining `kanban_stages` directly on
-  `from_stage_id`/`to_stage_id`, *not* by re-resolving the recruitment's current stage set via
+  `from_stage_id`/`to_stage_id`, _not_ by re-resolving the recruitment's current stage set via
   `resolveKanbanStages` — a recruitment's stages may have been replaced since the transition,
   and the historical rows are what the log is about.
 
@@ -139,15 +139,15 @@ Authorization lives entirely in Postgres; no API handler performs a group check,
 service-role client anywhere in the repo. Two helper tiers
 ([mark_rls_helpers_stable.sql:5-36](supabase/migrations/20260831195143_mark_rls_helpers_stable.sql:5)):
 `private.has_operation(op)` is org-wide, `private.has_recruitment_operation(id, op)` requires
-membership **and** the operation on the *same* group attached to that recruitment.
+membership **and** the operation on the _same_ group attached to that recruitment.
 
-| Table | SELECT policy | Scope |
-| --- | --- | --- |
-| `candidates` | `has_operation('candidate.read')` | **org-wide** ([:179](supabase/migrations/20260831183457_rls_policies.sql:179)) |
-| `candidate_recruitments` | `has_recruitment_operation(recruitment_id, 'recruitment.read')` | per group ([:194](supabase/migrations/20260831183457_rls_policies.sql:194)) |
-| `candidate_recruitment_status_history` | `EXISTS` → parent `candidate_recruitments` read | per group ([:210](supabase/migrations/20260831183457_rls_policies.sql:210)) |
-| `candidate_stage_notes` | `EXISTS` → parent read | per group |
-| `recruitments` | `has_recruitment_operation(id, 'recruitment.read')` | per group |
+| Table                                  | SELECT policy                                                   | Scope                                                                          |
+| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `candidates`                           | `has_operation('candidate.read')`                               | **org-wide** ([:179](supabase/migrations/20260831183457_rls_policies.sql:179)) |
+| `candidate_recruitments`               | `has_recruitment_operation(recruitment_id, 'recruitment.read')` | per group ([:194](supabase/migrations/20260831183457_rls_policies.sql:194))    |
+| `candidate_recruitment_status_history` | `EXISTS` → parent `candidate_recruitments` read                 | per group ([:210](supabase/migrations/20260831183457_rls_policies.sql:210))    |
+| `candidate_stage_notes`                | `EXISTS` → parent read                                          | per group                                                                      |
+| `recruitments`                         | `has_recruitment_operation(id, 'recruitment.read')`             | per group                                                                      |
 
 The org-wide candidate scope is **intentional and was justified by FR-015/FR-016 in F-01's own
 plan**: "FR-015/FR-016 and the Access Control guardrail describe candidate visibility as org-wide
@@ -193,7 +193,7 @@ list/search surface for FR-014/FR-015.
 
 Note the two ids in circulation: `candidateId` (`candidates.id`, used by `/candidates/:id`) and
 `candidateRecruitmentId` (`candidate_recruitments.id`, used by recruitment-scoped routes). Both
-travel on `CandidateCardDto` ([types.ts:57](src/types.ts:57)). Nothing currently links *to*
+travel on `CandidateCardDto` ([types.ts:57](src/types.ts:57)). Nothing currently links _to_
 `/candidates/{candidateId}` from anywhere — the new list is the first such entry point.
 
 ### 4. Attribution: showing "who changed the status"
@@ -321,9 +321,9 @@ one recruitment and has exactly one history row** (the initial add). Five are in
 Engineer" (Tenant A), one — Tomasz Kaminski — is in "Data Analyst" (Tenant B), deliberately as the
 Risk #1/#4 read-boundary fixture.
 
-So **no fixture demonstrates the thing FR-016 exists for**: a candidate in *multiple*
-recruitments with a *multi-step* log. S-06 must extend the seed. The highest-value fixture is a
-single candidate present in both Backend Engineer *and* Data Analyst with several moves in each —
+So **no fixture demonstrates the thing FR-016 exists for**: a candidate in _multiple_
+recruitments with a _multi-step_ log. S-06 must extend the seed. The highest-value fixture is a
+single candidate present in both Backend Engineer _and_ Data Analyst with several moves in each —
 that one row simultaneously proves FR-016's multi-recruitment log and serves as the Risk #4
 truncation fixture (the `tenantPeer` principal must see the candidate, one recruitment, and
 exactly the history of that one).
@@ -352,7 +352,7 @@ exactly the history of that one).
 ## Architecture Insights
 
 - **Authorization is a database property, not an application one.** Every S-06 read is safe by
-  construction *provided* it goes through the caller's RLS-scoped client and adds no
+  construction _provided_ it goes through the caller's RLS-scoped client and adds no
   `SECURITY DEFINER` shortcut. The single highest-recurrence defect class in this repo is a
   definer function shipped without its own authz re-check.
 - **The write path owns the audit trail.** Because no trigger writes history, "the log is

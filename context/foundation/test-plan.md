@@ -230,7 +230,27 @@ it will carry.
 
 ### 6.7 Per-rollout-phase notes
 
-(Filled in by `/10x-implement` as phases land.)
+**S-06 candidate history search** (`context/changes/candidate-history-search/plan.md`):
+
+- **Asserting presence and relative order, never totals, when the harness never resets.**
+  The integration and e2e harnesses share one database across the whole run with no
+  per-test truncation, so a global-count assertion (`expect(items).toHaveLength(N)`) is
+  guaranteed to flake as other specs add rows. Instead assert that a specific known row is
+  present (`expect(names).toContain("Julia Wojcik")`) and, for ordered results, that two
+  known rows appear in the expected relative order (`indexOf(a) < indexOf(b)`) — never that
+  the result set has an exact length.
+- **The cross-tenant shared-candidate fixture as a reusable Risk #4 probe.** Seed one
+  candidate who belongs to recruitments in two different security groups, each with its own
+  multi-step status-history chain (`supabase/seed.sql`, Julia Wojcik). Any future slice that
+  needs to prove per-group visibility on a candidate-scoped read can reuse this fixture
+  instead of growing a new one — the pairing already demonstrates both the "member sees it"
+  and "non-member does not" directions in one seed.
+- **Controlling debounced UI with fake timers, not real waits.** A component wrapping a
+  debounce hook (`useDebouncedValue`) must be tested with `vi.useFakeTimers()` and
+  `vi.advanceTimersByTime(delayMs)` around the state update, not `await new Promise(r =>
+setTimeout(r, delayMs))` — the latter makes the suite's wall-clock time track the debounce
+  interval for no signal gained, and is exactly the kind of real-time wait the unit layer
+  exists to avoid.
 
 ## 7. What We Deliberately Don't Test
 
@@ -262,6 +282,7 @@ interview answer would be. Re-open them at the first `--refresh`.
 - Stack versions last verified: 2026-09-02
 - AI-native tool references last verified: 2026-09-02
 - Cookbook §6.2/§6.4 last updated: 2026-09-03 (§3 Phase 1 landed)
+- Cookbook §6.7 last updated: 2026-09-03 (S-06 candidate-history-search landed)
 
 Refresh (`/10x-test-plan --refresh`) when:
 

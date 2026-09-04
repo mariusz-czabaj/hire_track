@@ -6,6 +6,7 @@ export const SEEDED_USERS = {
   hr: "hr.test@example.com",
   hiringManager: "hiring-manager.test@example.com",
   admin: "admin.test@example.com",
+  tenantPeer: "tenant-peer.test@example.com",
 } as const;
 
 export type SeededUserKey = keyof typeof SEEDED_USERS;
