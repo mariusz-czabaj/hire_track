@@ -3,6 +3,7 @@ import { includeIgnoreFile } from "@eslint/config-helpers";
 import eslint from "@eslint/js";
 import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import eslintPluginAstro from "eslint-plugin-astro";
+import jsxA11yUntyped from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
@@ -10,6 +11,11 @@ import path from "node:path";
 import tseslint from "typescript-eslint";
 
 const gitignorePath = path.resolve(import.meta.dirname, ".gitignore");
+
+// eslint-plugin-jsx-a11y ships no types; narrow its shape once here instead of `any` leaking into every use below.
+/** @type {{ flatConfigs: { recommended: { languageOptions: object; rules: Record<string, string | unknown[]> } } }} */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- untyped module, narrowed by the JSDoc cast above
+const jsxA11y = jsxA11yUntyped;
 
 const baseConfig = tseslint.config({
   extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
@@ -68,6 +74,20 @@ const generatedConfig = tseslint.config({
   },
 });
 
+const jsxA11yWarnRules = Object.fromEntries(
+  Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, severity]) => [
+    rule,
+    Array.isArray(severity) ? ["warn", ...severity.slice(1)] : severity === "error" ? "warn" : severity,
+  ]),
+);
+
+const jsxA11yConfig = tseslint.config({
+  files: ["**/*.{jsx,tsx}"],
+  plugins: { "jsx-a11y": jsxA11y },
+  languageOptions: jsxA11y.flatConfigs.recommended.languageOptions,
+  rules: jsxA11yWarnRules,
+});
+
 const astroConfig = tseslint.config({
   files: ["**/*.astro"],
   rules: {
@@ -83,6 +103,7 @@ export default tseslint.config(
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
   ...eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
+  jsxA11yConfig,
   astroConfig,
   generatedConfig,
   eslintPluginPrettier,
