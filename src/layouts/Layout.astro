@@ -8,10 +8,11 @@ interface Props {
 }
 
 const { title = "10x Astro Starter" } = Astro.props;
+const theme = Astro.locals.theme;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class:list={[theme]}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />

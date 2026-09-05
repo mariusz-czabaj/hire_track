@@ -411,28 +411,28 @@ Wycinek jest addytywny i odwracalny. Warstwa tokenowa dokładana jest obok istni
 
 #### Automated
 
-- [x] 1.1 Lint przechodzi: `npm run lint`
-- [x] 1.2 Typy przechodzą: `npm run typecheck`
-- [x] 1.3 Testy jednostkowe przechodzą, w tym miernik kontrastu na parach skrajnych i granicznych: `npm test`
-- [x] 1.4 Build produkcyjny przechodzi: `npm run build`
-- [x] 1.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 1.1 Lint przechodzi: `npm run lint` — ea48ddc
+- [x] 1.2 Typy przechodzą: `npm run typecheck` — ea48ddc
+- [x] 1.3 Testy jednostkowe przechodzą, w tym miernik kontrastu na parach skrajnych i granicznych: `npm test` — ea48ddc
+- [x] 1.4 Build produkcyjny przechodzi: `npm run build` — ea48ddc
+- [x] 1.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e` — ea48ddc
 
 #### Manual
 
-- [ ] 1.6 Układ, treść i klasy żadnego ekranu produktowego się nie zmieniły; zmiany wyglądu ograniczają się do powierzchni wyliczonych w Desired End State p.7
-- [ ] 1.7 Każda para „token tekstu na tokenie tła" osiąga próg AA w obu motywach — potwierdzone liczbą z miernika, nie oceną wzrokową
-- [ ] 1.8 Plik kroju ładuje się z własnej domeny — w zakładce Network brak żądań do `fonts.googleapis.com` i `fonts.gstatic.com`
-- [ ] 1.9 Nagłówek renderowany krojem serifowym nie miga krojem zastępczym przy przeładowaniu
+- [x] 1.6 Układ, treść i klasy żadnego ekranu produktowego się nie zmieniły; zmiany wyglądu ograniczają się do powierzchni wyliczonych w Desired End State p.7
+- [x] 1.7 Każda para „token tekstu na tokenie tła" osiąga próg AA w obu motywach — potwierdzone liczbą z miernika, nie oceną wzrokową
+- [x] 1.8 Plik kroju ładuje się z własnej domeny — w zakładce Network brak żądań do `fonts.googleapis.com` i `fonts.gstatic.com`
+- [x] 1.9 Nagłówek renderowany krojem serifowym nie miga krojem zastępczym przy przeładowaniu
 
 ### Phase 2: Rozstrzyganie motywu i przełącznik
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe funkcji rozstrzygającej motyw przechodzą, w tym przypadki `undefined` i nieznanej wartości cookie: `npm test`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Typy przechodzą: `npm run typecheck`
-- [ ] 2.4 Build produkcyjny przechodzi: `npm run build`
-- [ ] 2.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 2.1 Testy jednostkowe funkcji rozstrzygającej motyw przechodzą, w tym przypadki `undefined` i nieznanej wartości cookie: `npm test`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Typy przechodzą: `npm run typecheck`
+- [x] 2.4 Build produkcyjny przechodzi: `npm run build`
+- [x] 2.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
 
 #### Manual
 
