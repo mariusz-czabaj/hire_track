@@ -38,7 +38,7 @@ The four criteria are tracked per starter as `agent_friendly.{typed, convention_
 
 ### Per-language-family caveat (load-bearing)
 
-**Assess this criterion *per language family*, not globally.** Django is popular *in Python training data*; FastAPI is too; Spring is in Java training data; Rails is in Ruby training data. Comparing absolute training-data popularity unfairly penalizes every non-JS stack against the JS ecosystem's volume.
+**Assess this criterion _per language family_, not globally.** Django is popular _in Python training data_; FastAPI is too; Spring is in Java training data; Rails is in Ruby training data. Comparing absolute training-data popularity unfairly penalizes every non-JS stack against the JS ecosystem's volume.
 
 The boolean per starter records "is this popular within its language family?" — NOT "is this as popular as the JS top tier?". A `false` here means "even within its own language family, this is a niche pick" — examples might be a brand-new Rust web framework launched in the last six months, or a fork that broke from upstream and lost mind-share.
 

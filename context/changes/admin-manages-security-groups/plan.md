@@ -502,8 +502,7 @@ deliberately targets the Administrator group and asserts the refusal.
 **Intent**: Pin the enumeration boundary that S-04 established.
 
 **Contract**: As `admin`, a valid term returns matching users; a below-minimum,
-empty, and missing term each return an empty array. As `hr`, the route returns
-403. Direct PostgREST invocation of the function as a non-admin — using
+empty, and missing term each return an empty array. As `hr`, the route returns 403. Direct PostgREST invocation of the function as a non-admin — using
 `getAccessTokenForRole` and `supabaseRestUrl` — is rejected, proving the guard
 lives in the function and not only in the route.
 

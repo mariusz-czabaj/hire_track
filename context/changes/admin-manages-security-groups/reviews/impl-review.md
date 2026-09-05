@@ -72,7 +72,7 @@ Post-triage dimension verdicts: Plan Adherence PASS, Scope Discipline WARNING (j
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
 - **Dimension**: Plan Adherence
-- **Location**: N/A (src/lib/api/security-group-errors.test.ts, src/components/admin/*.test.tsx — none exist)
+- **Location**: N/A (src/lib/api/security-group-errors.test.ts, src/components/admin/\*.test.tsx — none exist)
 - **Detail**: The plan's Testing Strategy > Unit Tests names four: `handleSecurityGroupError` errcode mapping incl. the logging 500 fallback; zod rejection of empty / whitespace-only / over-length / out-of-catalog input; `SecurityGroupDetail` checkbox revert on failed write; `UserSearchPicker` below-minimum / loading / empty / error states. None were written — `src/lib/api/` and `src/components/admin/` contain no test files, and `npm run test` passes 92 tests across 12 files, none of them from this slice. The component branching in F4 and F5 has no coverage at any layer; the integration suite exercises the API only. Phases 2-4 checked off "Unit tests pass" truthfully but vacuously.
 - **Fix**: Write the four planned unit tests, prioritising the two component ones since F4 and F5 are live bugs in exactly that logic.
   - Strength: Restores the plan's stated two-layer strategy and would have caught F4/F5 before review.

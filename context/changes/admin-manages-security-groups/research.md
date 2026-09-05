@@ -55,7 +55,7 @@ Three findings drive the plan:
 
 3. **The caller's own operations are not observable by the frontend.** There is
    no endpoint or `Astro.locals` field exposing "does this user hold
-   `group.manage`". The house rule to date is *no UI-level permission logic*
+   `group.manage`". The house rule to date is _no UI-level permission logic_
    (403/404 from the server is the only gate), which is defensible for
    recruitment routes but produces a dead-end for an admin nav entry. This is
    the main open product question below.
@@ -90,11 +90,11 @@ the endpoint must map to a 422 with a human message rather than a 500.
 
 `supabase/migrations/20260831183457_rls_policies.sql`:
 
-| Table | SELECT | INSERT / UPDATE / DELETE |
-| --- | --- | --- |
-| `security_groups` | `using (true)` — every authenticated user (needed by FR-001a's group picker) | `group.manage` |
-| `group_memberships` | own rows **or** `group.manage` | `group.manage` |
-| `group_operations` | `group.manage` | `group.manage` |
+| Table               | SELECT                                                                       | INSERT / UPDATE / DELETE |
+| ------------------- | ---------------------------------------------------------------------------- | ------------------------ |
+| `security_groups`   | `using (true)` — every authenticated user (needed by FR-001a's group picker) | `group.manage`           |
+| `group_memberships` | own rows **or** `group.manage`                                               | `group.manage`           |
+| `group_operations`  | `group.manage`                                                               | `group.manage`           |
 
 Grants match: `select, insert, update, delete` on all three tables to
 `authenticated` (end of file). So S-07's writes work through the ordinary
@@ -121,7 +121,7 @@ PostgREST." Its replacement,
 `get_user_emails_for_candidate(bigint, uuid[])`, resolves ids only from
 `candidate_stage_notes` rows the caller already has `recruitment.read` on.
 
-S-07 needs the opposite shape — list *candidate* users to add to a group — so it
+S-07 needs the opposite shape — list _candidate_ users to add to a group — so it
 must introduce a new function, e.g.
 `public.list_users_for_group_management()` / `search_users(...)`, whose **first
 statement** is `if not (select private.has_operation('group.manage')) then raise
@@ -181,7 +181,7 @@ constraints), `23503 → 422` (group still assigned to a recruitment, or a
 `src/lib/test-support/integration-client.ts` already seeds an
 `admin.test@example.com` principal (`SeededRole = "admin"`) whose group holds
 **`group.manage` only** — deliberately the strongest negative fixture for every
-other slice, and now the *positive* fixture for S-07. `hr`, `hiringManager`,
+other slice, and now the _positive_ fixture for S-07. `hr`, `hiringManager`,
 `noGroup`, `tenantPeer`, `multiGroup` are all available as negatives.
 `getAccessTokenForRole` + `supabaseRestUrl` allow asserting directly against
 PostgREST for paths the app never exposes.
@@ -262,7 +262,7 @@ responsibility, not a test-plan phase.
    narrow escape hatch: expose the caller's own operations (which
    `private.has_operation` already computes) via `Astro.locals` in
    `src/middleware.ts` or a `GET /api/me/operations` route, and treat it as
-   *rendering* data rather than authorization. **Owner: user.** This is the one
+   _rendering_ data rather than authorization. **Owner: user.** This is the one
    decision that changes the shape of the slice.
 
 2. **Self-lockout: may an admin remove the last `group.manage` grant, or remove

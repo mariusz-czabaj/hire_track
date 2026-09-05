@@ -27,7 +27,7 @@ argument-hint: "<change-id> [phase N] | @context/changes/<change-id>/plan.md | <
 
 # 10x E2E — Risk-Driven E2E Plan Execution
 
-You drive an approved technical plan from `context/changes/<change-id>/plan.md` to **browser-level coverage**, one phase at a time, one risk at a time. An agent can generate a *passing* E2E test in seconds; the hard part is making it **protect a real risk** and **survive tomorrow's refactor**. This skill drives only the phases where that work belongs — a risk that crosses several system boundaries (auth, routing, API, DB) or exists only in the rendered UI — and for each one runs the loop:
+You drive an approved technical plan from `context/changes/<change-id>/plan.md` to **browser-level coverage**, one phase at a time, one risk at a time. An agent can generate a _passing_ E2E test in seconds; the hard part is making it **protect a real risk** and **survive tomorrow's refactor**. This skill drives only the phases where that work belongs — a risk that crosses several system boundaries (auth, routing, API, DB) or exists only in the rendered UI — and for each one runs the loop:
 
 ```
 PLAN     →  pick the risk, explore the running app, map the flow (or fill the prompt template)
@@ -122,7 +122,7 @@ This skill assumes Playwright is already installed; it won't set it up. Options:
 ```
 
 6. **Ensure the two quality levers exist (the one-time per-project setup).** These do the heavy lifting — the prompt stays thin.
-   - **Seed test** (`seed.spec.ts`): the exemplar every generated test is modeled on. *What you show is what you get* — if the seed uses `getByRole`, generated tests do too; if it has `waitForTimeout`, every generated test inherits it. If absent, create it from `references/seed-test-pattern.md`, adapted to this app's real routes and roles. See also `references/browser-driven-generation.md`.
+   - **Seed test** (`seed.spec.ts`): the exemplar every generated test is modeled on. _What you show is what you get_ — if the seed uses `getByRole`, generated tests do too; if it has `waitForTimeout`, every generated test inherits it. If absent, create it from `references/seed-test-pattern.md`, adapted to this app's real routes and roles. See also `references/browser-driven-generation.md`.
    - **E2E rules**: the rules file the agent reads automatically before generating code (`CLAUDE.md`, `.cursor/rules/`, or a dedicated file in the test dir). If absent, create it from `references/e2e-quality-rules.md`.
    - Treat both as part of the **first phase's** touched-file set so they land in that phase's commit. Once they exist, leave them — don't recreate them each phase.
 
@@ -132,7 +132,7 @@ This skill assumes Playwright is already installed; it won't set it up. Options:
 
 9. **Find the starting point**: scan `## Progress` — the first `- [ ]` in document order is where you start. If a `phase N` argument was passed, jump to the first `- [ ]` under `### Phase N:`.
 
-> **Clipboard convention.** Wherever this skill says *copy `X` to the clipboard*, pipe the exact string `X` to the platform clipboard — try `pbcopy` (macOS), then `clip.exe` (Windows/WSL), then `xclip -selection clipboard` (Linux), and fall back silently if none exist. Then display the copied command on its own line suffixed with `(✓ copied)`.
+> **Clipboard convention.** Wherever this skill says _copy `X` to the clipboard_, pipe the exact string `X` to the platform clipboard — try `pbcopy` (macOS), then `clip.exe` (Windows/WSL), then `xclip -selection clipboard` (Linux), and fall back silently if none exist. Then display the copied command on its own line suffixed with `(✓ copied)`.
 
 ---
 
@@ -150,13 +150,13 @@ A phase is eligible for this skill only when all three hold.
 
 A risk needs E2E when it **crosses several system boundaries** (auth, routing, API, DB) or **exists only in the rendered UI**. If an isolated function, endpoint contract, or integration test could prove the risk, E2E is the wrong (slow, brittle) tool — drive it with `/10x-tdd` or `/10x-implement` instead.
 
-| E2E-worthy — drive it here | Not E2E-worthy — redirect to /10x-tdd or /10x-implement |
-|---|---|
-| Full user flows across auth → routing → API → DB | Pure functions, parsers, validators, flag computation |
-| Data survives a real SSR page reload / navigation | A single endpoint's status/shape/auth/gating contract |
-| State that only exists in the rendered, interactive UI | Business logic with clear inputs/outputs |
-| Multi-step journeys a unit test can't reproduce | Anything an isolated function or integration test can prove |
-| Risks that only appear when real boundaries integrate | Config, scaffolding, infra wiring, docs |
+| E2E-worthy — drive it here                             | Not E2E-worthy — redirect to /10x-tdd or /10x-implement     |
+| ------------------------------------------------------ | ----------------------------------------------------------- |
+| Full user flows across auth → routing → API → DB       | Pure functions, parsers, validators, flag computation       |
+| Data survives a real SSR page reload / navigation      | A single endpoint's status/shape/auth/gating contract       |
+| State that only exists in the rendered, interactive UI | Business logic with clear inputs/outputs                    |
+| Multi-step journeys a unit test can't reproduce        | Anything an isolated function or integration test can prove |
+| Risks that only appear when real boundaries integrate  | Config, scaffolding, infra wiring, docs                     |
 
 ### Feature-presence check (the inverse of /10x-tdd)
 
@@ -185,7 +185,6 @@ Do a quick search for an existing spec covering this risk. If a **passing** E2E 
 - If all three hold, state that in one line and proceed to the plan → generate → review → verify loop.
 - If the risk is **clearly not browser-level**, run the **redirect** (below).
 - If it's **mixed or ambiguous** (e.g., a phase that's partly an endpoint contract, partly a rendered-UI flow), use `AskUserQuestion`:
-
   - question: "Phase [N] mixes an isolated-function risk and a browser-level flow. How should I drive it?"
     header: "E2E gate"
     options:
@@ -195,11 +194,11 @@ Do a quick search for an existing spec covering this risk. If a **passing** E2E 
       description: "Hand the entire phase off — copy the resume command to the clipboard."
     - label: "E2E the whole phase anyway"
       description: "Force browser-level coverage even for the parts a unit test would prove. Slower, more brittle."
-    multiSelect: false
+      multiSelect: false
 
 ### Redirect a non-E2E phase
 
-State *why* the phase isn't a browser-level fit (one or two sentences, grounded in the table above), then use `AskUserQuestion`:
+State _why_ the phase isn't a browser-level fit (one or two sentences, grounded in the table above), then use `AskUserQuestion`:
 
 - question: "Phase [N] isn't a good E2E fit. How do you want to handle it?"
   header: "Not E2E-worthy"
@@ -212,7 +211,7 @@ State *why* the phase isn't a browser-level fit (one or two sentences, grounded 
     description: "I'll generate a browser-level test despite the cost — then continue to the next phase's gate."
   - label: "Skip — already done"
     description: "Mark the phase's Progress rows and move to the next phase."
-  multiSelect: false
+    multiSelect: false
 
 **On "Hand off":** copy the chosen resume command to the clipboard, print the block below, and STOP — the other skill will flip this phase's Progress rows and run its own commit ritual. Tell the user to resume E2E afterward.
 
@@ -239,10 +238,10 @@ E2E is expensive and flake-prone, so the budget is **tight** — typically **one
 
 ### PLAN — pick the risk and map the flow
 
-1. State the contract in one sentence: **input** = one browser-level risk; **output** = a reviewed E2E test that *fails when that risk materializes*. If the phase's risk isn't concrete, pull the observable business outcome from `test-plan.md` or the phase's Success Criteria before planning. In a standalone run with no `test-plan.md`, ask the user for the risk and its observable business outcome first.
+1. State the contract in one sentence: **input** = one browser-level risk; **output** = a reviewed E2E test that _fails when that risk materializes_. If the phase's risk isn't concrete, pull the observable business outcome from `test-plan.md` or the phase's Success Criteria before planning. In a standalone run with no `test-plan.md`, ask the user for the risk and its observable business outcome first.
 2. Choose a path — same contract either way:
    - **Browser-driven** (default when you can drive a real browser — prefer the Playwright **CLI** for its lower token cost, else a Playwright **MCP** server): you act as both planner and generator. Navigate the running app, explore its **accessibility snapshot** (not screenshots), and map the flow for this risk — happy path plus the edge/error case the risk implies. Model the plan on `seed.spec.ts` — **seed quality is test quality.** See `references/browser-driven-generation.md` for the transport trade-off (CLI vs MCP) and the full discipline (set up the page first, snapshot over screenshots, scenarios independent and any-order).
-   - **Prompt-template** (no live browser, simplest): fill `references/e2e-prompt-template.md` with the risk, research anchor, business scenario, and real-vs-mocked boundaries, and write the spec from your reading of the app. Leave the template file untouched; write a *new* prompt file for this specific risk. Use this when no Playwright MCP is available or the flow is simple and well-understood.
+   - **Prompt-template** (no live browser, simplest): fill `references/e2e-prompt-template.md` with the risk, research anchor, business scenario, and real-vs-mocked boundaries, and write the spec from your reading of the app. Leave the template file untouched; write a _new_ prompt file for this specific risk. Use this when no Playwright MCP is available or the flow is simple and well-understood.
 3. Separate **real** from **mocked** boundaries up front. **E2E ≠ zero mocking.** Internal boundaries (auth, routing, DB) stay real — that's where integration risk hides. Mock expensive or non-deterministic external APIs at the network layer. (Caveat: for an API the app calls **server-side**, browser-level `page.route()` won't intercept it — mock it where the server actually calls out.)
 
 ### GENERATE — produce the test from the levers
@@ -253,12 +252,12 @@ E2E is expensive and flake-prone, so the budget is **tight** — typically **one
 ### REVIEW — five anti-patterns, re-prompt by name
 
 6. Never trust a generated E2E test on sight. Review it against the five agent E2E anti-patterns in `references/e2e-anti-patterns.md`: hallucinated assertion, brittle selector, shared state, wait-for-time, no cleanup.
-7. For any anti-pattern found, **re-prompt by name** — never "fix this test." Name the specific anti-pattern, explain *why* it doesn't protect the risk (or why it produces false failures), and give the **target pattern**. Three elements per re-prompt: what's wrong, why it doesn't protect the risk, what replaces it. See the re-prompt discipline in `references/e2e-anti-patterns.md`.
+7. For any anti-pattern found, **re-prompt by name** — never "fix this test." Name the specific anti-pattern, explain _why_ it doesn't protect the risk (or why it produces false failures), and give the **target pattern**. Three elements per re-prompt: what's wrong, why it doesn't protect the risk, what replaces it. See the re-prompt discipline in `references/e2e-anti-patterns.md`.
 
 ### VERIFY — green, then risk-tied
 
 8. **Run just this spec** with the project's single-spec invocation (against the running app), and confirm it passes. Show the user the green result briefly.
-9. **Control question:** *would this test fail if the `test-plan.md` risk came true?* If not, the assertion is decorative — go back to GENERATE/REVIEW. To make this concrete, do a **deliberate break**: temporarily invert or weaken the production behavior the risk targets (or the test's key assertion's target), re-run, and confirm the test goes red. If it stays green after you break the thing it's supposed to protect, the assertion protects nothing — fix it before moving on. **Revert the deliberate break immediately**; never commit it.
+9. **Control question:** _would this test fail if the `test-plan.md` risk came true?_ If not, the assertion is decorative — go back to GENERATE/REVIEW. To make this concrete, do a **deliberate break**: temporarily invert or weaken the production behavior the risk targets (or the test's key assertion's target), re-run, and confirm the test goes red. If it stays green after you break the thing it's supposed to protect, the assertion protects nothing — fix it before moving on. **Revert the deliberate break immediately**; never commit it.
 10. **Mark the step done.** Flip exactly that step's row in `## Progress`: `- [ ] N.M <title>` → `- [x] N.M <title>` (no SHA yet — the SHA lands at phase end). Then loop back to PLAN for the next risk.
 
 Never use `test.skip()` / `test.fixme()` to "pass" a phase — a skipped test is invisible. A test that can't be made to pass against the real app is a signal to investigate (the feature, the flow, or the flake), not to silence.
@@ -277,7 +276,7 @@ When all `#### Automated` rows in `### Phase N:` are `[x]`, run the phase-end ri
 
 Maintain a **touched-file set** throughout the phase: every file you `Edit`/`Write` (specs, the prompt file, and on the first phase the seed + rules levers) goes in it, plus `context/changes/<change-id>/plan.md` (always — you edit its Progress). On the **first phase** of a change, also seed it with any untracked/modified files inside `context/changes/<change-id>/` (`change.md`, `research.md`, etc.). The set **resets at each phase boundary**.
 
-1. **Run the phase's E2E spec(s)** against the running app and confirm green. (A *full* E2E pass runs in CI, not per-edit — locally you confirm the spec(s) this phase added. Fix any breakage before committing.)
+1. **Run the phase's E2E spec(s)** against the running app and confirm green. (A _full_ E2E pass runs in CI, not per-edit — locally you confirm the spec(s) this phase added. Fix any breakage before committing.)
 
 2. **Manual confirmation gate.** Tell the human automated verification passed, list the plan's manual verification items for this phase (including the deliberate-break check you ran), and pause. Do not proceed until they confirm.
 
@@ -294,7 +293,7 @@ Please perform the manual verification steps from the plan:
 Let me know when manual testing is complete so I can commit.
 ```
 
-   On the **final phase**, also roll up any still-pending `#### Manual` rows from earlier phases (informational; the gate still only pauses, it doesn't hard-block).
+On the **final phase**, also roll up any still-pending `#### Manual` rows from earlier phases (informational; the gate still only pauses, it doesn't hard-block).
 
 3. **Detect unrelated dirty paths.** Run `git status --porcelain`; intersect with paths **outside** the touched set. If any exist, present them and ask via `AskUserQuestion` whether to commit only the planned set (Recommended), stage all, or abort. If none, skip.
 
@@ -325,7 +324,7 @@ Use `AskUserQuestion`:
     description: "Copy the resume command to the clipboard. Start fresh for Phase [N+1]."
   - label: "Review this phase first"
     description: "Run /10x-impl-review to verify the implementation against the plan before continuing."
-  multiSelect: false
+    multiSelect: false
 
 **Continue:** read the next phase, set its task `in_progress`, run the E2E gate, proceed. No need to re-read the whole plan.
 
@@ -366,7 +365,7 @@ Summary:
 - Levers in place: seed.spec.ts + E2E rules
 ```
 
-   Then `AskUserQuestion`: run `/10x-impl-review <change-id>` (full-plan review) or skip.
+Then `AskUserQuestion`: run `/10x-impl-review <change-id>` (full-plan review) or skip.
 
 ---
 
@@ -380,7 +379,7 @@ Principles that govern every test here — the references carry the syntax and t
 
 **Real vs mocked** is the test's core value: internal boundaries (auth, routing, DB) stay real — that's where integration risk hides; mock only expensive or non-deterministic external APIs at the network layer.
 
-**Vision** (`--caps=vision`) is a supplement for visual-only risks (layout, z-index, animation, canvas), not the default — DOM snapshots verify function. **Auto-healing tools** help on selector/timing drift (route their output through PR review, never auto-commit) but must never "fix" a *changed business behavior* — that masks the regression the test exists to catch. Both are detailed in `references/browser-driven-generation.md`; a failing E2E test is a debugging job, not a generation or healing job.
+**Vision** (`--caps=vision`) is a supplement for visual-only risks (layout, z-index, animation, canvas), not the default — DOM snapshots verify function. **Auto-healing tools** help on selector/timing drift (route their output through PR review, never auto-commit) but must never "fix" a _changed business behavior_ — that masks the regression the test exists to catch. Both are detailed in `references/browser-driven-generation.md`; a failing E2E test is a debugging job, not a generation or healing job.
 
 ### File placement
 

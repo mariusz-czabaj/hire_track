@@ -12,7 +12,7 @@ The seed test shapes the generated test; the rules file constrains the agent
 automatically. The prompt supplies only what those two can't know: the specific
 risk, flow, and boundaries.
 
-**Usage:** leave this template file untouched. Ask the agent to create a *new*
+**Usage:** leave this template file untouched. Ask the agent to create a _new_
 prompt file for the specific risk, filled from the fields below.
 
 ## Template
@@ -72,7 +72,7 @@ Explain in one sentence which regression this test catches.
 Compare with a unit-test generation prompt: there you point at a specific
 function and the risk it must protect. Here you give the whole user flow and
 explicitly separate real boundaries from mocked ones — for E2E, the system
-boundaries *are* the test. But "Business scenario" plays the same role in both:
+boundaries _are_ the test. But "Business scenario" plays the same role in both:
 it forces an assertion tied to the risk, not to the implementation.
 
 Whether you use the prompt directly or the browser-driven path, the same

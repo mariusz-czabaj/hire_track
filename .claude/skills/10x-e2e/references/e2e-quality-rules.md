@@ -34,7 +34,7 @@ default — agents apply known patterns far more reliably than they invent new o
   that's where integration risk hides. Mock expensive/non-deterministic external
   APIs (LLMs, payment gateways) at the network layer.
 - **Name the test after the risk:** `test('flashcard data persists after page
-  reload', ...)`, not `test('test 1', ...)`.
+reload', ...)`, not `test('test 1', ...)`.
 - **The assertion must fail if the risk materializes.** Control question for
   every assertion: would this fail if the `test-plan.md` risk came true? If not,
   it's decorative.

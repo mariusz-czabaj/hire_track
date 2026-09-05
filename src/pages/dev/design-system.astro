@@ -1,0 +1,274 @@
+---
+export const prerender = false;
+
+import Layout from "@/layouts/Layout.astro";
+import AppShell from "@/components/AppShell.astro";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { DesignSystemDialogDemo } from "@/components/DesignSystemDialogDemo";
+import { Skeleton } from "@/components/ui/skeleton";
+import { contrastRatio, meetsAA } from "@/lib/contrast";
+import { lightPalette, darkPalette, tokenPairs, type TokenPalette } from "@/lib/design-tokens";
+
+const isDev = import.meta.env.DEV;
+if (!isDev) {
+  Astro.response.status = 404;
+}
+
+const buttonVariantNames = ["default", "destructive", "outline", "secondary", "ghost", "link"] as const;
+const buttonSizeNames = ["default", "sm", "lg", "icon"] as const;
+const badgeVariantNames = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
+
+function measure(palette: TokenPalette) {
+  return tokenPairs.map((pair) => {
+    const ratio = contrastRatio(palette[pair.foreground], palette[pair.background]);
+    return { ...pair, ratio, passes: meetsAA(ratio, pair.size) };
+  });
+}
+
+const lightResults = measure(lightPalette);
+const darkResults = measure(darkPalette);
+---
+
+{
+  isDev && (
+    <Layout title="Design System — 10x">
+      <AppShell containerWidth="wide">
+        <Fragment slot="nav">
+          <div class="text-muted-foreground p-4 text-sm">Design System</div>
+        </Fragment>
+        <Fragment slot="topbar-actions">
+          <ThemeToggle theme={Astro.locals.theme} client:load />
+        </Fragment>
+        <Fragment slot="page-title">
+          <h1 class="font-serif text-2xl font-semibold">Design system</h1>
+        </Fragment>
+
+        <div class="flex flex-col gap-12">
+          <section aria-labelledby="colors-heading">
+            <h2 id="colors-heading" class="mb-4 font-serif text-xl font-semibold">
+              Colors
+            </h2>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              {(
+                [
+                  { name: "background", cls: "bg-background" },
+                  { name: "foreground", cls: "bg-foreground" },
+                  { name: "card", cls: "bg-card" },
+                  { name: "card-foreground", cls: "bg-card-foreground" },
+                  { name: "popover", cls: "bg-popover" },
+                  { name: "popover-foreground", cls: "bg-popover-foreground" },
+                  { name: "primary", cls: "bg-primary" },
+                  { name: "primary-foreground", cls: "bg-primary-foreground" },
+                  { name: "secondary", cls: "bg-secondary" },
+                  { name: "secondary-foreground", cls: "bg-secondary-foreground" },
+                  { name: "muted", cls: "bg-muted" },
+                  { name: "muted-foreground", cls: "bg-muted-foreground" },
+                  { name: "accent", cls: "bg-accent" },
+                  { name: "accent-foreground", cls: "bg-accent-foreground" },
+                  { name: "destructive", cls: "bg-destructive" },
+                  { name: "border", cls: "bg-border" },
+                  { name: "input", cls: "bg-input" },
+                  { name: "ring", cls: "bg-ring" },
+                  { name: "sidebar", cls: "bg-sidebar" },
+                  { name: "sidebar-foreground", cls: "bg-sidebar-foreground" },
+                  { name: "sidebar-primary", cls: "bg-sidebar-primary" },
+                  { name: "sidebar-accent", cls: "bg-sidebar-accent" },
+                  { name: "sidebar-border", cls: "bg-sidebar-border" },
+                ] as const
+              ).map((token) => (
+                <div class="overflow-hidden rounded-lg border">
+                  <div class="h-16" class:list={[token.cls]} />
+                  <div class="px-2 py-1 text-xs">--{token.name}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="typography-heading">
+            <h2 id="typography-heading" class="mb-4 font-serif text-xl font-semibold">
+              Typography
+            </h2>
+            <div class="flex flex-col gap-3">
+              <p class="font-serif text-4xl">Serif heading — Aa Ćć Żż</p>
+              <p class="font-sans text-base">Sans body text — Aa Ćć Żż</p>
+            </div>
+          </section>
+
+          <section aria-labelledby="radius-shadow-heading">
+            <h2 id="radius-shadow-heading" class="mb-4 font-serif text-xl font-semibold">
+              Radius &amp; shadows
+            </h2>
+            <div class="flex flex-wrap gap-4">
+              {(
+                [
+                  { name: "sm", cls: "rounded-sm" },
+                  { name: "md", cls: "rounded-md" },
+                  { name: "lg", cls: "rounded-lg" },
+                  { name: "xl", cls: "rounded-xl" },
+                ] as const
+              ).map((radius) => (
+                <div class="bg-card flex size-20 items-center justify-center border text-xs" class:list={[radius.cls]}>
+                  radius-{radius.name}
+                </div>
+              ))}
+              {(
+                [
+                  { name: "sm", cls: "shadow-sm" },
+                  { name: "md", cls: "shadow-md" },
+                  { name: "lg", cls: "shadow-lg" },
+                ] as const
+              ).map((shadow) => (
+                <div
+                  class="bg-card flex size-20 items-center justify-center rounded-md text-xs"
+                  class:list={[shadow.cls]}
+                >
+                  shadow-{shadow.name}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="button-heading">
+            <h2 id="button-heading" class="mb-4 font-serif text-xl font-semibold">
+              Buttons
+            </h2>
+            <div class="flex flex-col gap-4">
+              {buttonVariantNames.map((variant) => (
+                <div class="flex flex-wrap items-center gap-3">
+                  <span class="text-muted-foreground w-24 text-xs">{variant}</span>
+                  {buttonSizeNames.map((size) => (
+                    <Button variant={variant} size={size}>
+                      {size}
+                    </Button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="badge-heading">
+            <h2 id="badge-heading" class="mb-4 font-serif text-xl font-semibold">
+              Badges
+            </h2>
+            <div class="flex flex-wrap gap-3">
+              {badgeVariantNames.map((variant) => (
+                <Badge variant={variant}>{variant}</Badge>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="card-heading">
+            <h2 id="card-heading" class="mb-4 font-serif text-xl font-semibold">
+              Card
+            </h2>
+            <Card className="max-w-sm">
+              <CardHeader>
+                <CardTitle>Card title</CardTitle>
+                <CardDescription>Card description text</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p class="text-sm">Card content area.</p>
+              </CardContent>
+              <CardFooter>
+                <Button size="sm">Action</Button>
+              </CardFooter>
+            </Card>
+          </section>
+
+          <section aria-labelledby="input-heading">
+            <h2 id="input-heading" class="mb-4 font-serif text-xl font-semibold">
+              Input
+            </h2>
+            <Input className="max-w-sm" placeholder="Type something…" />
+          </section>
+
+          <section aria-labelledby="dialog-heading">
+            <h2 id="dialog-heading" class="mb-4 font-serif text-xl font-semibold">
+              Dialog
+            </h2>
+            <DesignSystemDialogDemo client:load />
+          </section>
+
+          <section aria-labelledby="skeleton-heading">
+            <h2 id="skeleton-heading" class="mb-4 font-serif text-xl font-semibold">
+              Skeleton
+            </h2>
+            <Skeleton className="h-4 w-48" />
+          </section>
+
+          <section aria-labelledby="pending-heading">
+            <h2 id="pending-heading" class="mb-2 font-serif text-xl font-semibold">
+              Pending migration (S-13)
+            </h2>
+            <p class="text-muted-foreground mb-4 text-sm">
+              <code>Textarea</code> and <code>FileInput</code> below are shown for completeness only — they have
+              hardcoded cosmic-theme classes and do not react to design tokens. They will be migrated in S-13.
+            </p>
+            <div class="rounded-lg border border-dashed p-4">
+              <p class="text-muted-foreground text-sm">
+                Not rendered here on purpose: rendering them against the token palette would look like a broken
+                component rather than an unmigrated one, since their classes hardcode colors like{" "}
+                <code>bg-white/10</code> and <code>text-blue-100/80</code> regardless of theme.
+              </p>
+            </div>
+          </section>
+
+          <section aria-labelledby="contrast-heading">
+            <h2 id="contrast-heading" class="mb-4 font-serif text-xl font-semibold">
+              Contrast (WCAG AA)
+            </h2>
+            <div class="grid gap-6 md:grid-cols-2">
+              <div>
+                <h3 class="mb-2 text-sm font-semibold">Light</h3>
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-muted-foreground border-b text-left">
+                      <th class="py-1 pr-2">Pair</th>
+                      <th class="py-1 pr-2">Ratio</th>
+                      <th class="py-1">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lightResults.map((result) => (
+                      <tr class="border-b">
+                        <td class="py-1 pr-2">{result.label}</td>
+                        <td class="py-1 pr-2">{result.ratio.toFixed(2)}:1</td>
+                        <td class="py-1">{result.passes ? "Passes AA" : "Fails AA"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <h3 class="mb-2 text-sm font-semibold">Dark</h3>
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-muted-foreground border-b text-left">
+                      <th class="py-1 pr-2">Pair</th>
+                      <th class="py-1 pr-2">Ratio</th>
+                      <th class="py-1">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {darkResults.map((result) => (
+                      <tr class="border-b">
+                        <td class="py-1 pr-2">{result.label}</td>
+                        <td class="py-1 pr-2">{result.ratio.toFixed(2)}:1</td>
+                        <td class="py-1">{result.passes ? "Passes AA" : "Fails AA"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </AppShell>
+    </Layout>
+  )
+}
+{!isDev && <p>Not found.</p>}

@@ -446,10 +446,10 @@ Wycinek jest addytywny i odwracalny. Warstwa tokenowa dokładana jest obok istni
 
 #### Automated
 
-- [x] 3.1 Lint przechodzi, w tym reguły `astro/jsx-a11y/*` na nowym pliku: `npm run lint`
-- [x] 3.2 Typy przechodzą: `npm run typecheck`
-- [x] 3.3 Build produkcyjny przechodzi: `npm run build`
-- [x] 3.4 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 3.1 Lint przechodzi, w tym reguły `astro/jsx-a11y/*` na nowym pliku: `npm run lint` — e21aaa4
+- [x] 3.2 Typy przechodzą: `npm run typecheck` — e21aaa4
+- [x] 3.3 Build produkcyjny przechodzi: `npm run build` — e21aaa4
+- [x] 3.4 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e` — e21aaa4
 
 #### Manual
 
@@ -461,9 +461,9 @@ Wycinek jest addytywny i odwracalny. Warstwa tokenowa dokładana jest obok istni
 
 #### Automated
 
-- [ ] 4.1 Lint przechodzi: `npm run lint`
-- [ ] 4.2 Typy przechodzą: `npm run typecheck`
-- [ ] 4.3 Build produkcyjny przechodzi: `npm run build`
+- [x] 4.1 Lint przechodzi: `npm run lint`
+- [x] 4.2 Typy przechodzą: `npm run typecheck`
+- [x] 4.3 Build produkcyjny przechodzi: `npm run build`
 
 #### Manual
 

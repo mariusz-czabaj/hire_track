@@ -39,10 +39,10 @@ If the file does not exist, stop and report the path. Do not invent content.
 
 ## What this skill does NOT do
 
-- Does not edit the rules file *unless the user explicitly approves the reorder proposed by Check 5*. The default output is read-only.
+- Does not edit the rules file _unless the user explicitly approves the reorder proposed by Check 5_. The default output is read-only.
 - Does not generate a full "fixed version" of the file. At most, Check 5 may move/regroup sections; it never rewrites rule content.
 - Does not assume the file's tool target. CLAUDE.md, AGENTS.md, `.mdc`, `.windsurfrules`, custom names — all treated as "a rules-for-AI file".
-- Does not score *project content* (architecture, tech choices, conventions). It scores the *rule artifact's condition* — the same way a code review scores code, not the product.
+- Does not score _project content_ (architecture, tech choices, conventions). It scores the _rule artifact's condition_ — the same way a code review scores code, not the product.
 
 ## Procedure
 
@@ -60,34 +60,38 @@ If the file does not exist, stop and report the path. Do not invent content.
 
 Count non-empty lines (ignore blank lines and pure separator lines like `---`).
 
-| Lines       | Verdict      | Symbol |
-|-------------|--------------|--------|
-| 0–200       | fine         | OK     |
-| 201–500     | watch out    | WARN   |
-| 501+        | warn         | FAIL   |
+| Lines   | Verdict   | Symbol |
+| ------- | --------- | ------ |
+| 0–200   | fine      | OK     |
+| 201–500 | watch out | WARN   |
+| 501+    | warn      | FAIL   |
 
 Why it matters: long rule files crowd out the user's prompt in the context window, and middle-of-file rules get the weakest attention from the model. Length is a proxy for "you're paying context for things the agent doesn't need every session."
 
 For WARN/FAIL, suggest:
+
 - Split per-area rules into nested files closer to their code (e.g. `src/api/AGENTS.md`).
 - Replace duplicated docs with `@`-references to the canonical file.
 - Drop rules that aren't tied to a recurring agent failure mode.
 
 ### Check 2 — Direct code/config snippets
 
-Scan for fenced code blocks (```` ``` ````) and inline code blocks longer than ~3 lines.
+Scan for fenced code blocks (` ``` `) and inline code blocks longer than ~3 lines.
 
 Flag any block that looks like:
+
 - An example component, endpoint, migration, schema, query, bash script or test.
 - A configuration file (`tsconfig.json`, `eslintrc`, `package.json`, `wrangler.toml`).
 - A migration template or boilerplate that lives elsewhere in the repo.
 
 Do **not** flag:
-- Short structural snippets used to define a *format* the agent must produce (e.g. a 2–4 line error-shape template).
+
+- Short structural snippets used to define a _format_ the agent must produce (e.g. a 2–4 line error-shape template).
 - Command examples (`npm run dev`, `git rebase`, etc.).
 - Mermaid/diagram blocks.
 
 For each flagged block, suggest:
+
 - Move the snippet to a real file in the repo.
 - Replace the block with a one-line `@`-reference, e.g. `@src/features/users/user.service.ts`, `@docs/api-errors.md`.
 - Reason: the example will be wrong in two places at the next refactor; a reference can't drift.
@@ -110,6 +114,7 @@ Scan for vague intent that cannot be checked against a diff. Common offenders:
 For every match, **always propose at least one concrete, testable alternative grounded in this project's context**. Never suggest "just delete it" — the author put the line there for a reason; your job is to translate the intent into something a reviewer can check against a diff.
 
 To ground the suggestion, pull signal from:
+
 - the file under review (stack mentioned, naming conventions stated elsewhere, hard rules in other sections),
 - nearby paragraphs around the vague phrase (what was the author about to say?),
 - visible repo context if available (`package.json`, `tsconfig.json`, framework choice, lint config, sibling rule files).
@@ -118,14 +123,14 @@ If the project context truly doesn't suggest anything specific, propose a sensib
 
 Examples (note how each replacement borrows project-specific names/conventions, not generic advice):
 
-| Vague phrase in file              | Project context signal                          | Grounded testable replacement                                                                              |
-|-----------------------------------|--------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| "Write clean code"                | TypeScript + ESLint mentioned in same file      | "Avoid `any`. Functions over 40 lines must be split. Run `pnpm lint` before committing."                   |
-| "Handle errors properly"          | Hard rule earlier: API returns `{ error: {...} }` shape | "API handlers must return `{ error: { code, message, context } }` per the shape defined above. Never throw raw." |
-| "Be consistent with naming"       | File mentions `feature.handler.ts` elsewhere    | "Use `<feature>.handler.ts` (matching the existing handlers in `src/api/`), not `featureHandler.ts`."       |
-| "Use modern patterns"             | Project uses native JS, no lodash in `package.json` | "Use native `Array`/`Object` methods. Do not add `lodash` — it's not in `package.json` and we keep it that way." |
-| "Make components readable"        | React + Tailwind project                         | "Components over 150 lines must be split. Tailwind classes go through `cn()` for conditionals (assumed — confirm if a different helper is used)." |
-| "Keep things simple"              | Python FastAPI service                           | "Prefer one Pydantic model per request/response. No nested decorators beyond `@router.post` + `@requires_auth`." |
+| Vague phrase in file        | Project context signal                                  | Grounded testable replacement                                                                                                                     |
+| --------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Write clean code"          | TypeScript + ESLint mentioned in same file              | "Avoid `any`. Functions over 40 lines must be split. Run `pnpm lint` before committing."                                                          |
+| "Handle errors properly"    | Hard rule earlier: API returns `{ error: {...} }` shape | "API handlers must return `{ error: { code, message, context } }` per the shape defined above. Never throw raw."                                  |
+| "Be consistent with naming" | File mentions `feature.handler.ts` elsewhere            | "Use `<feature>.handler.ts` (matching the existing handlers in `src/api/`), not `featureHandler.ts`."                                             |
+| "Use modern patterns"       | Project uses native JS, no lodash in `package.json`     | "Use native `Array`/`Object` methods. Do not add `lodash` — it's not in `package.json` and we keep it that way."                                  |
+| "Make components readable"  | React + Tailwind project                                | "Components over 150 lines must be split. Tailwind classes go through `cn()` for conditionals (assumed — confirm if a different helper is used)." |
+| "Keep things simple"        | Python FastAPI service                                  | "Prefer one Pydantic model per request/response. No nested decorators beyond `@router.post` + `@requires_auth`."                                  |
 
 Verdict: OK if 0 vague phrases · WARN if 1–3 · FAIL if 4+.
 
@@ -148,12 +153,14 @@ Use these self-checks while scanning:
 - **The "tutorial smell" test.** If the paragraph reads like a section from the framework's "Getting Started" page or a Medium article — it's tutorial content, not project knowledge. You read those during training.
 
 What is **not** redundant (don't flag):
+
 - Project-specific conventions that contradict the framework default ("we use `useEffect` only for non-data side effects").
 - Local pitfalls and historical workarounds you couldn't infer from the code ("the `events` table is partitioned by month — bulk inserts to the wrong partition fail silently").
 - Internal naming, layout, or workflow rules ("postings live in `<verb>_<noun>.posting.ts`").
 - Rules that look generic but are tied to a real incident (the file should mention the incident or link to a failure-modes register).
 
 For each flagged paragraph, suggest one of:
+
 - **Delete it** — you already knew it.
 - **Replace with `@`-reference** — `@README.md`, `@tsconfig.json`, `@docs/...`.
 - **Keep only if backed by an incident** — and if so, ask the author to add the incident note inline so the rule survives future audits.
@@ -164,13 +171,14 @@ Verdict: OK if 0 redundant paragraphs · WARN if 1–3 · FAIL if 4+.
 
 Models pay more attention to the start and end of long contexts ("U-shaped attention"). Critical rules buried in the middle of a long file are statistically less likely to be followed. This check has its own multi-step flow because reordering a file is a meaningful edit, not a one-line fix.
 
-Run the steps in order. The result of this check goes into the scorecard *and* may trigger an interactive reorder.
+Run the steps in order. The result of this check goes into the scorecard _and_ may trigger an interactive reorder.
 
 #### Step 5a — List the current high-level order
 
 Walk the file and print the current top-level structure as a numbered list. Use H1/H2 headings (and H3s only if there are no H2s). Include the line number of each heading. Do **not** comment yet — just lay out what's there.
 
 Example:
+
 ```
 Current order:
 1. # Welcome to OrderFlow            (line 1)
@@ -184,7 +192,7 @@ Current order:
 N. ## Project conventions            (line 312)
 ```
 
-If the file has no headings, say so explicitly: *"No section headings — file is one undifferentiated block."*
+If the file has no headings, say so explicitly: _"No section headings — file is one undifferentiated block."_
 
 #### Step 5b — Comment on the order
 
@@ -205,9 +213,10 @@ Then state the structural problem in one paragraph. Examples:
 
 #### Step 5c — Propose a better order (only if needed)
 
-If the comment in 5b identified a real problem, propose a target order. Frame it as *"sections moved to top / kept / moved to bottom / removed"*, not as a full rewrite of every line.
+If the comment in 5b identified a real problem, propose a target order. Frame it as _"sections moved to top / kept / moved to bottom / removed"_, not as a full rewrite of every line.
 
 Example:
+
 ```
 Proposed order:
 1. ## Hard rules         (was: line 312)        ← moved to top
@@ -218,7 +227,7 @@ Proposed order:
 —   ## About the team / Mission / Values        ← remove (Check 3/4 already flagged these)
 ```
 
-If 5b found no problem, skip 5c entirely — say *"Order is sound; no reshuffle needed."*
+If 5b found no problem, skip 5c entirely — say _"Order is sound; no reshuffle needed."_
 
 #### Step 5d — Ask before reordering
 

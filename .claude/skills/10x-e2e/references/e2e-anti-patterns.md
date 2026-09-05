@@ -60,8 +60,8 @@ created in a previous run, guaranteeing a clean start even after a crash.
 Same discipline as for unit tests, lifted to E2E: **never say
 "fix this test."** Name the specific anti-pattern, explain why it doesn't protect
 the risk (or why it produces false failures), and give the target pattern. Three
-elements per re-prompt: *what's wrong*, *why it doesn't protect the risk*, *what
-replaces it*.
+elements per re-prompt: _what's wrong_, _why it doesn't protect the risk_, _what
+replaces it_.
 
 ### Target-pattern re-prompt examples
 

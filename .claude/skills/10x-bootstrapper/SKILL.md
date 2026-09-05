@@ -109,6 +109,7 @@ Hand-off received:
 Ask one confirmation:
 
 AskUserQuestion:
+
 - question: "Proceed with this hand-off, or correct something first?"
   header: "Hand-off"
   options:
@@ -118,7 +119,7 @@ AskUserQuestion:
     description: "I'll ask which field to override for this run; the file on disk is unchanged."
   - label: "Stop — fix the hand-off first"
     description: "Exit. Re-run /10x-tech-stack-selector to update tech-stack.md, then re-invoke."
-  multiSelect: false
+    multiSelect: false
 
 If "Correct a value": ask which field, capture an override, proceed with the override applied for this session only. Then run the populated-cwd guard from `references/refusal-protocol.md` (warn-and-confirm if cwd already carries a scaffold-shaped fingerprint such as `package.json`, `Cargo.toml`, `Gemfile`, `pyproject.toml`, etc.).
 

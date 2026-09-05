@@ -30,21 +30,22 @@ refused with a clear message rather than silently bricking the installation.
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-| --- | --- | --- | --- |
-| UI gating | Expose the caller's own operations in `Astro.locals` | Closes the dead-end nav entry without weakening security — the database stays the only real gate. | Plan |
-| Self-lockout | Hard guard inside `SECURITY DEFINER` functions | The "at least one administrator remains" invariant is trivial in a function and impossible in an RLS policy alone. | Plan |
-| CRUD scope | Create, rename, operations, membership — no delete | Covers FR-017/FR-018 fully and sidesteps the `on delete restrict` FK entirely. | Plan |
-| User discovery | Search box with a minimum query length | Keeps the enumeration surface narrow — the exact concern that killed the unscoped `get_user_emails` in S-04. | Plan |
-| Page structure | List page plus group detail page | Matches the existing recruitments list/detail shape and keeps each React island small. | Plan |
-| Operation writes | Per-checkbox immediate write | Each toggle maps to exactly one unique-constrained row; no diffing, failures stay isolated. | Plan |
-| Authorization mechanism | Plain RLS-covered tables except the two lockout paths | RLS already gates all three tables on `group.manage`; only the cross-row invariant needs a function. | Research |
-| Testing | Integration tests on the security boundary | Tests what a mock would lie about — RLS, unique constraints, the lockout invariant — with fixtures that already exist. | Plan |
-| Seed names | Rename `HR/Rekruter` to English, in its own phase | Clears a known English-only violation at the moment renaming becomes a product feature; it ripples through 4 test files. | Plan |
+| Decision                | Choice                                                | Why (1 sentence)                                                                                                         | Source   |
+| ----------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------- |
+| UI gating               | Expose the caller's own operations in `Astro.locals`  | Closes the dead-end nav entry without weakening security — the database stays the only real gate.                        | Plan     |
+| Self-lockout            | Hard guard inside `SECURITY DEFINER` functions        | The "at least one administrator remains" invariant is trivial in a function and impossible in an RLS policy alone.       | Plan     |
+| CRUD scope              | Create, rename, operations, membership — no delete    | Covers FR-017/FR-018 fully and sidesteps the `on delete restrict` FK entirely.                                           | Plan     |
+| User discovery          | Search box with a minimum query length                | Keeps the enumeration surface narrow — the exact concern that killed the unscoped `get_user_emails` in S-04.             | Plan     |
+| Page structure          | List page plus group detail page                      | Matches the existing recruitments list/detail shape and keeps each React island small.                                   | Plan     |
+| Operation writes        | Per-checkbox immediate write                          | Each toggle maps to exactly one unique-constrained row; no diffing, failures stay isolated.                              | Plan     |
+| Authorization mechanism | Plain RLS-covered tables except the two lockout paths | RLS already gates all three tables on `group.manage`; only the cross-row invariant needs a function.                     | Research |
+| Testing                 | Integration tests on the security boundary            | Tests what a mock would lie about — RLS, unique constraints, the lockout invariant — with fixtures that already exist.   | Plan     |
+| Seed names              | Rename `HR/Rekruter` to English, in its own phase     | Clears a known English-only violation at the moment renaming becomes a product feature; it ripples through 4 test files. | Plan     |
 
 ## Scope
 
 **In scope:**
+
 - Gated user-search RPC and two lockout-guarded write functions
 - Caller-operations signal in middleware and `Astro.locals`
 - Admin API routes for groups, operations, members, and user search
@@ -53,6 +54,7 @@ refused with a clear message rather than silently bricking the installation.
 - English rename of seeded group names
 
 **Out of scope:**
+
 - Deleting groups; any schema change to the three RBAC tables
 - Adding or removing values from the operation catalog (that is a migration)
 - Inviting or creating users; per-group audit logging
@@ -74,14 +76,14 @@ the route.
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Database | Gated user search plus two lockout-guarded write functions | A guard placed only at the route leaves the function callable via PostgREST |
-| 2. Operations signal | Caller's own operations in `Astro.locals`; `/admin` protected | Adds a query to every authenticated request |
-| 3. API + service | Four route families and a shared error mapper | Unmapped errcodes falling through to 500s — the failure this repo has hit three times |
-| 4. Admin UI | List and detail pages, member picker, gated nav entry | Per-checkbox writes leaving visibly partial state on failure |
-| 5. Integration tests | Security-boundary coverage with existing fixtures | Tests that pass without actually exercising the guard |
-| 6. Seed rename | English group names across seed, RLS script, 4 test files | Missed reference breaking an unrelated suite |
+| Phase                | What it delivers                                              | Key risk                                                                              |
+| -------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 1. Database          | Gated user search plus two lockout-guarded write functions    | A guard placed only at the route leaves the function callable via PostgREST           |
+| 2. Operations signal | Caller's own operations in `Astro.locals`; `/admin` protected | Adds a query to every authenticated request                                           |
+| 3. API + service     | Four route families and a shared error mapper                 | Unmapped errcodes falling through to 500s — the failure this repo has hit three times |
+| 4. Admin UI          | List and detail pages, member picker, gated nav entry         | Per-checkbox writes leaving visibly partial state on failure                          |
+| 5. Integration tests | Security-boundary coverage with existing fixtures             | Tests that pass without actually exercising the guard                                 |
+| 6. Seed rename       | English group names across seed, RLS script, 4 test files     | Missed reference breaking an unrelated suite                                          |
 
 **Prerequisites:** F-01 (`core-recruitment-data-foundation`) — shipped. Local Supabase
 running for phases 1, 5, and 6.

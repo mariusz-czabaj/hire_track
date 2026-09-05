@@ -25,7 +25,7 @@ Analyse the hire_track project with a focus on the UI. The results will be used 
 visual redesign of the interface.
 
 > Note on naming: there is no `hire_track` directory. The recruitment product (recruitments,
-> kanban, candidates, security groups) *is* this repository — still carrying the starter's
+> kanban, candidates, security groups) _is_ this repository — still carrying the starter's
 > name `10x-astro-starter` in `package.json` and `10x Astro Starter` as the default page
 > title. That naming leftover is itself a redesign item.
 
@@ -102,7 +102,7 @@ Three components bypass the primitives entirely:
   (`bg-white/10 border ... placeholder-white/40 focus:ring-purple-400`) instead of `Input`,
   so auth forms and app forms cannot share a field style.
 - `src/components/auth/ServerError.tsx:11` — bespoke `border-red-500/30 bg-red-900/30
-  text-red-300` error box instead of a `destructive` token. It is the **only** error surface
+text-red-300` error box instead of a `destructive` token. It is the **only** error surface
   used app-wide, so one file governs every error's look.
 - `src/components/Banner.astro` — scoped `<style>` with literal hexes (`#dbeafe`, `#fef3c7`,
   `#fee2e2`) and **light-mode colours on a permanently dark page**. It renders config errors at
@@ -153,18 +153,18 @@ the copy-pasted shell — this also gives the kanban its own full-width case wit
 
 ### 4. Screen inventory (what has to be redesigned)
 
-| Route | Shell | Island | Notes |
-|---|---|---|---|
-| `/` | `Welcome.astro` | — | Starter marketing page, `Topbar` only here |
-| `/auth/signin`, `/auth/signup`, `/auth/confirm-email` | centered glass card | `SignInForm`, `SignUpForm` | Own `FormField`, not `Input` |
-| `/dashboard` | centered glass card | — | Placeholder |
-| `/recruitments` | `max-w-4xl` | `RecruitmentList` | Pill filters + link-wrapped cards |
-| `/recruitments/new` | `max-w-xl` | `CreateRecruitmentForm` (222 ln) | Longest form in the app |
-| `/recruitments/:id` | `max-w-6xl` | `KanbanBoard` (194 ln) | Densest screen; header packs h1 + badge + 3 status pills + 2 dialog triggers on one flex row |
-| `/recruitments/:id/candidates/:crId` | `max-w-4xl` | `CandidateDetail` (225 ln) | Notes + status history |
-| `/candidates` | `max-w-4xl` | `CandidateList` | Debounced search |
-| `/candidates/:id` | `max-w-4xl` | `CandidateProfile` (306 ln) | Largest component; CV upload |
-| `/admin/groups`, `/admin/groups/:id` | `max-w-4xl` | `SecurityGroupList`, `SecurityGroupDetail` (258 ln) | Inline unauthorized message |
+| Route                                                 | Shell               | Island                                              | Notes                                                                                        |
+| ----------------------------------------------------- | ------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `/`                                                   | `Welcome.astro`     | —                                                   | Starter marketing page, `Topbar` only here                                                   |
+| `/auth/signin`, `/auth/signup`, `/auth/confirm-email` | centered glass card | `SignInForm`, `SignUpForm`                          | Own `FormField`, not `Input`                                                                 |
+| `/dashboard`                                          | centered glass card | —                                                   | Placeholder                                                                                  |
+| `/recruitments`                                       | `max-w-4xl`         | `RecruitmentList`                                   | Pill filters + link-wrapped cards                                                            |
+| `/recruitments/new`                                   | `max-w-xl`          | `CreateRecruitmentForm` (222 ln)                    | Longest form in the app                                                                      |
+| `/recruitments/:id`                                   | `max-w-6xl`         | `KanbanBoard` (194 ln)                              | Densest screen; header packs h1 + badge + 3 status pills + 2 dialog triggers on one flex row |
+| `/recruitments/:id/candidates/:crId`                  | `max-w-4xl`         | `CandidateDetail` (225 ln)                          | Notes + status history                                                                       |
+| `/candidates`                                         | `max-w-4xl`         | `CandidateList`                                     | Debounced search                                                                             |
+| `/candidates/:id`                                     | `max-w-4xl`         | `CandidateProfile` (306 ln)                         | Largest component; CV upload                                                                 |
+| `/admin/groups`, `/admin/groups/:id`                  | `max-w-4xl`         | `SecurityGroupList`, `SecurityGroupDetail` (258 ln) | Inline unauthorized message                                                                  |
 
 Dialogs (`AddCandidateDialog`, `MoveCandidateDialog`, `StageEditor`) are the only modal
 surfaces and are the one place where shadcn styling shows through mostly unmodified — so today
@@ -194,7 +194,7 @@ the same box.
 - ARIA use is sparse: only 9 files contain any `aria-*`, most a single attribute
   (`StageEditor.tsx` has 3). Live regions for async results are absent — `ServerError` renders
   a plain `<p>` with no `role="alert"`, so failures are silent for screen readers. `Banner.astro`
-  *does* set `role="alert"`/`role="status"` and is the model to follow.
+  _does_ set `role="alert"`/`role="status"` and is the model to follow.
 - **Contrast risk is systemic**: the palette leans on `text-blue-100/40`, `/50`, `/60`, `/70`
   over `bg-white/5` on a near-black gradient. `text-blue-100/40` on `bg-white/5`
   (`KanbanBoard.tsx:150`) is almost certainly below WCAG AA. Every low-emphasis label in the
@@ -206,7 +206,7 @@ the same box.
   `flex-row justify-between` with 3 metadata items and a badge on the right, with **no**
   mobile stacking — this will crush on narrow screens.
 - Link semantics: `RecruitmentList.tsx:84` wraps a whole `Card` in an `<a>` — fine, but the
-  card contains no other interactive element; `KanbanBoard.tsx:163-176` puts a link *and* a
+  card contains no other interactive element; `KanbanBoard.tsx:163-176` puts a link _and_ a
   dialog trigger inside a card, correctly avoiding the nested-interactive trap.
 - `formatDate` uses `toLocaleDateString("en-CA")` (i.e. forced ISO `YYYY-MM-DD`) in
   `KanbanBoard.tsx:25` and `RecruitmentList.tsx:22` — duplicated, and a deliberate-looking

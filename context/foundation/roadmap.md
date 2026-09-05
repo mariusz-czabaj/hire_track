@@ -51,16 +51,16 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 
 ## At a glance
 
-| ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites | Scope anchors | Status   |
-| ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | -------- |
+| ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites | Scope anchors | Status      |
+| ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | ----------- |
 | F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
-| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | new      |
-| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | new      |
-| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new      |
-| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new      |
-| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new      |
-| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new      |
-| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new      |
+| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | new         |
+| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | new         |
+| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new         |
+| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new         |
+| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new         |
+| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new         |
+| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new         |
 
 ## Streams
 
