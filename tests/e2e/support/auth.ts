@@ -32,5 +32,5 @@ export async function signInAs(page: Page, user: SeededUserKey): Promise<void> {
   }).toPass({ timeout: 10_000 });
 
   await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL("/");
+  await page.waitForURL("/recruitments");
 }

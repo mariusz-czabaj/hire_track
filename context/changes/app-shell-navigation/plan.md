@@ -693,33 +693,33 @@ existing sessions get the default with no special handling.
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run build`
-- [x] 1.2 Linting passes, including `jsx-a11y` rules on the new islands: `npm run lint`
-- [x] 1.3 Unit tests pass: `npx vitest run`
-- [x] 1.4 Existing E2E suite still passes: `npx playwright test`
+- [x] 1.1 Type checking passes: `npm run build` — fd4d6ff
+- [x] 1.2 Linting passes, including `jsx-a11y` rules on the new islands: `npm run lint` — fd4d6ff
+- [x] 1.3 Unit tests pass: `npx vitest run` — fd4d6ff
+- [x] 1.4 Existing E2E suite still passes: `npx playwright test` — fd4d6ff
 
 #### Manual
 
-- [ ] 1.5 Sidebar shows Recruitments and Candidates; Administration only with `group.manage`
-- [ ] 1.6 Collapse survives reload with no flash of the expanded state
-- [ ] 1.7 Avatar menu opens with keyboard alone, shows email, signs out
-- [ ] 1.8 Mobile drawer traps focus, closes on Escape, restores focus to the hamburger
-- [ ] 1.9 Contrast table still reports AA passes in both themes, including nav pills
+- [x] 1.5 Sidebar shows Recruitments and Candidates; Administration only with `group.manage` — fd4d6ff
+- [x] 1.6 Collapse survives reload with no flash of the expanded state — fd4d6ff
+- [x] 1.7 Avatar menu opens with keyboard alone, shows email, signs out — fd4d6ff
+- [x] 1.8 Mobile drawer traps focus, closes on Escape, restores focus to the hamburger — fd4d6ff
+- [x] 1.9 Contrast table still reports AA passes in both themes, including nav pills — fd4d6ff
 
 ### Phase 2: Route Surface Cleanup
 
 #### Automated
 
-- [ ] 2.1 Build succeeds with no unresolved imports after the deletions: `npm run build`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 No source reference to the deleted modules or route remains
-- [ ] 2.4 E2E suite still passes: `npx playwright test`
+- [x] 2.1 Build succeeds with no unresolved imports after the deletions: `npm run build`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 No source reference to the deleted modules or route remains
+- [x] 2.4 E2E suite still passes: `npx playwright test`
 
 #### Manual
 
-- [ ] 2.5 `/` while signed out lands on `/auth/signin`
-- [ ] 2.6 `/` while signed in lands on `/recruitments`
-- [ ] 2.7 `/dashboard` returns a 404
+- [x] 2.5 `/` while signed out lands on `/auth/signin`
+- [x] 2.6 `/` while signed in lands on `/recruitments`
+- [x] 2.7 `/dashboard` returns a 404
 
 ### Phase 3: Recruitments Area
 

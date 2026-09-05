@@ -7,7 +7,7 @@ import type { Operation } from "@/types";
 import { resolveTheme, THEME_COOKIE_NAME } from "@/lib/theme";
 import { resolveSidebarCollapsed, SIDEBAR_COLLAPSED_COOKIE_NAME } from "@/lib/sidebar";
 
-const PROTECTED_ROUTES = ["/dashboard", "/recruitments", "/candidates", "/admin"];
+const PROTECTED_ROUTES = ["/recruitments", "/candidates", "/admin"];
 
 // Routes under /api/ that must stay reachable without authentication. Kept separate from
 // isAuthRoute below, which also skips resolveCallerOperations - widening it would silently
