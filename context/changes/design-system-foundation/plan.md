@@ -428,34 +428,34 @@ Wycinek jest addytywny i odwracalny. Warstwa tokenowa dokładana jest obok istni
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe funkcji rozstrzygającej motyw przechodzą, w tym przypadki `undefined` i nieznanej wartości cookie: `npm test`
-- [x] 2.2 Lint przechodzi: `npm run lint`
-- [x] 2.3 Typy przechodzą: `npm run typecheck`
-- [x] 2.4 Build produkcyjny przechodzi: `npm run build`
-- [x] 2.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 2.1 Testy jednostkowe funkcji rozstrzygającej motyw przechodzą, w tym przypadki `undefined` i nieznanej wartości cookie: `npm test` — fdcc95a
+- [x] 2.2 Lint przechodzi: `npm run lint` — fdcc95a
+- [x] 2.3 Typy przechodzą: `npm run typecheck` — fdcc95a
+- [x] 2.4 Build produkcyjny przechodzi: `npm run build` — fdcc95a
+- [x] 2.5 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e` — fdcc95a
 
 #### Manual
 
-- [ ] 2.6 Przełączenie motywu i przeładowanie strony zachowuje wybór
-- [ ] 2.7 Przy pierwszej wizycie (wyczyszczone cookies) aplikacja podąża za ustawieniem motywu w systemie
-- [ ] 2.8 Przy ładowaniu nie widać mignięcia niewłaściwego motywu — również przy wymuszonym wolnym łączu
-- [ ] 2.9 Przełącznik działa na ekranie logowania, czyli dla niezalogowanego użytkownika
-- [ ] 2.10 Przełącznik da się obsłużyć samą klawiaturą i ma czytelną nazwę w czytniku ekranu
+- [x] 2.6 Przełączenie motywu i przeładowanie strony zachowuje wybór
+- [x] 2.7 Przy pierwszej wizycie (wyczyszczone cookies) aplikacja podąża za ustawieniem motywu w systemie
+- [x] 2.8 Przy ładowaniu nie widać mignięcia niewłaściwego motywu — również przy wymuszonym wolnym łączu
+- [x] 2.9 Przełącznik działa na ekranie logowania, czyli dla niezalogowanego użytkownika
+- [x] 2.10 Przełącznik da się obsłużyć samą klawiaturą i ma czytelną nazwę w czytniku ekranu
 
 ### Phase 3: AppShell — powłoka ze slotami
 
 #### Automated
 
-- [ ] 3.1 Lint przechodzi, w tym reguły `astro/jsx-a11y/*` na nowym pliku: `npm run lint`
-- [ ] 3.2 Typy przechodzą: `npm run typecheck`
-- [ ] 3.3 Build produkcyjny przechodzi: `npm run build`
-- [ ] 3.4 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 3.1 Lint przechodzi, w tym reguły `astro/jsx-a11y/*` na nowym pliku: `npm run lint`
+- [x] 3.2 Typy przechodzą: `npm run typecheck`
+- [x] 3.3 Build produkcyjny przechodzi: `npm run build`
+- [x] 3.4 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
 
 #### Manual
 
-- [ ] 3.5 Żadna istniejąca trasa nie renderuje `AppShell` — ekrany produktowe pozostają nietknięte
-- [ ] 3.6 Powłoka poprawnie chowa obszar nawigacji poniżej breakpointu i nie powoduje przewijania w poziomie
-- [ ] 3.7 Odsyłacz „przejdź do treści" jest pierwszym elementem po `Tab` i faktycznie przenosi fokus do `main`
+- [x] 3.5 Żadna istniejąca trasa nie renderuje `AppShell` — ekrany produktowe pozostają nietknięte
+- [x] 3.6 Powłoka poprawnie chowa obszar nawigacji poniżej breakpointu i nie powoduje przewijania w poziomie
+- [x] 3.7 Odsyłacz „przejdź do treści" jest pierwszym elementem po `Tab` i faktycznie przenosi fokus do `main`
 
 ### Phase 4: Strona podglądu systemu projektowego
 

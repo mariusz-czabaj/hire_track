@@ -1,0 +1,45 @@
+---
+export type AppShellContainerWidth = "narrow" | "standard" | "wide";
+
+interface Props {
+  containerWidth?: AppShellContainerWidth;
+}
+
+const { containerWidth = "standard" } = Astro.props;
+
+const containerWidthClass: Record<AppShellContainerWidth, string> = {
+  narrow: "max-w-xl",
+  standard: "max-w-4xl",
+  wide: "max-w-6xl",
+};
+---
+
+<div class="bg-background text-foreground min-h-screen">
+  <a
+    href="#main-content"
+    class="bg-background text-foreground focus-visible:ring-ring sr-only focus:not-sr-only focus-visible:absolute focus-visible:top-2 focus-visible:left-2 focus-visible:z-50 focus-visible:rounded-md focus-visible:px-4 focus-visible:py-2 focus-visible:ring-2 focus-visible:outline-none"
+  >
+    Skip to content
+  </a>
+  <div class="flex min-h-screen flex-col md:flex-row">
+    <nav aria-label="Primary" class="border-border hidden shrink-0 border-b md:block md:w-64 md:border-r md:border-b-0">
+      <slot name="nav" />
+    </nav>
+    <div class="flex min-w-0 flex-1 flex-col">
+      <header class="border-border flex items-center justify-end gap-2 border-b px-4 py-3 sm:px-6">
+        <slot name="topbar-actions" />
+      </header>
+      <main
+        id="main-content"
+        class="mx-auto w-full flex-1 px-4 py-6 sm:px-6"
+        class:list={[containerWidthClass[containerWidth]]}
+      >
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <div class="min-w-0"><slot name="page-title" /></div>
+          <div class="flex shrink-0 items-center gap-2"><slot name="page-actions" /></div>
+        </div>
+        <slot />
+      </main>
+    </div>
+  </div>
+</div>
