@@ -476,16 +476,16 @@ Wycinek jest addytywny i odwracalny. Warstwa tokenowa dokładana jest obok istni
 
 #### Automated
 
-- [x] 5.1 `npx eslint --print-config src/components/recruitments/KanbanBoard.tsx` raportuje niezerową liczbę aktywnych reguł `jsx-a11y/*`
-- [x] 5.2 Lint przechodzi (ostrzeżenia dopuszczalne, błędy nie): `npm run lint`
-- [x] 5.3 Testy jednostkowe przechodzą: `npm test`
-- [x] 5.4 Typy przechodzą: `npm run typecheck`
-- [x] 5.5 Build produkcyjny przechodzi: `npm run build`
-- [x] 5.6 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e`
+- [x] 5.1 `npx eslint --print-config src/components/recruitments/KanbanBoard.tsx` raportuje niezerową liczbę aktywnych reguł `jsx-a11y/*` — 9421c1a
+- [x] 5.2 Lint przechodzi (ostrzeżenia dopuszczalne, błędy nie): `npm run lint` — 9421c1a
+- [x] 5.3 Testy jednostkowe przechodzą: `npm test` — 9421c1a
+- [x] 5.4 Typy przechodzą: `npm run typecheck` — 9421c1a
+- [x] 5.5 Build produkcyjny przechodzi: `npm run build` — 9421c1a
+- [x] 5.6 Testy E2E przechodzą bez zmian w asercjach: `npm run test:e2e` — 9421c1a
 
 #### Manual
 
-- [ ] 5.7 Strona podglądu nie raportuje ani jednej pary poniżej progu AA w motywie jasnym
-- [ ] 5.8 Strona podglądu nie raportuje ani jednej pary poniżej progu AA w motywie ciemnym
-- [ ] 5.9 Ewentualne odstępstwa od progu są spisane wraz z uzasadnieniem
-- [ ] 5.10 Układ, treść i klasy żadnego ekranu produktowego nadal się nie zmieniły; lista zmienionych powierzchni tokenowych jest nadal tożsama z tą z Desired End State p.7
+- [x] 5.7 Strona podglądu nie raportuje ani jednej pary poniżej progu AA w motywie jasnym
+- [x] 5.8 Strona podglądu nie raportuje ani jednej pary poniżej progu AA w motywie ciemnym
+- [x] 5.9 Ewentualne odstępstwa od progu są spisane wraz z uzasadnieniem
+- [x] 5.10 Układ, treść i klasy żadnego ekranu produktowego nadal się nie zmieniły; lista zmienionych powierzchni tokenowych jest nadal tożsama z tą z Desired End State p.7
