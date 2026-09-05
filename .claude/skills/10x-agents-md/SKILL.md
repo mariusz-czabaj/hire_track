@@ -42,16 +42,16 @@ The same skill can produce two materially different documents depending on **whe
 
 **Repo-level scope.** Follow the procedure and "Output structure" below as written — the document is a high-level onboarding guide (project structure, build commands, CI gate, commit conventions, etc.).
 
-**Directory-level scope.** Drop the repository-onboarding framing entirely. The reader already knows the repo; they need the rules of _this_ directory. Reorient discovery and output:
+**Directory-level scope.** Drop the repository-onboarding framing entirely. The reader already knows the repo; they need the rules of *this* directory. Reorient discovery and output:
 
 - **Discover locally first.** Inspect the files actually living next to the target: sibling source files, the nearest `index.*`/`mod.rs`/`__init__.py`, co-located tests, the parent directory's README if any, and any nested config (e.g. `tsconfig.json`, `.eslintrc`, route manifests) that overrides repo-level defaults. Only consult repo-root docs (`README.md`, `CLAUDE.md`) to **resolve conflicts** or pull a single canonical `@`-reference — not as the primary source.
 - **Infer the local pattern by reading siblings.** What shape do existing files in this directory take? Component file layout, naming (`PascalCase.tsx`, `kebab-case.ts`, `*.handler.ts`), default vs. named exports, prop/argument conventions, where types/styles/tests live relative to the unit, error-handling idioms, what gets imported from where. The AGENTS.md captures the convention you observed, not generic advice.
 - **Reframe sections around the local unit.** Replace repo-level sections with directory-relevant ones. Useful defaults (adapt to what's there):
-  - _Adding a new \<unit\>_ — concrete steps for the dominant artifact in this directory (component, route handler, migration, hook, worker, etc.), citing one existing sibling as the reference shape via `@./<sibling-file>`.
-  - _File layout & naming_ — naming pattern, co-location rules (test next to source? styles inline? types in a sibling file?), barrel-export policy if one exists.
-  - _Local conventions_ — props/args shape, state/data-flow rules, allowed imports (and forbidden ones — e.g. "components in this directory must not import from `src/server/`"), accessibility or i18n rules visible in siblings.
-  - _Testing this unit_ — the test pattern used by neighbors, how to run just this directory's tests.
-  - _Tripwires_ — directory-specific "never do X" rules visible in siblings or a nearby CLAUDE.md fragment.
+  - *Adding a new \<unit\>* — concrete steps for the dominant artifact in this directory (component, route handler, migration, hook, worker, etc.), citing one existing sibling as the reference shape via `@./<sibling-file>`.
+  - *File layout & naming* — naming pattern, co-location rules (test next to source? styles inline? types in a sibling file?), barrel-export policy if one exists.
+  - *Local conventions* — props/args shape, state/data-flow rules, allowed imports (and forbidden ones — e.g. "components in this directory must not import from `src/server/`"), accessibility or i18n rules visible in siblings.
+  - *Testing this unit* — the test pattern used by neighbors, how to run just this directory's tests.
+  - *Tripwires* — directory-specific "never do X" rules visible in siblings or a nearby CLAUDE.md fragment.
 - **Skip the repo-level sections.** No top-level project structure map, no monorepo package list, no global build/CI overview, no commit-convention recap — those belong in the root `AGENTS.md`. If the reader needs them, link once: `See @AGENTS.md at the repo root for repo-wide rules.`
 - **Length budget shrinks.** Aim for **120–250 words** of body for directory-level guides; the surface area is smaller, and padding here is worse than at the root.
 
@@ -59,7 +59,7 @@ The Quality guards still apply, with one substitution: guard 5 ("Critical rules 
 
 ## Interactive prompts — host-agnostic
 
-Whenever the procedure says _"ask the user"_, use whichever interactive-question tool the host agent exposes. The skill is host-agnostic; do not hard-code one tool name. Known equivalents (non-exhaustive):
+Whenever the procedure says *"ask the user"*, use whichever interactive-question tool the host agent exposes. The skill is host-agnostic; do not hard-code one tool name. Known equivalents (non-exhaustive):
 
 - Claude Code → `AskUserQuestion`
 - Cursor → `ask_question`
@@ -155,7 +155,7 @@ Triggered when the target file already exists. The default is a **surgical edit*
    - **UPDATE** — directionally right but a detail is stale (renamed script, moved path, changed tool, version bump). Note the exact replacement.
    - **REMOVE** — the underlying file/command/convention no longer exists, or the rule has been contradicted by a newer source (CLAUDE.md, README) that you trust more.
    - **MISSING** — not currently in the file but should be (new top-level package, new required script, new "never do X" rule landed via CI validator, new commit convention visible in `git log`).
-     Keep this classification as a short table you can show the user. Cite `path:line` (in the existing AGENTS.md) for every UPDATE/REMOVE entry, and cite the source-of-truth path (e.g. `package.json:42`) for every UPDATE/MISSING entry.
+   Keep this classification as a short table you can show the user. Cite `path:line` (in the existing AGENTS.md) for every UPDATE/REMOVE entry, and cite the source-of-truth path (e.g. `package.json:42`) for every UPDATE/MISSING entry.
 
 5. **Confirm scope before editing.** Use the host's interactive-question tool once (see "Interactive prompts — host-agnostic" above) with these options:
    - **Apply the proposed updates** — execute the UPDATE/REMOVE/MISSING list as targeted `Edit` calls; KEEP lines are not touched.
@@ -167,7 +167,7 @@ Triggered when the target file already exists. The default is a **surgical edit*
 
 7. **Re-run the Quality guards** on the updated file. The same five gates apply. If a guard now fails because of the update (e.g. body grew past 400 words after MISSING additions), trim KEEP content that has become low-leverage rather than dropping the new MISSING content.
 
-8. **Report.** Confirm path, new word count, and a one-line summary of what changed in each bucket (e.g. _"3 updated, 1 removed, 2 added; section order unchanged"_).
+8. **Report.** Confirm path, new word count, and a one-line summary of what changed in each bucket (e.g. *"3 updated, 1 removed, 2 added; section order unchanged"*).
 
 ## Output structure
 
@@ -181,8 +181,8 @@ Order sections by **leverage to a fresh agent**, not by tradition. Critical rule
 4. **Coding Style & Naming Conventions** — indentation, language version, naming patterns (with one short example pattern, not a code block), and the lint/format tools that enforce them.
 5. **Testing Guidelines** — framework, where tests live, naming pattern, how to run a single test, any coverage threshold the repo actually checks.
 6. **Commit & Pull Request Guidelines** — the convention observed in `git log` (e.g. Conventional Commits prefixes seen), PR description expectations, required CI checks.
-7. **Security & Configuration Tips** _(optional)_ — secrets handling, env-file location, validator scripts that fail CI.
-8. **Architecture Overview** _(optional, only if not already covered by a `@`-reference)_ — 3–6 bullets max; otherwise link out.
+7. **Security & Configuration Tips** *(optional)* — secrets handling, env-file location, validator scripts that fail CI.
+8. **Architecture Overview** *(optional, only if not already covered by a `@`-reference)* — 3–6 bullets max; otherwise link out.
 
 Open the file with one short paragraph (1–2 sentences) naming what the project is and the primary stack — enough that an agent landing in the repo for the first time has a frame. No mission statements, team intros, or values.
 
@@ -192,7 +192,7 @@ Each guard is a hard gate. If any fails, revise the draft.
 
 1. **Length.** Body is 200–400 words. Under 200 means you skipped specifics; over 400 means you padded or inlined what should be a reference.
 2. **No multi-line snippets.** No fenced code blocks longer than a single command line. Replace example components / configs / migrations with `@path/to/file`. Short single-line command examples (`pnpm test`, `git rebase main`) are fine.
-3. **Every rule is checkable.** Re-read each sentence and ask: _could a reviewer flag a diff against this?_ If not, rewrite it with a concrete pattern, threshold, or named tool. Strike phrases like "clean code", "best practices", "modern patterns", "be consistent", "handle errors properly", "keep it simple".
+3. **Every rule is checkable.** Re-read each sentence and ask: *could a reviewer flag a diff against this?* If not, rewrite it with a concrete pattern, threshold, or named tool. Strike phrases like "clean code", "best practices", "modern patterns", "be consistent", "handle errors properly", "keep it simple".
 4. **No redundant knowledge.** Strike any line you could have written without opening the repo. Framework defaults, language tutorials, and definitions of common terms do not earn a slot. If a rule duplicates `README.md` / `package.json` / lint config, replace it with `@README.md` / `@package.json` / `@.eslintrc.json`.
 5. **Critical rules first.** The first third of the file must contain the highest-stakes rules and the most-used commands. If the only "never do X" rule is at the bottom, move it up. If the top is welcome/mission/values, cut it.
 
@@ -207,7 +207,7 @@ Report to the user:
 - the file path written,
 - the body word count,
 - a one-line summary of the section order chosen,
-- a reminder: _test the file by running a real task with a fresh agent session — onboarding docs only prove themselves on the next run._
+- a reminder: *test the file by running a real task with a fresh agent session — onboarding docs only prove themselves on the next run.*
 
 Do not propose follow-ups unless the user asks.
 

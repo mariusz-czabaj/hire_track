@@ -1,200 +1,226 @@
 ---
 project: System wspomagający rekrutację
-version: 1
+version: 2
 status: draft
 created: 2026-08-27
-updated: 2026-09-04
+updated: 2026-09-05
 prd_version: 1
 main_goal: speed
 top_blocker: time
-milestone_id: first-recruiter-workflow-mvp
-milestone_seq: 1
+milestone_id: ui-visual-redesign
+milestone_seq: 2
 milestone_status: open
 ---
 
 # Roadmap: System wspomagający rekrutację
 
 > Wygenerowano z `context/foundation/prd.md` (v1) + auto-zbadanego baseline'u kodu.
+> Milestone M-2 wywodzi się z opisu wizualnego (referencyjny screenshot ATS) — patrz kotwice `MS-NN` w charterze.
 > Edytuj w miejscu; archiwizuj przy pełnej regeneracji.
-> Wycinki poniżej są uporządkowane wg kolejności zależności. Tabela "Podsumowanie" to indeks.
+> Wycinki poniżej są uporządkowane wg kolejności zależności. Tabela "At a glance" to indeks.
 
 ## Milestone
 
-**M-1: Pierwszy używalny cykl pracy rekrutera** — Status: open
+**M-2: Spójny język wizualny aplikacji** — Status: open
 
-- **Intent:** Dowieźć cały ścieżkowy must-have flow z PRD — logowanie, przeglądanie i tworzenie rekrutacji, zarządzanie kandydatami na kanbanie z wymuszoną notatką, profil kandydata z CV, wyszukiwanie historii kandydata i administrację grupami bezpieczeństwa — czyli komplet Kryteriów sukcesu (Primary) z PRD.
-- **Source materials:** `context/foundation/prd.md` (v1)
-- **Done when:** każdy F-NN i S-NN poniżej ma status `done`.
-- **Scope anchors:** US-01, US-02, FR-001 do FR-018 (w tym FR-001a, FR-013a).
+- **Intent:** Zastąpić odziedziczony po starterze motyw "cosmic" (glass-morphism, wymuszony dark mode, kolory wklepane w ~250 miejscach) własnym systemem projektowym opartym na tokenach, wzorowanym na dostarczonym screenshocie referencyjnym ATS: jasna powierzchnia, stały sidebar z nawigacją, serifowy nagłówek strony, kolorowe kolumny kanbana z akcentem na kartach. Efektem ma być interfejs, w którym zmiana motywu to zmiana jednego pliku, a nie 35.
+- **Source materials:** referencyjny screenshot ATS dostarczony przez użytkownika 2026-09-05; `context/changes/ui-redesign-foundation/research.md` (analiza obecnego UI); `context/changes/ui-redesign-foundation/design-brief.md` (wymagania A–G wyprowadzone ze screenshotu)
+- **Done when:** każdy F-NN i S-NN poniżej ma status `done`, a poza tym: (a) w kodzie funkcyjnym nie ma literałów palety Tailwind ani `bg-cosmic` — kolory wyłącznie przez tokeny, (b) każdy ekran przechodzi WCAG 2.1 AA w obu motywach, (c) wszystkie 9 kotwic `data-testid` i zestaw testów E2E przechodzą.
+- **Scope anchors:**
+  - **MS-01:** Warstwa tokenów jest jedynym źródłem kolorów; motyw jasny i ciemny z przełącznikiem i persystencją wyboru.
+  - **MS-02:** Powłoka aplikacji — stały sidebar z nawigacją, topbar z menu użytkownika, jeden `AppShell` zamiast powłoki kopiowanej w 7 plikach.
+  - **MS-03:** Nagłówek rekrutacji — serifowy tytuł, badge statusu, wiersz metadanych z ikonami, menu akcji.
+  - **MS-04:** Kanban — kolorowe pigułki nagłówków kolumn, karty z paskiem akcentu, deterministyczna paleta etapów.
+  - **MS-05:** Przenoszenie kandydatów metodą przeciągnij-i-upuść, z zachowaniem wymuszonej notatki (FR-013).
+  - **MS-06:** Widoki listowe (rekrutacje, kandydaci, administracja) w nowym języku wizualnym.
+  - **MS-07:** Formularze, komunikaty błędów i potwierdzenia akcji na wspólnych prymitywach.
+  - **MS-08:** Usunięcie powierzchni odziedziczonych po starterze (landing marketingowy, placeholderowy dashboard).
+  - **MS-09:** WCAG 2.1 AA jako twarde kryterium odbioru, weryfikowane w obu motywach.
 
 ## Vision recap
 
 Rekruterzy i hiring managerowie prowadzą rekrutacje bez centralnego narzędzia — statusy kandydatów żyją w arkuszach, historia poprzednich rekrutacji jest niedostępna. System ma zastąpić arkusze jednym źródłem prawdy: tablicą kanban per rekrutacja i bazą kandydatów przeszukiwalną przez historię wszystkich rekrutacji.
 
+M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygląda jak starter, na którym została zbudowana, a nie jak narzędzie rekrutacyjne.
+
 ## North star
 
-**S-01: Rekruter przegląda listę rekrutacji i otwiera rekrutację jako tablicę kanban kandydatów** — to najmniejszy kawałek end-to-end, który dowodzi, że produkt rozwiązuje główny ból z PRD (US-01, Kryterium sukcesu Primary).
+**S-10: Kanban w nowym języku wizualnym** — to najgęstszy ekran produktu i jednocześnie ten, który na screenshocie referencyjnym niesie najwięcej decyzji projektowych (kolory etapów, akcenty kart, rytm kolumn). Jeśli nowy system tokenów obroni się tutaj, obroni się wszędzie.
 
 > "Gwiazda przewodnia" = najmniejszy kompletny wycinek funkcjonalności, który jeśli zadziała, dowodzi, że reszta produktu ma sens budować dalej — dlatego jest sekwencjonowana najwcześniej, jak tylko pozwalają na to jej zależności.
 
 ## At a glance
 
-| ID   | Change ID                          | Outcome (user can …)                                                                                       | Prerequisites | PRD refs                                                            | Status      |
-| ---- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------- | ----------- |
-| F-01 | core-recruitment-data-foundation   | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa                           | —             | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | in-progress |
-| S-01 | recruiter-views-kanban-board       | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów                            | F-01          | US-01, FR-003, FR-004, FR-005, FR-010                               | in-progress |
-| S-02 | recruiter-creates-recruitment      | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status                    | F-01, S-01    | FR-001, FR-001a, FR-002                                             | in-progress |
-| S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji                                         | F-01, S-01    | FR-004                                                              | in-progress |
-| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu)           | S-01, S-02    | FR-006, FR-008, FR-009, FR-013, Business Logic                      | in-progress |
-| S-05 | candidate-profile-and-cv-upload    | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach               | S-04          | FR-011, FR-012, FR-013a, NFR-retencja                               | in-progress |
-| S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | S-04, F-01    | US-02, FR-014, FR-015, FR-016                                       | in-progress |
-| S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | F-01          | FR-017, FR-018                                                      | in-progress |
+| ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites | Scope anchors | Status   |
+| ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | -------- |
+| F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
+| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | new      |
+| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | new      |
+| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new      |
+| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new      |
+| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new      |
+| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new      |
+| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new      |
 
 ## Streams
 
 Pomoc nawigacyjna — grupuje elementy dzielące ten sam łańcuch zależności. Kanoniczna kolejność wciąż żyje w grafie zależności poniżej; ta tabela to proponowana kolejność czytania po równoległych ścieżkach.
 
-| Stream | Theme                       | Chain                                                        | Note                                                                                                                                                                                             |
-| ------ | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| A      | Główna pętla rekrutera      | `F-01` → `S-01` → `S-02` → `S-03` → `S-04` → `S-05` → `S-06` | S-05 i S-06 mogą iść równolegle po S-04 (nie zależą od siebie nawzajem); to dominujący ciąg must-have — sekwencjonowany pierwszy zgodnie z celem `speed`.                                        |
-| B      | Administracja i uprawnienia | `F-01` → `S-07`                                              | Niezależny od głównej pętli — S-07 potrzebuje tylko F-01, więc może iść równolegle z S-01…S-06 (przy `top_blocker: time` to realna dźwignia — osobny agent/branch może go dowozić równocześnie). |
+| Stream | Theme                   | Chain                                      | Note                                                                                                                                                                                     |
+| ------ | ----------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A      | Kanban (ścieżka główna) | `F-02` → `S-08` → `S-09` → `S-10` → `S-11` | Dominujący ciąg — prowadzi do north star i dalej do jedynej nowej funkcjonalności w tym milestonie (DnD).                                                                                |
+| B      | Pozostałe powierzchnie  | `F-02` → `S-12`, `F-02` → `S-13`           | S-12 i S-13 nie zależą od siebie ani od kanbana — po F-02 (a S-12 dodatkowo po S-08) mogą iść równolegle z ścieżką A, osobnym agentem/branchem. Przy blokerze `time` to realna dźwignia. |
+| C      | Domknięcie              | wszystko → `S-14`                          | Audyt dostępności jest z definicji ostatni — mierzy stan końcowy, nie pośredni.                                                                                                          |
 
 ## Baseline
 
-Co już jest w kodzie na dzień `2026-08-27` (auto-zbadane + potwierdzone przez użytkownika).
-Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponownie.
+Co już jest w kodzie na dzień `2026-09-05` (po domknięciu M-1, potwierdzone przez użytkownika).
+Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 
-- **Frontend:** present — szkielet Astro 6 + React 19 (`src/pages/dashboard.astro`, `src/pages/index.astro`, komponenty UI w `src/components/ui/`).
-- **Backend / API:** partial — endpointy auth (`src/pages/api/auth/{signin,signup,signout}.ts`); brak endpointów domenowych (rekrutacje, kandydaci).
-- **Data:** absent — brak `supabase/migrations`, brak schematu domenowego.
-- **Auth:** partial — logowanie e-mail+hasło działa (`src/lib/supabase.ts`, `src/middleware.ts` chroni `/dashboard`); RBAC z grupami (FR-017/018) niezaimplementowane.
-- **Deploy / infra:** present — `wrangler.jsonc` skonfigurowany pod Cloudflare Workers, połączenie z Supabase aktywne (`context/deployment/deploy-plan.md`).
-- **Observability:** absent — brak biblioteki logowania/error trackingu poza wbudowanym Cloudflare observability.
+- **Frontend:** present — komplet ekranów M-1 (rekrutacje, kanban, kandydaci, profil, administracja) w Astro 6 + React 19, wszystkie wyspy `client:load`.
+- **Warstwa prezentacji:** present, ale niespójna — tokeny shadcn zdefiniowane w `src/styles/global.css` i nieużywane (~10 wystąpień), nadpisane ręcznymi klasami motywu "cosmic" (~250 wystąpień w ~35 plikach). To jest przedmiot tego milestone'u.
+- **Prymitywy UI:** partial — `button`, `card`, `badge`, `input`, `textarea`, `dialog`, `skeleton`, `file-input` (stock shadcn, nietknięte). Brak: `dropdown-menu`, `avatar`, `tooltip`, `separator`, toasty.
+- **Nawigacja:** absent — `src/components/Topbar.astro` istnieje, ale jest importowany wyłącznie przez landing `Welcome.astro`; żaden ekran zalogowanego użytkownika nie ma chrome'u nawigacyjnego.
+- **Stany asynchroniczne:** present — `useApiResource` daje każdemu ekranowi `loading | success | error | not-found`, skeletony odwzorowują docelowy układ. Brak warstwy potwierdzeń sukcesu.
+- **Backend / API:** present — komplet endpointów domenowych z M-1. `KanbanBoardDto.recruitment` niesie tylko `id`, `title`, `status` (rozszerzenie w S-09).
+- **Testy:** present — testy jednostkowe obok komponentów, integracyjne przy API, E2E w `tests/e2e/` (54× `getByText`, 44× `getByRole`, 37× `getByLabel`, 16× `getByTestId`, 8× `locator()`) oraz 9 kotwic `data-testid` w `src/`.
+- **Dostępność:** partial — ARIA szczątkowa (9 plików), brak live regions, `ServerError` bez `role="alert"`; systemowe ryzyko kontrastu na `text-blue-100/40…/70`.
+- **Deploy / infra:** present — bez zmian względem M-1.
 
 ## Foundations
 
-### F-01: Fundament danych i RLS — rekrutacje, kandydaci, grupy bezpieczeństwa
+### F-02: Fundament systemu projektowego — tokeny, motywy, powłoka
 
-- **Outcome:** (foundation) istnieje schemat Postgres (rekrutacje, kandydaci, powiązanie kandydat-rekrutacja ze statusem i datą dodania, grupy bezpieczeństwa, członkostwo użytkownik-grupa, domyślny zestaw etapów kanban) wraz z politykami RLS ograniczającymi widoczność rekrutacji do przypisanych grup bezpieczeństwa.
-- **Change ID:** core-recruitment-data-foundation
-- **PRD refs:** FR-001a (scoping grupowy), FR-007 (współdzielony profil kandydata), FR-017, FR-018 (model danych pod grupy — UI w S-07), Access Control, NFR (dane kandydatów niedostępne nieuprawnionym)
-- **Unlocks:** S-01, S-02, S-04 (model współdzielonego profilu kandydata), S-07 (model grup, na którym stawia UI administracyjne)
+- **Outcome:** (foundation) istnieje warstwa tokenów będąca jedynym źródłem kolorów, promieni, cieni i skali typograficznej (nagłówek serifowy / UI sans); motyw jasny jest domyślny, ciemny dostępny przez przełącznik w topbarze z persystencją wyboru i poszanowaniem `prefers-color-scheme`; istnieje komponent `AppShell` przyjmujący nawigację, tytuł strony i treść, gotowy do podstawienia pod istniejące trasy.
+- **Change ID:** design-system-foundation
+- **Scope anchors:** MS-01, MS-02
+- **Unlocks:** S-08, S-09, S-10, S-12, S-13 (każdy z nich konsumuje tokeny i/lub `AppShell`)
 - **Prerequisites:** —
 - **Parallel with:** —
 - **Blockers:** —
-- **Unknowns:** —
-- **Risk:** Sekwencjonowany jako pierwszy, bo praktycznie każdy wycinek zależy od jakiegoś podzbioru tego schematu (Baseline: Data = absent) — zrobienie tego później oznaczałoby przebudowę RLS pod istniejące dane. Zakres celowo minimalny: tylko tabele i polityki potrzebne pod S-01/S-02/S-07, bez pełnej logiki notatek czy CV (te dochodzą wraz z S-04/S-05).
+- **Unknowns:**
+  - Konkretna paleta (odcień primary, skala szarości, rodzina serif dla nagłówków) nie jest podana — screenshot jest referencją kierunkową, nie specyfikacją. — Owner: user. Block: nie (propozycja powstaje na poziomie `/10x-plan`, do akceptacji przed implementacją).
+- **Risk:** Sekwencjonowany jako pierwszy, bo każdy kolejny wycinek maluje po tych tokenach — zrobienie go później oznaczałoby przemalowanie tych samych 35 plików dwa razy. Zakres celowo ogranicza się do warstwy i powłoki: F-02 **nie** przestylowuje żadnego ekranu funkcyjnego, tylko dostarcza narzędzia. Kluczowe ryzyko to rozjazd dwóch motywów — decyzja o dark mode podnosi koszt każdego kolejnego wycinka o drugi przebieg weryfikacji kontrastu.
 - **Status:** in-progress
 
 ## Slices
 
-### S-01: Rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów
+### S-08: Nawigacja aplikacji i usunięcie powierzchni startera
 
-- **Outcome:** rekruter (i hiring manager, tylko odczyt) loguje się, widzi listę rekrutacji z filtrowaniem po statusie i otwiera rekrutację jako tablicę kanban kandydatów pogrupowanych po etapach, z licznikiem per kolumna i datą dodania na każdej karcie.
-- **Change ID:** recruiter-views-kanban-board
-- **PRD refs:** US-01, FR-003, FR-004 (tylko domyślny zestaw etapów), FR-005, FR-010
-- **Prerequisites:** F-01; external state: zasiane dane testowe (rekrutacja przypisana do grupy bezpieczeństwa, kandydaci na etapach, użytkownik testowy będący członkiem tej grupy).
-- **Parallel with:** S-07
+- **Outcome:** zalogowany użytkownik porusza się po aplikacji stałym sidebarem (Rekrutacje / Kandydaci / Administracja — ostatnia pozycja tylko przy operacji `group.manage`) i topbarem z menu użytkownika i wylogowaniem; sidebar chowa się poniżej breakpointu; `/` przekierowuje zalogowanych na `/recruitments`, a niezalogowanych na `/auth/signin`; marketingowy landing startera i placeholderowy `/dashboard` znikają.
+- **Change ID:** app-shell-navigation
+- **Scope anchors:** MS-02, MS-08
+- **Prerequisites:** F-02 (`AppShell` i tokeny muszą istnieć, zanim podstawimy je pod trasy)
+- **Parallel with:** S-13
 - **Blockers:** —
 - **Unknowns:**
-  - Jaki dokładnie zakres ma widzieć Hiring Manager (read-only) vs Rekruter (edycja) na tym samym widoku, zanim S-07 dostarczy pełny model operacja→grupa? — Owner: user. Block: nie (F-01 startuje z grubszym podziałem ról, S-07 doprecyzowuje).
-- **Risk:** To jest gwiazda przewodnia — sekwencjonowana najwcześniej jak pozwala F-01, mimo że tworzenie rekrutacji (FR-001) jest osobnym wycinkiem (S-02); używa zasianych danych, żeby nie czekać na S-02.
-- **Status:** in-progress
+  - Pole globalnego wyszukiwania widoczne na screenshocie referencyjnym jest **świadomie poza zakresem tej iteracji** (decyzja użytkownika 2026-09-05) — topbar powstaje bez niego. — Owner: user. Block: nie.
+- **Risk:** Największa zmiana strukturalna w milestonie — dotyka wszystkich 7 plików `.astro` z powieloną powłoką naraz i usuwa trasy, więc `PROTECTED_ROUTES` w `src/middleware.ts` oraz nawigacyjne kroki w testach E2E muszą pójść w tym samym change'u. Sidebar zostaje w `.astro` (jak dzisiejszy `Topbar`), żeby nie wysyłać JS na chrome — wyjątkiem jest drobny island na chowanie sidebara i przełącznik motywu.
+- **Status:** new
 
-### S-02: Rekruter tworzy i zarządza statusem rekrutacji
+### S-09: Nagłówek rekrutacji z metadanymi i menu akcji
 
-- **Outcome:** rekruter tworzy nową rekrutację ze stanowiskiem i metadanymi (lokalizacja, dział, typ zatrudnienia, data otwarcia), przypisuje co najmniej jedną grupę bezpieczeństwa, oraz ustawia/zmienia jej status (Draft / Live / Closed).
-- **Change ID:** recruiter-creates-recruitment
-- **PRD refs:** FR-001, FR-001a, FR-002
-- **Prerequisites:** F-01, S-01 (współdzieli widok listy/szczegółu rekrutacji)
-- **Parallel with:** S-03, S-07
+- **Outcome:** rekruter otwierając rekrutację widzi serifowy tytuł z badge'em statusu, pod nim wiersz metadanych z ikonami (lokalizacja, dział, typ zatrudnienia, data otwarcia), link powrotny do listy oraz menu akcji "…" skupiające zmianę statusu i edycję etapów; "Dodaj kandydata" pozostaje wyróżnionym przyciskiem primary.
+- **Change ID:** recruitment-header-metadata
+- **Scope anchors:** MS-03
+- **Prerequisites:** F-02, S-08 (nagłówek strony jest slotem `AppShell`)
+- **Parallel with:** S-12, S-13
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Bez tego wycinka S-01 działa tylko na zasianych danych — to jest krok, który czyni produkt realnie używalnym (rekruter sam zakłada rekrutacje), stąd sekwencjonowany zaraz po north star.
-- **Status:** in-progress
+- **Risk:** Jedyny wycinek redesignu sięgający do backendu: `KanbanBoardDto.recruitment` niesie dziś tylko `id`, `title` i `status`, więc `/api/recruitments/[id]/board` trzeba rozszerzyć o `location`, `department`, `employmentType` i `openedAt` (pola istnieją w bazie i w `RecruitmentDto` — zmiana jest addytywna, ale wymaga testu integracyjnego). Drugie ryzyko to przeniesienie zmiany statusu do menu "…" — dziś to widoczny wprost zestaw pigułek z kotwicą `data-testid="status-control"`, którą trzeba przenieść dosłownie, a testy E2E dopisać o krok otwarcia menu. Wymaga instalacji prymitywu `dropdown-menu`.
+- **Status:** new
 
-### S-03: Rekruter dostosowuje etapy kanban per rekrutacja
+### S-10: Kanban w nowym języku wizualnym
 
-- **Outcome:** rekruter nadpisuje globalny domyślny zestaw etapów kanban własnym zestawem dla konkretnej rekrutacji (różne stanowiska — np. tech vs. sprzedaż — mają różne procesy).
-- **Change ID:** recruiter-customizes-kanban-stages
-- **PRD refs:** FR-004 (część "nadpisanie per rekrutacja")
-- **Prerequisites:** F-01, S-01 (kanban musi już renderować się z domyślnych etapów)
-- **Parallel with:** S-02, S-07
-- **Blockers:** —
-- **Unknowns:** —
-- **Risk:** Niski — czysto addytywna zmiana nad istniejącym mechanizmem etapów z F-01/S-01; sekwencjonowana po S-01, bo bez renderowania kanbana nie ma czego nadpisywać.
-- **Status:** in-progress
-
-### S-04: Rekruter zarządza statusem kandydata z wymaganą notatką
-
-- **Outcome:** rekruter dodaje kandydata do rekrutacji i przesuwa go między etapami na kanbanie; system blokuje zmianę statusu, jeśli notatka po rozmowie z tym kandydatem w tej rekrutacji jest pusta; rekruter może też cofnąć/poprawić status.
-- **Change ID:** recruiter-manages-candidate-status
-- **PRD refs:** FR-006, FR-008, FR-009, FR-013, Business Logic (blokada zmiany statusu bez notatki)
-- **Prerequisites:** S-01 (kanban do przesuwania kart), S-02 (realna rekrutacja do której dodaje się kandydatów)
-- **Parallel with:** S-03
-- **Blockers:** —
-- **Unknowns:** —
-- **Risk:** Reguła biznesowa (blokada bez notatki) jest w PRD w pełni deterministyczna — niskie ryzyko niejednoznaczności; główne ryzyko to UX blokady (jak komunikować brak notatki), do rozstrzygnięcia na poziomie `/10x-plan`.
-- **Status:** in-progress
-
-### S-05: Profil kandydata i upload CV z retencją
-
-- **Outcome:** użytkownik otwiera profil kandydata z danymi osobowymi; rekruter uploaduje plik CV (PDF/DOCX) do profilu; plik CV jest automatycznie i trwale usuwany 12 miesięcy po dodaniu, bez naruszenia profilu ani historii statusów.
-- **Change ID:** candidate-profile-and-cv-upload
-- **PRD refs:** FR-011, FR-012, FR-013a, NFR (retencja danych / niezawodność uploadu)
-- **Prerequisites:** S-04 (kandydat musi już istnieć w kontekście rekrutacji)
-- **Parallel with:** S-06
+- **Outcome:** rekruter widzi kolumny kanbana z pełnoszerokościowymi kolorowymi pigułkami nagłówków (nazwa etapu wersalikami + licznik), karty kandydatów na białym tle z paskiem akcentu w kolorze etapu, nazwiskiem i datą dodania; kolory etapów przydzielane są deterministycznie po `sortOrder` z cyklicznie zawijanej palety, więc działają także dla etapów zdefiniowanych własnoręcznie w S-03.
+- **Change ID:** kanban-visual-redesign
+- **Scope anchors:** MS-04
+- **Prerequisites:** F-02, S-09 (kanban i jego nagłówek to jeden ekran — rozdzielenie ich na dwa change'y wymaga, żeby nagłówek był pierwszy)
+- **Parallel with:** S-12, S-13
 - **Blockers:** —
 - **Unknowns:**
-  - Maksymalny rozmiar pliku CV i dokładny mechanizm harmonogramowania usuwania (np. scheduled job / cron) nie są określone w PRD — decyzja implementacyjna. — Owner: team. Block: nie (rozstrzygane na poziomie `/10x-plan`).
-- **Risk:** Guardrail PRD "upload CV musi być niezawodny — utrata pliku jest niedopuszczalna" podnosi poprzeczkę weryfikacji tego wycinka; retencja (FR-013a) dodaje wymóg schedulera, którego dotąd nie ma w Baseline (Observability/infra absent dla tego typu zadań).
-- **Status:** in-progress
+  - Zachowanie kanbana na wąskim ekranie: poziomy scroll (jak dziś i jak na screenshocie) czy widok listowy per etap. — Owner: user. Block: nie (rozstrzygane na poziomie `/10x-plan`).
+- **Risk:** To gwiazda przewodnia M-2 — najgęstszy ekran, najwięcej decyzji projektowych. Główne ryzyko jest kontrastowe: biały tekst na pigułkach nagłówków musi przejść AA dla **każdego** koloru palety w **obu** motywach; odcienie bursztynowe i cyjanowe są tu najbardziej zagrożone i mogą wymusić ciemniejsze warianty lub ciemny tekst. Drugie ryzyko: kolor nie może być jedynym nośnikiem informacji o etapie — nazwa etapu na pigułce to zapewnia, ale pasek akcentu na karcie potrzebuje tekstowego odpowiednika dostępnego dla czytnika ekranu. Kotwice `data-testid="kanban-columns"` przenoszone dosłownie.
+- **Status:** new
 
-### S-06: Wyszukiwanie historii kandydata w bazie
+### S-11: Przeciąganie kart kandydatów między etapami
 
-- **Outcome:** użytkownik przechodzi do widoku "Kandydaci", wyszukuje po imieniu/nazwisku i widzi kandydata wraz z listą wszystkich rekrutacji, w których brał udział, z pełnym logiem zmian statusów per rekrutacja.
-- **Change ID:** candidate-history-search
-- **PRD refs:** US-02, FR-014, FR-015, FR-016
-- **Prerequisites:** S-04 (potrzebne realne zmiany statusów do zalogowania historii), F-01 (współdzielony profil kandydata między rekrutacjami)
-- **Parallel with:** S-05
+- **Outcome:** rekruter przenosi kandydata na inny etap przeciągając kartę myszą; upuszczenie otwiera dialog z notatką i dopiero jego potwierdzenie utrwala zmianę, więc reguła "brak notatki blokuje zmianę statusu" pozostaje nienaruszona; ta sama operacja jest wykonalna z klawiatury bez użycia przeciągania.
+- **Change ID:** kanban-drag-and-drop
+- **Scope anchors:** MS-05
+- **Prerequisites:** S-10 (przeciąganie ma sens dopiero na docelowym układzie kolumn i kart)
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:**
+  - Czy po nieudanym zapisie karta wraca na miejsce z komunikatem, czy zostaje w stanie optymistycznym do ponowienia. — Owner: team. Block: nie (rozstrzygane na poziomie `/10x-plan`).
+- **Risk:** Jedyny wycinek M-2 wprowadzający nową funkcjonalność, a nie zmieniający wygląd — i jedyny dotykający reguły biznesowej z PRD (FR-013). Przeciąganie **nie może** stać się drogą na skróty omijającą notatkę: upuszczenie jest wyłącznie skrótem do otwarcia istniejącego `MoveCandidateDialog`, nigdy samodzielnym zapisem. Wymaga biblioteki DnD z obsługą klawiatury (przeciąganie samą myszą wykluczyłoby część użytkowników i złamałoby kryterium MS-09) oraz zachowania dotychczasowej ścieżki przez przycisk na karcie jako równorzędnej, nie zapasowej. Kotwica `data-testid="move-candidate-dialog"` i istniejące testy E2E ruchu kandydata muszą przejść bez zmian w warstwie asercji.
+- **Status:** new
+
+### S-12: Widoki listowe w nowym języku wizualnym
+
+- **Outcome:** użytkownik przegląda listę rekrutacji (karty z metadanymi i badge'em statusu, wspólny komponent filtrów statusu), listę kandydatów (pole wyszukiwania w nowym stylu, zachowana podpowiedź zawężenia zamiast paginacji) oraz ekrany administracyjne — wszystkie na tokenach, wszystkie składające się poprawnie na wąskim ekranie.
+- **Change ID:** list-views-redesign
+- **Scope anchors:** MS-06
+- **Prerequisites:** F-02, S-08 (listy renderują się wewnątrz `AppShell`)
+- **Parallel with:** S-09, S-10, S-13
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** To drugi filar Kryterium sukcesu (Primary) obok north star — udowadnia wartość współdzielonego profilu kandydata (FR-007); sekwencjonowany zaraz po tym, jak S-04 zacznie generować realną historię statusów do przeszukania.
-- **Status:** in-progress
+- **Risk:** Niskie ryzyko techniczne, wysokie ryzyko regresji testowej — to ekrany z największą liczbą asercji tekstowych w E2E, a kotwice `data-testid="candidate-list"` i stany puste (`No recruitments match this filter.`, `No recruitments are visible to you.`) muszą przetrwać co do znaku, jeśli nie zmieniamy ich świadomie. Dwie rzeczy do zachowania mimo restylingu: świadoma decyzja z S-06 o "cap-plus-hint" zamiast paginacji (nie wolno dorobić pagera) oraz duplikacja logiki filtrów w dwóch miejscach, którą ten wycinek ma skonsolidować w jeden komponent, a nie powielić po raz trzeci.
+- **Status:** new
 
-### S-07: Administrator zarządza grupami bezpieczeństwa i użytkownikami
+### S-13: Formularze, komunikaty błędów i potwierdzenia akcji
 
-- **Outcome:** administrator tworzy grupy bezpieczeństwa, przypisuje im dozwolone operacje, oraz dodaje/usuwa użytkowników z grup.
-- **Change ID:** admin-manages-security-groups
-- **PRD refs:** FR-017, FR-018
-- **Prerequisites:** F-01 (model grup i członkostwa musi już istnieć)
-- **Parallel with:** S-01, S-02, S-03
+- **Outcome:** użytkownik wypełnia formularze (logowanie, rejestracja, nowa rekrutacja, dialogi) na jednym zestawie pól opartym o prymityw `input`; błędy prezentuje jeden, dostępny komponent komunikatu; udana akcja daje widoczne potwierdzenie zamiast cichego odświeżenia listy; banner konfiguracyjny przestaje być jasną wstawką z osobnego świata.
+- **Change ID:** forms-feedback-redesign
+- **Scope anchors:** MS-07
+- **Prerequisites:** F-02
+- **Parallel with:** S-08, S-09, S-10, S-12
+- **Blockers:** —
+- **Unknowns:**
+  - Wybór mechanizmu potwierdzeń (toast globalny vs. komunikat inline przy akcji). — Owner: team. Block: nie (rozstrzygane na poziomie `/10x-plan`).
+- **Risk:** `ServerError` jest **jedyną** powierzchnią błędu w całej aplikacji — jego zmiana dotyka każdego ekranu naraz, więc jest to jednocześnie najtańszy moment na dodanie `role="alert"` (dziś nieobecnego) i największe ryzyko regresji, jeśli asercje E2E opierają się na jego strukturze. Drugie: `FormField` ma własne stylowanie pola równoległe do `ui/input.tsx` — konsolidacja musi zachować ikonę wiodącą, przełącznik widoczności hasła i powiązanie `label`/`htmlFor`, na których stoi 37 lokatorów `getByLabel`. Przy okazji: `Banner.astro` zawiera polskie stringi ("Uwaga:", "Dokumentacja") łamiące regułę English-only z `context/foundation/lessons.md` — do naprawy w tym wycinku.
+- **Status:** new
+
+### S-14: Audyt dostępności WCAG 2.1 AA
+
+- **Outcome:** (weryfikacja) każdy ekran aplikacji spełnia WCAG 2.1 AA w motywie jasnym i ciemnym: zmierzony kontrast tekstu i pigułek etapów, pełna obsługa z klawiatury (w tym przenoszenie kandydata), widoczny stan focus, komunikaty asynchroniczne ogłaszane czytnikowi ekranu; wynik audytu i ewentualne odstępstwa spisane w artefaktach change'u.
+- **Change ID:** accessibility-audit-wcag-aa
+- **Scope anchors:** MS-09
+- **Prerequisites:** S-08, S-09, S-10, S-11, S-12, S-13 (audyt mierzy stan końcowy, nie pośredni)
+- **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Nie blokuje głównej pętli rekrutera (S-01…S-06 działają na grupach zasianych ręcznie/manualnie przez F-01), więc przy celu `speed` i blokerze `time` jest sekwencjonowany później — ale to wciąż wycinek must-have, nie Parked, i może być dowożony równolegle przez osobnego agenta/branch od razu po F-01.
-- **Status:** in-progress
+- **Risk:** WCAG AA jest twardym kryterium odbioru M-2 (decyzja użytkownika 2026-09-05), więc ten wycinek może **cofnąć** decyzje kolorystyczne podjęte w F-02 i S-10 — dlatego każdy wcześniejszy wycinek ma mierzyć kontrast u siebie, a nie odkładać go tutaj. S-14 jest siecią bezpieczeństwa, nie jedyną bramką; jeśli wykryje systemowy problem palety, koszt poprawki rośnie z każdym już domkniętym wycinkiem. `eslint-plugin-jsx-a11y` jest w zależnościach — do potwierdzenia, czy jest faktycznie włączony w `eslint.config.js`, zanim się na nim oprzemy.
+- **Status:** new
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                          | Suggested issue title                                               | Ready for `/10x-plan` | Notes                                                                              |
-| ---------- | ---------------------------------- | ------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------- |
-| F-01       | core-recruitment-data-foundation   | Fundament danych i RLS: rekrutacje, kandydaci, grupy bezpieczeństwa | yes                   | Uruchom `/10x-plan core-recruitment-data-foundation` — rekomendowany następny krok |
-| S-01       | recruiter-views-kanban-board       | Rekruter przegląda listę rekrutacji i kanban kandydatów             | no                    | Czeka na F-01                                                                      |
-| S-02       | recruiter-creates-recruitment      | Rekruter tworzy i zarządza statusem rekrutacji                      | no                    | Czeka na F-01, S-01                                                                |
-| S-03       | recruiter-customizes-kanban-stages | Rekruter nadpisuje etapy kanban per rekrutacja                      | no                    | Czeka na F-01, S-01                                                                |
-| S-04       | recruiter-manages-candidate-status | Rekruter zarządza statusem kandydata z wymaganą notatką             | no                    | Czeka na S-01, S-02                                                                |
-| S-05       | candidate-profile-and-cv-upload    | Profil kandydata i upload CV z retencją 12 miesięcy                 | no                    | Czeka na S-04                                                                      |
-| S-06       | candidate-history-search           | Wyszukiwanie historii kandydata w bazie                             | no                    | Czeka na S-04, F-01                                                                |
-| S-07       | admin-manages-security-groups      | Administrator zarządza grupami bezpieczeństwa i użytkownikami       | no                    | Czeka na F-01; może iść równolegle z S-01…S-06                                     |
+| Roadmap ID | Change ID                   | Suggested issue title                                    | Ready for `/10x-plan` | Notes                                                                      |
+| ---------- | --------------------------- | -------------------------------------------------------- | --------------------- | -------------------------------------------------------------------------- |
+| F-02       | design-system-foundation    | Fundament systemu projektowego: tokeny, motywy, AppShell | yes                   | Uruchom `/10x-plan design-system-foundation` — rekomendowany następny krok |
+| S-08       | app-shell-navigation        | Nawigacja aplikacji i usunięcie powierzchni startera     | no                    | Czeka na F-02                                                              |
+| S-09       | recruitment-header-metadata | Nagłówek rekrutacji z metadanymi i menu akcji            | no                    | Czeka na F-02, S-08; obejmuje rozszerzenie `/api/recruitments/[id]/board`  |
+| S-10       | kanban-visual-redesign      | Kanban w nowym języku wizualnym                          | no                    | Czeka na F-02, S-09 — north star M-2                                       |
+| S-11       | kanban-drag-and-drop        | Przeciąganie kart kandydatów między etapami              | no                    | Czeka na S-10; jedyna nowa funkcjonalność w milestonie                     |
+| S-12       | list-views-redesign         | Widoki listowe w nowym języku wizualnym                  | no                    | Czeka na F-02, S-08; może iść równolegle ze ścieżką kanbana                |
+| S-13       | forms-feedback-redesign     | Formularze, komunikaty błędów i potwierdzenia akcji      | no                    | Czeka na F-02; może iść równolegle ze ścieżką kanbana                      |
+| S-14       | accessibility-audit-wcag-aa | Audyt dostępności WCAG 2.1 AA                            | no                    | Czeka na wszystkie pozostałe wycinki M-2                                   |
 
 ## Open Roadmap Questions
 
-1. **Jaki jest szacunkowy QPS systemu?** — Owner: użytkownik. Block: brak (informacyjne — dotyczy F-01 przy projektowaniu indeksów, nie blokuje żadnego S-NN).
-2. **Jaki jest szacunkowy wolumen danych (liczba kandydatów, rekrutacji, rozmiar plików CV)?** — Owner: użytkownik. Block: brak (informacyjne — dotyczy F-01 i limitu rozmiaru pliku w S-05).
-3. **Który zewnętrzny dostawca tożsamości dla docelowego OAuth (Google Workspace vs Microsoft 365)?** — Owner: poza zakresem tego milestone'u (dotyczy przyszłej migracji z e-mail+hasło). Block: brak — nie gates żadnego S-NN w tym milestone.
+1. **Jaka dokładnie paleta i jaki krój serifowy dla nagłówków?** — Owner: użytkownik. Block: nie (screenshot jest referencją kierunkową; konkretna propozycja powstaje w `/10x-plan design-system-foundation` i wymaga akceptacji przed implementacją — dotyczy F-02 i pośrednio S-10).
+2. **Zachowanie kanbana poniżej breakpointu — poziomy scroll czy widok listowy per etap?** — Owner: użytkownik. Block: nie (dotyczy S-10; domyślnie poziomy scroll, zgodnie ze screenshotem i stanem obecnym).
+3. **Czy globalne wyszukiwanie w topbarze wraca w kolejnym milestonie?** — Owner: użytkownik. Block: nie (świadomie wyłączone z M-2; endpoint `/api/candidates?q=` już istnieje, więc koszt późniejszego dołożenia jest niski).
+4. **Jaki jest szacunkowy QPS systemu?** — Owner: użytkownik. Block: nie (przeniesione z M-1, wciąż informacyjne — dotyczy indeksów, nie gates żadnego wycinka M-2).
+5. **Jaki jest szacunkowy wolumen danych (liczba kandydatów, rekrutacji, rozmiar plików CV)?** — Owner: użytkownik. Block: nie (przeniesione z M-1, informacyjne).
+6. **Który zewnętrzny dostawca tożsamości dla docelowego OAuth (Google Workspace vs Microsoft 365)?** — Owner: poza zakresem tego milestone'u. Block: nie.
 
 ## Parked
 
+- **Globalne wyszukiwanie w topbarze** — Why parked: świadoma decyzja użytkownika z 2026-09-05 — pole widoczne na screenshocie referencyjnym zostaje poza M-2; wyszukiwanie pozostaje na ekranie `/candidates`. Kandydat do kolejnego milestone'u.
+- **Kolory etapów wybierane przez użytkownika** — Why parked: wymagałoby kolumny `color` w tabeli etapów, migracji, walidacji w API i color-pickera w `StageEditor` — to slice funkcjonalny, nie redesign. M-2 przydziela kolory deterministycznie po `sortOrder`.
+- **`/dashboard` jako realny home rekrutera (moje rekrutacje, ostatnia aktywność)** — Why parked: to nowa funkcjonalność wymagająca własnych zapytań i decyzji produktowych; M-2 tylko usuwa placeholder i przekierowuje `/` na `/recruitments`.
+- **Regresja wizualna (snapshot testing)** — Why parked: sensowna dopiero po ustabilizowaniu nowego języka wizualnego, czyli po domknięciu M-2.
 - **Integracja z zewnętrznymi systemami ATS (Workable, Greenhouse, itp.)** — Why parked: PRD §Poza zakresem — system autonomiczny, świadoma redukcja złożoności dla narzędzia wewnętrznego.
 - **Multi-tenancy (obsługa wielu organizacji)** — Why parked: PRD §Poza zakresem — single-tenant w MVP, skalowanie do SaaS to osobna decyzja produktowa.
 - **Publiczna strona ogłoszenia o pracę** — Why parked: PRD §Poza zakresem — kandydaci dodawani przez rekrutera, nie aplikują samodzielnie.
@@ -204,8 +230,19 @@ Fundamenty poniżej zakładają, że to jest obecne i NIE skafoldują tego ponow
 
 ## Milestone History
 
-(brak — to pierwszy milestone)
+- **M-1: Pierwszy używalny cykl pracy rekrutera** — opened 2026-08-27, closed 2026-09-05. Dowieziono komplet must-have flow z PRD v1: fundament danych i RLS (F-01), przeglądanie rekrutacji i kanban (S-01), tworzenie i status rekrutacji (S-02), własne etapy kanban (S-03), zarządzanie statusem kandydata z wymuszoną notatką (S-04), profil kandydata i CV z retencją (S-05), wyszukiwanie historii kandydata (S-06), administracja grupami bezpieczeństwa (S-07). Pokrycie: US-01, US-02, FR-001…FR-018 (w tym FR-001a, FR-013a). Zamknięte na 8/8 elementów `done`.
 
 ## Done
 
-(brak jeszcze ukończonych wycinków)
+### M-1: Pierwszy używalny cykl pracy rekrutera (zamknięty 2026-09-05)
+
+| ID   | Change ID                          | Outcome                                                                                                    | PRD refs                                                            | Status |
+| ---- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------ |
+| F-01 | core-recruitment-data-foundation   | (foundation) model danych + RLS dla rekrutacji, kandydatów i grup bezpieczeństwa                           | FR-001a, FR-007, FR-017, FR-018, Access Control, NFR-bezpieczeństwo | done   |
+| S-01 | recruiter-views-kanban-board       | rekruter przegląda listę rekrutacji i otwiera rekrutację jako kanban kandydatów                            | US-01, FR-003, FR-004, FR-005, FR-010                               | done   |
+| S-02 | recruiter-creates-recruitment      | rekruter tworzy nową rekrutację przypisaną do grupy bezpieczeństwa i zmienia jej status                    | FR-001, FR-001a, FR-002                                             | done   |
+| S-03 | recruiter-customizes-kanban-stages | rekruter nadpisuje domyślne etapy kanban dla konkretnej rekrutacji                                         | FR-004                                                              | done   |
+| S-04 | recruiter-manages-candidate-status | rekruter dodaje kandydata i przesuwa go przez etapy z wymaganą notatką (w tym cofnięcie statusu)           | FR-006, FR-008, FR-009, FR-013, Business Logic                      | done   |
+| S-05 | candidate-profile-and-cv-upload    | rekruter otwiera profil kandydata i uploaduje CV z automatycznym usunięciem po 12 miesiącach               | FR-011, FR-012, FR-013a, NFR-retencja                               | done   |
+| S-06 | candidate-history-search           | użytkownik przeszukuje bazę kandydatów po nazwisku i widzi pełną historię statusów z wszystkich rekrutacji | US-02, FR-014, FR-015, FR-016                                       | done   |
+| S-07 | admin-manages-security-groups      | administrator tworzy grupy bezpieczeństwa, przypisuje operacje i zarządza członkostwem użytkowników        | FR-017, FR-018                                                      | done   |

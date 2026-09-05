@@ -15,7 +15,6 @@ Catch substance problems in an implementation plan before a line of code is writ
 Where `/10x-impl-review` asks "did we build what we planned?", this asks "will this plan actually work?"
 
 Two modes:
-
 - **Fresh review**: analyze → findings → interactive triage
 - **Resume triage**: load a saved report and jump to per-issue triage
 
@@ -32,7 +31,6 @@ If the resolved plan path starts with `context/archive/`, refuse to write a revi
 ## Step 1: Load and internal consistency scan
 
 Read the plan file fully. Also read the sibling `plan-brief.md` in the same change folder if it exists. Read `context/foundation/lessons.md` if present and use accepted rules as priors when scanning for substance / feasibility / contract-break issues — a finding that restates a known recurring rule should weigh more, not less. Extract:
-
 - **Desired End State** and **Success Criteria**
 - **Current State Analysis** — documented constraints and gotchas
 - **Scope boundaries** — "What We're NOT Doing"
@@ -51,12 +49,11 @@ Before any code verification, check the plan against itself. These three scans o
   - Each `## Phase N: <name>` in the plan body has a matching `### Phase N: <name>` in Progress.
   - Every Success Criteria bullet (under `#### Automated Verification:` / `#### Manual Verification:`) in a Phase block has a matching `- [ ] N.M <title>` (or `- [x]`) in the corresponding Progress subsection.
   - Phase blocks contain plain `- ` bullets only — no `- [ ]` or `- [x]` outside the Progress section.
-    Treat any of these as a CRITICAL finding under Plan Completeness — `/10x-implement` will fail to parse a malformed Progress section.
+  Treat any of these as a CRITICAL finding under Plan Completeness — `/10x-implement` will fail to parse a malformed Progress section.
 
 ## Step 2: Grounding
 
 Quick, no sub-agents:
-
 - **Paths**: `ls -l` on ≥5 file paths the plan claims to modify. Non-existent paths are critical.
 - **Symbols**: grep for specific functions/config keys the plan references.
 - **Brief↔plan consistency**: phases, decisions, scope match?
@@ -80,23 +77,18 @@ Give the sub-agent targeted questions with relevant file paths — don't dump th
 Analyze the plan against five dimensions. Only produce findings for real issues — don't pad with "no issues found".
 
 ### End-State Alignment
-
 Walking phases sequentially, does the system reach the stated end state? Could all success criteria pass while the goal remains unmet? Any "last mile" gap where the plan does 90% and stops short?
 
 ### Lean Execution
-
 For each phase: "if I removed this, would the end state still be achievable?" Watch for premature abstraction, "while we're here" additions, framework-where-a-function-would-do, scope contradictions ("not doing" items appearing in phases).
 
 ### Architectural Fitness
-
 Does this fit the existing system? New patterns where existing ones would work (pattern proliferation). Clean module boundaries and correct dependency direction. High-blast-radius changes — phases touching many files across modules, changes to shared utilities. Vague "refactor as needed" or "update accordingly" that will spiral.
 
 ### Blind Spots
-
 What didn't the plan consider? Error paths (only happy path described?), rollback story (phase 3 fails — can we revert?), resource/cost impact (API calls, computational work — what does this cost at expected usage?), default value changes (a default that triples cost or time should be called out), testing gaps, security boundaries.
 
 ### Plan Completeness
-
 Is the document actionable? File paths specific (not "somewhere in src/")? Changes at function/method level? Success criteria with runnable commands? TBDs, TODOs, or placeholder sections?
 
 ## Step 5: Compile findings
@@ -116,11 +108,11 @@ Each finding has:
 
 Orthogonal to severity. A CRITICAL with LOW impact (obvious fix) is cheap to resolve; a WARNING with HIGH impact (unclear tradeoffs, wide blast) deserves careful thought.
 
-| Impact        | Meaning                                                                                |
-| ------------- | -------------------------------------------------------------------------------------- |
-| 🏃 **LOW**    | Quick decision. Fix is obvious and narrowly scoped. Safe to batch.                     |
-| 🔎 **MEDIUM** | Worth pausing. Real tradeoff or non-trivial edit — think before deciding.              |
-| 🔬 **HIGH**   | Architectural stakes. Wide blast radius, strategic implications, or unclear best path. |
+| Impact | Meaning |
+|---|---|
+| 🏃 **LOW** | Quick decision. Fix is obvious and narrowly scoped. Safe to batch. |
+| 🔎 **MEDIUM** | Worth pausing. Real tradeoff or non-trivial edit — think before deciding. |
+| 🔬 **HIGH** | Architectural stakes. Wide blast radius, strategic implications, or unclear best path. |
 
 ### Fix options
 
@@ -131,7 +123,6 @@ Default to **one** fix. Only present two when there's a genuine tradeoff a smart
 **LOW-impact findings**: skip the decomposition — just `Fix: [one line]`. Noise isn't helpful when the answer is obvious.
 
 **MEDIUM/HIGH-impact findings**: each option gets:
-
 ```
 [1-sentence approach] · Strength: [advantage, ideally grounded in plan/codebase evidence] · Tradeoff: [cost or risk] · Confidence: HIGH|MED|LOW — [1-line why] · Blind spot: [what we haven't verified, or "None significant"]
 ```
@@ -268,7 +259,6 @@ Save to `context/changes/<change-id>/reviews/plan-review.md` (one plan-review pe
 
 ```markdown
 <!-- PLAN-REVIEW-REPORT -->
-
 # Plan Review: [Plan Title]
 
 - **Plan**: [plan file path]
@@ -279,16 +269,15 @@ Save to `context/changes/<change-id>/reviews/plan-review.md` (one plan-review pe
 
 ## Verdicts
 
-| Dimension             | Verdict           |
-| --------------------- | ----------------- |
-| End-State Alignment   | PASS/WARNING/FAIL |
-| Lean Execution        | PASS/WARNING/FAIL |
+| Dimension | Verdict |
+|-----------|---------|
+| End-State Alignment | PASS/WARNING/FAIL |
+| Lean Execution | PASS/WARNING/FAIL |
 | Architectural Fitness | PASS/WARNING/FAIL |
-| Blind Spots           | PASS/WARNING/FAIL |
-| Plan Completeness     | PASS/WARNING/FAIL |
+| Blind Spots | PASS/WARNING/FAIL |
+| Plan Completeness | PASS/WARNING/FAIL |
 
 ## Grounding
-
 [grounding line]
 
 ## Findings
@@ -339,7 +328,6 @@ If entered via saved file: read it, parse `### F` headers, filter to `Decision: 
 Walk findings in severity order (CRITICAL → WARNING → OBSERVATION). For each:
 
 **With 2 fix options:**
-
 ```
 question: "F[N] — [title]\n\nSeverity: [sev icon] [SEV]\nImpact: [impact icon] [LEVEL] — [meaning]\nDimension: [dim]\nLocation: [loc]\n\nDetail: [detail]\n\n[Fix A block]\n\n[Fix B block]"
 header: "Finding [current] of [total remaining]"
@@ -362,7 +350,6 @@ multiSelect: false
 **With 1 fix option:** same options, but replace "Apply Fix A/B" with a single "Fix in plan".
 
 **Handling responses:**
-
 - **Apply Fix A/B / Fix in plan**: show the exact plan edit (before/after). Brief confirmation, then apply. Mark FIXED (record which fix, e.g. "Fixed via Fix A").
 - **Fix differently**: ask the preferred approach, apply, mark FIXED.
 - **Skip** → SKIPPED. **Accept risk** → ACCEPTED. **Disagree** → DISMISSED. Move on, don't argue.
@@ -391,7 +378,7 @@ After each decision, if working from a saved file, update its `Decision:` field.
 - Be specific. "Phase 3 introduces a second event system alongside the existing EventBus in `src/core/events.ts`" — not "architecture might have issues".
 - Distinguish "won't work" (FAIL) from "could be better" (WARNING).
 - If the plan is genuinely good, say so briefly and stop. Don't manufacture findings.
-- Impact is about _decision effort_, not _severity_. LOW impact on a CRITICAL finding means the fix is obvious; HIGH impact on a WARNING means the tradeoff is real.
+- Impact is about *decision effort*, not *severity*. LOW impact on a CRITICAL finding means the fix is obvious; HIGH impact on a WARNING means the tradeoff is real.
 - Two fix options only when there's a genuine tradeoff. Don't invent alternatives for trivial fixes.
 - During triage, keep momentum. User already read the report — present the finding, take the decision, move on.
 - When applying a fix to the plan, make minimal targeted edits. Don't restructure the whole plan for one finding.

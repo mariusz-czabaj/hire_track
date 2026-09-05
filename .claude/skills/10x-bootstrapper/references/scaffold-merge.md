@@ -61,15 +61,15 @@ Sequence:
 
 Applied during the move-up step for `subdir-then-move` and `git-clone`. Compares each path under `.bootstrap-scaffold/` against the same relative path under cwd.
 
-| Path pattern in scaffold                                                 | Path exists in cwd? | Resolution                                                                                                                                                   |
-| ------------------------------------------------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `context/**` (any path under `context/`)                                 | yes or no           | scaffold copy is dropped; cwd `context/` is the source of truth and never overwritten                                                                        |
-| `.gitignore`                                                             | yes                 | append-merged: cwd lines kept in order, then scaffold lines de-duped against the cwd set, appended at the end with a `# from <starter_id>` separator comment |
-| `.gitignore`                                                             | no                  | move silently                                                                                                                                                |
-| `package.json`, `README.md`, `CLAUDE.md`, `AGENTS.md`, root-level `*.md` | yes                 | existing wins; scaffold copy lands as `<filename>.scaffold` sibling                                                                                          |
-| `package.json`, `README.md`, `CLAUDE.md`, `AGENTS.md`, root-level `*.md` | no                  | move silently                                                                                                                                                |
-| anything else                                                            | yes                 | existing wins; scaffold copy lands as `<filename>.scaffold` sibling                                                                                          |
-| anything else                                                            | no                  | move silently                                                                                                                                                |
+| Path pattern in scaffold                                                       | Path exists in cwd? | Resolution                                                                          |
+| ------------------------------------------------------------------------------ | ------------------- | ----------------------------------------------------------------------------------- |
+| `context/**` (any path under `context/`)                                       | yes or no           | scaffold copy is dropped; cwd `context/` is the source of truth and never overwritten |
+| `.gitignore`                                                                   | yes                 | append-merged: cwd lines kept in order, then scaffold lines de-duped against the cwd set, appended at the end with a `# from <starter_id>` separator comment |
+| `.gitignore`                                                                   | no                  | move silently                                                                       |
+| `package.json`, `README.md`, `CLAUDE.md`, `AGENTS.md`, root-level `*.md`       | yes                 | existing wins; scaffold copy lands as `<filename>.scaffold` sibling                  |
+| `package.json`, `README.md`, `CLAUDE.md`, `AGENTS.md`, root-level `*.md`       | no                  | move silently                                                                       |
+| anything else                                                                  | yes                 | existing wins; scaffold copy lands as `<filename>.scaffold` sibling                  |
+| anything else                                                                  | no                  | move silently                                                                       |
 
 Notes on the matrix:
 

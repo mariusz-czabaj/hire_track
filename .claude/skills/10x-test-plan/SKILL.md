@@ -12,7 +12,7 @@ argument-hint: "[path ...] | --status | --refresh"
 
 # 10x Test Plan — Stateful Phased Rollout Orchestrator
 
-This skill writes and manages `context/foundation/test-plan.md` as a **phased rollout strategy**, then launches one rollout phase at a time into the 10x change/research/plan/implement chain. The guide starts as the _blueprint_ of phases — each phase eventually opens its own `context/changes/<change-id>/` folder and fills in the cookbook sections (§6) as it ships. The skill is **stateful**: every invocation re-derives the current state by checking which artifacts exist, and resumes from the next pending rollout phase. It does **not** force a return to `/10x-test-plan` after every downstream stage. Once a rollout change is opened, the established process is research → plan → implement: after each major phase, suggest the next natural command unless there is a clear blocker, correction, or decision that belongs back in `/10x-test-plan`.
+This skill writes and manages `context/foundation/test-plan.md` as a **phased rollout strategy**, then launches one rollout phase at a time into the 10x change/research/plan/implement chain. The guide starts as the *blueprint* of phases — each phase eventually opens its own `context/changes/<change-id>/` folder and fills in the cookbook sections (§6) as it ships. The skill is **stateful**: every invocation re-derives the current state by checking which artifacts exist, and resumes from the next pending rollout phase. It does **not** force a return to `/10x-test-plan` after every downstream stage. Once a rollout change is opened, the established process is research → plan → implement: after each major phase, suggest the next natural command unless there is a clear blocker, correction, or decision that belongs back in `/10x-test-plan`.
 
 `$ARGUMENTS`:
 
@@ -47,13 +47,13 @@ Each handoff is a **STOP point** for this skill. The user `/clear`s and runs the
 
 Three rules every invocation obeys; all three land in §1 of the artifact.
 
-1. **Cost × signal.** Every test the rollout adds — classic or AI-native — must answer one question: _what is the cheapest test that gives a real signal for this risk?_ Do not promote to e2e because it "feels safer"; do not layer a vision model on top of a deterministic diff that already catches the regression. Pass this through to `/10x-plan` for every rollout phase.
+1. **Cost × signal.** Every test the rollout adds — classic or AI-native — must answer one question: *what is the cheapest test that gives a real signal for this risk?* Do not promote to e2e because it "feels safer"; do not layer a vision model on top of a deterministic diff that already catches the regression. Pass this through to `/10x-plan` for every rollout phase.
 
 2. **User concerns are evidence.** Risks the team has lived through carry the same weight as PRD lines or hot-spot data.
 
-3. **Signal, not knowledge.** This skill reads the codebase for _signal_ — hot-spot churn, test-base profile, project marker, language/framework. It does **not** read for _knowledge_ — call graph, schemas, error translation, which line owns a failure. The §2 risk map cites evidence (PRD lines, interview answers, hot-spot directories); it never asserts a file as "where the failure lives." That anchor is `/10x-research`'s output, produced during each rollout phase. The skill is a **QA spec author and challenger**, not a code auditor.
+3. **Signal, not knowledge.** This skill reads the codebase for *signal* — hot-spot churn, test-base profile, project marker, language/framework. It does **not** read for *knowledge* — call graph, schemas, error translation, which line owns a failure. The §2 risk map cites evidence (PRD lines, interview answers, hot-spot directories); it never asserts a file as "where the failure lives." That anchor is `/10x-research`'s output, produced during each rollout phase. The skill is a **QA spec author and challenger**, not a code auditor.
 
-   Operational consequence: when the hot-spot scan surfaces `src/lib/foo/` as a top directory, §2 may cite "hot-spot dir `src/lib/foo/` — 12 commits/30d" as _likelihood evidence_. It may NOT cite "anchor: `src/lib/foo/bar.ts`" — the call graph inside that directory is unverified until research runs.
+   Operational consequence: when the hot-spot scan surfaces `src/lib/foo/` as a top directory, §2 may cite "hot-spot dir `src/lib/foo/` — 12 commits/30d" as *likelihood evidence*. It may NOT cite "anchor: `src/lib/foo/bar.ts`" — the call graph inside that directory is unverified until research runs.
 
 ## When to use, when to skip
 
@@ -67,12 +67,12 @@ Three rules every invocation obeys; all three land in §1 of the artifact.
 
 ## Relationship to other skills
 
-| Skill                                                         | Role                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/10x-shape`, `/10x-prd`, `/10x-roadmap`                      | Upstream. Produce the PRD/roadmap that discovery consumes.                                                                                                                                                                                                                                                                                                                                                            |
-| `/10x-stack-assess`                                           | Upstream (brownfield). Identifies the existing test base.                                                                                                                                                                                                                                                                                                                                                             |
+| Skill              | Role                                                                                   |
+|--------------------|----------------------------------------------------------------------------------------|
+| `/10x-shape`, `/10x-prd`, `/10x-roadmap` | Upstream. Produce the PRD/roadmap that discovery consumes.      |
+| `/10x-stack-assess` | Upstream (brownfield). Identifies the existing test base.                             |
 | `/10x-new` → `/10x-research` → `/10x-plan` → `/10x-implement` | Downstream chain, invoked once per rollout phase. `/10x-test-plan` launches the chain; after each major phase, the active downstream skill suggests the next natural command in the established research → plan → implement process unless blocked. `/10x-research` is the **knowledge-extraction surface** — it reads the code, traces call graphs, and produces the file:line anchors this plan deliberately omits. |
-| `/10x-tdd`                                                    | Sibling. Reads the cookbook (§6) when adding a single test.                                                                                                                                                                                                                                                                                                                                                           |
+| `/10x-tdd`         | Sibling. Reads the cookbook (§6) when adding a single test.                            |
 
 ---
 
@@ -120,16 +120,16 @@ Read what exists; do not invent. For every input, record the file path you actua
 
 Explicit paths from `$ARGUMENTS` are **always read**, regardless of where they live. The defaults below are searched only when not already supplied via arguments.
 
-| Source                         | Default path                                                                              | What to extract                                                               |
-| ------------------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| PRD-like docs                  | `context/foundation/prd.md` + argument-provided paths                                     | Users, primary flows, non-goals, business rules, dependencies, success metric |
-| Roadmap                        | `context/foundation/roadmap.md` + argument-provided roadmap                               | Upcoming slices, what is "next" (raises likelihood)                           |
-| Archived slices                | `context/archive/*/plan.md` + argument-provided slice plans                               | What is already implemented (current risk surface)                            |
-| Tech stack                     | `context/foundation/tech-stack.md` + argument-provided stack note, OR detect via manifest | Language, framework, runtime, test runner already in use                      |
-| Briefs / scoping notes         | argument-provided only — no fixed default                                                 | Constraints, non-goals, risk hints that never landed in a PRD                 |
-| Existing AGENTS.md / CLAUDE.md | repo root                                                                                 | Hard rules and conventions that constrain testing choices                     |
-| Existing testing config        | `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `pytest.ini`, etc.             | What test infra already exists                                                |
-| Session MCP tools              | current host/session tool list                                                            | Docs/search MCPs that can ground stack-sensitive recommendations              |
+| Source | Default path | What to extract |
+|---|---|---|
+| PRD-like docs | `context/foundation/prd.md` + argument-provided paths | Users, primary flows, non-goals, business rules, dependencies, success metric |
+| Roadmap | `context/foundation/roadmap.md` + argument-provided roadmap | Upcoming slices, what is "next" (raises likelihood) |
+| Archived slices | `context/archive/*/plan.md` + argument-provided slice plans | What is already implemented (current risk surface) |
+| Tech stack | `context/foundation/tech-stack.md` + argument-provided stack note, OR detect via manifest | Language, framework, runtime, test runner already in use |
+| Briefs / scoping notes | argument-provided only — no fixed default | Constraints, non-goals, risk hints that never landed in a PRD |
+| Existing AGENTS.md / CLAUDE.md | repo root | Hard rules and conventions that constrain testing choices |
+| Existing testing config | `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `pytest.ini`, etc. | What test infra already exists |
+| Session MCP tools | current host/session tool list | Docs/search MCPs that can ground stack-sensitive recommendations |
 
 ### Read sources
 
@@ -178,7 +178,6 @@ Persist a short `Stack grounding tools` note for §4 and the seed brief:
 
 ```markdown
 **Stack grounding tools (current session):**
-
 - Docs: <Context7 / framework docs MCP / none> — <what was checked or why skipped>; checked: <YYYY-MM-DD>
 - Search: <Exa.ai / web search MCP / none> — <what was checked or why skipped>; checked: <YYYY-MM-DD>
 - Runtime/browser: <Playwright MCP / browser tool / none> — <possible use, or "not used">; checked: <YYYY-MM-DD>
@@ -220,7 +219,7 @@ Summarize the inputs back to the user in ≤12 lines: `path → classified-type 
 
 ## Phase 2 — User Interview (only when the guide is missing)
 
-Phase 1 surfaces what the documents say. Phase 2 surfaces what the user knows that documents never capture: past incidents, gut fears, areas they change without confidence, and explicit instructions about what _not_ to test. Treat its answers with the same weight as PRD lines or hot-spot data — a risk anchored in "user fears Y, failure would surface in `<file>`" is grounded as long as the file holds up under research.
+Phase 1 surfaces what the documents say. Phase 2 surfaces what the user knows that documents never capture: past incidents, gut fears, areas they change without confidence, and explicit instructions about what *not* to test. Treat its answers with the same weight as PRD lines or hot-spot data — a risk anchored in "user fears Y, failure would surface in `<file>`" is grounded as long as the file holds up under research.
 
 Skip the interview only if the user explicitly asks. Warn once that document-only rollouts mirror whatever the PRD emphasises, which is rarely what the team actually fears breaking.
 
@@ -249,7 +248,7 @@ Each question below ships with example answers. Read them to the user as part of
    - e.g., "The Cloudflare Worker routing — works locally, breaks in prod."
    - e.g., "The R2 upload script — I run it and pray."
 
-4. **"What feels under-tested today that you've been quietly worried about?"** _(see conditional rewrite below if the test-base profile is `none`)_
+4. **"What feels under-tested today that you've been quietly worried about?"** *(see conditional rewrite below if the test-base profile is `none`)*
    - e.g., "The webhook retry path — we have one happy-path test and that's it."
    - e.g., "Error boundaries — they exist but I've never seen them fire in a test."
    - e.g., "Anything that touches money — coverage is light and the impact is severe."
@@ -266,8 +265,8 @@ If a user's answer to one question fully covers the next, acknowledge the overla
 The Phase 1 test-base profile decides how (or whether) to ask Q4:
 
 - **`meaningful`** — ask Q4 as written. The user has tests; "under-tested" is a coherent concept.
-- **`sparse`** — rephrase: _"You have some tests in `<area>` but most of the codebase is bare. Where is the gap that scares you most?"_ and offer the same examples.
-- **`none`** — **skip Q4**. There is nothing to be under-tested _relative to_. Tell the user explicitly: _"Skipping the 'under-tested' question — no meaningful suite exists yet, so the answer would be 'everything'. Phase 1 of the rollout will bootstrap the test runner."_ Do not count this as a user-initiated skip toward the abort threshold.
+- **`sparse`** — rephrase: *"You have some tests in `<area>` but most of the codebase is bare. Where is the gap that scares you most?"* and offer the same examples.
+- **`none`** — **skip Q4**. There is nothing to be under-tested *relative to*. Tell the user explicitly: *"Skipping the 'under-tested' question — no meaningful suite exists yet, so the answer would be 'everything'. Phase 1 of the rollout will bootstrap the test runner."* Do not count this as a user-initiated skip toward the abort threshold.
 
 **Optional priming on Q3.** If the hot-spot scan produced a usable list and the user's answer to Q3 is vague, show the top 3 hot-spot directories and ask whether any of them match. Never lead with the list; never let it overwrite a clear verbal answer.
 
@@ -278,13 +277,13 @@ Persist the answers as a structured note (in-memory; passed into the brief and t
 ```markdown
 **User-stated concerns (Phase 2 interview):**
 
-| #   | Question                  | User answer (paraphrase OK)                               | Implied risk(s)                          |
-| --- | ------------------------- | --------------------------------------------------------- | ---------------------------------------- |
-| 1   | Worries most              | "Paid user gets a 403 instead of their content."          | API gating regression on lesson endpoint |
-| 2   | Burned before             | "Catalog build silently dropped lessons last month."      | Strict ref resolution at build time      |
-| 3   | Change without confidence | (skipped)                                                 | —                                        |
-| 4   | Under-tested today        | "The webhook retry path."                                 | Billing webhook idempotency              |
-| 5   | Do NOT spend on           | "Internal admin tools — we trust the small set of users." | Negative space note                      |
+| # | Question | User answer (paraphrase OK) | Implied risk(s)                            |
+|---|----------|------------------------------|---------------------------------------------|
+| 1 | Worries most         | "Paid user gets a 403 instead of their content." | API gating regression on lesson endpoint |
+| 2 | Burned before        | "Catalog build silently dropped lessons last month." | Strict ref resolution at build time |
+| 3 | Change without confidence | (skipped) | — |
+| 4 | Under-tested today   | "The webhook retry path." | Billing webhook idempotency |
+| 5 | Do NOT spend on      | "Internal admin tools — we trust the small set of users." | Negative space note |
 ```
 
 ## Phase 3 — Synthesize the seed brief (only when the guide is missing)
@@ -295,15 +294,10 @@ In-memory only. The brief drives Phase 4 and is the source of truth for the roll
 # Seed Brief (in-memory)
 
 ## 1. Top risks (5–7): | # | Risk (failure scenario) | Impact | Likelihood | Source(s) — evidence, not anchors |
-
 ## 2. Hot-spots (top 5 files + top 5 directories, scope list) — used as likelihood evidence, not as failure-location anchors
-
 ## 3. User-stated concerns (verbatim from Phase 2)
-
 ## 4. Stack notes (detected test infra, or "none yet"; include Stack grounding tools checked in current session)
-
 ## 5. Risk response guidance: | Risk # | What would prove protection | Must challenge | Context needed | Likely cheapest layer | Anti-pattern to avoid |
-
 ## 6. Proposed rollout phases (3–5): | # | Phase name | Goal | Risks covered | Test types | Order rationale |
 ```
 
@@ -327,7 +321,7 @@ If a risk cannot produce this row, it is not actionable enough for the rollout. 
 
 If the product has authentication, payments, or accepts any user input, the top-N risks must include at least one **abuse scenario** — the happy path excludes the attacker, so these almost never surface from the Phase 2 interview on their own. Before finalizing the brief, run the risk set against these classes and add a row where the product genuinely exposes the surface:
 
-- **Authorization/access** — IDOR and ownership checks: does the endpoint verify _this resource belongs to you_, not just _you are logged in_?
+- **Authorization/access** — IDOR and ownership checks: does the endpoint verify *this resource belongs to you*, not just *you are logged in*?
 - **Untrusted input** — injection and server-side validation parity (the server must not trust the client).
 - **Secret/PII leakage** — keys, tokens, or personal data escaping into logs, error bodies, or the front-end bundle.
 - **Resource abuse** — rate-limit bypass, costly operations in a loop, mass-triggering of side effects (e.g. magic-link floods).
@@ -342,9 +336,9 @@ Score both axes on a coarse High / Medium / Low scale (see `references/test-plan
 
 Before showing the brief to the user, walk every top-N risk and apply the QA-consultant lens. Three checks per risk:
 
-1. **"Is this a defect, or am I describing the implementation?"** If breaking the risk would require _adding_ a safeguard first (e.g., "no fallback path" when no fallback exists), the risk is speculative — drop it or reframe it to test what _does_ exist (e.g., "outage path surfaces a clean 5xx, doesn't pretend to succeed, doesn't write to the database"). Speculative risks that survive into §2 force `/10x-research` to either invent code under test or flag the risk back for revision; both waste a cycle.
+1. **"Is this a defect, or am I describing the implementation?"** If breaking the risk would require *adding* a safeguard first (e.g., "no fallback path" when no fallback exists), the risk is speculative — drop it or reframe it to test what *does* exist (e.g., "outage path surfaces a clean 5xx, doesn't pretend to succeed, doesn't write to the database"). Speculative risks that survive into §2 force `/10x-research` to either invent code under test or flag the risk back for revision; both waste a cycle.
 
-2. **"Does this row cite a file as anchor?"** Strip anything in the Source column that looks like `src/foo/bar.ts:42` or `<module>` (specific symbol). Replace with the evidence that _raised_ the risk — interview Q#, PRD line, hot-spot **directory**. If after stripping there is no evidence left, the risk is unsourced and must be dropped or supported by a real interview/PRD citation.
+2. **"Does this row cite a file as anchor?"** Strip anything in the Source column that looks like `src/foo/bar.ts:42` or `<module>` (specific symbol). Replace with the evidence that *raised* the risk — interview Q#, PRD line, hot-spot **directory**. If after stripping there is no evidence left, the risk is unsourced and must be dropped or supported by a real interview/PRD citation.
 
 3. **"Would the recommended response catch a real regression, or only make coverage go up?"** Reject response guidance that says only "add unit tests," "cover the module," "test the happy path," or "assert current output." A valid response names the behavior/failure mode, the context `/10x-research` must verify, and at least one anti-pattern to avoid. The single most dangerous anti-pattern for AI-written tests is the **oracle problem**: an assertion whose expected value was lifted from the implementation under test rather than from an independent source (requirements, contract, interview). Such a test is tautological — it green-lights current behavior, including current bugs, and can never fail for the right reason. Frame the "What would prove protection" cell as user/business behavior precisely so the downstream test gets its oracle from the risk, not from the code it reads.
 
@@ -460,7 +454,6 @@ After `research.md` lands and before presenting Handoff C, read the new research
 If either is present, ask the user:
 
 > Research surfaced corrections to the test plan §2:
->
 > - [list each finding in one line]
 >
 > Backport into `context/foundation/test-plan.md` §2 now (Source column, risk wording, or Risk Response Guidance only — never adds file anchors), or defer to `--refresh`?
@@ -590,7 +583,7 @@ Triggered when the user invokes `/10x-test-plan --refresh`, or when the guide is
 
 ## Interactive prompts — host-agnostic
 
-Whenever this skill says _"ask the user"_, use whichever interactive-question tool the host exposes (e.g., `AskUserQuestion`, `ask_question`, `request_user_input`). Before the first interactive step, scan available tools for one with a `question` parameter and an `options`/`choices` field; use the first match. If none exists, fall back to a plain conversational message with labelled options.
+Whenever this skill says *"ask the user"*, use whichever interactive-question tool the host exposes (e.g., `AskUserQuestion`, `ask_question`, `request_user_input`). Before the first interactive step, scan available tools for one with a `question` parameter and an `options`/`choices` field; use the first match. If none exists, fall back to a plain conversational message with labelled options.
 
 ## All phases complete
 

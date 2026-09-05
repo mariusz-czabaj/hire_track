@@ -35,7 +35,6 @@ Read `references/starter-registry.yaml` `recommended_defaults` map. Look up `rec
 **Q0 prompt** (only fires if a recommended starter was found):
 
 Ask the user: "For a `<product_type>` in `<language_family>`, the recommended starter is `<starter_name>` (`<starter_id>`) — `<one-line fit>`. Bootstrapper confidence: `<value>`. Take it, or design your own?" with these options:
-
 - "Take recommended `<starter_id>` (Recommended)" — Use the recommendation as-is. We'll just confirm deployment, CI/CD, and project name before writing the hand-off.
 - "Design my own" — Walk through feature audit, team profile, technology preferences, deployment, CI/CD, framework variant, and a final five-point self-check.
 
@@ -77,7 +76,6 @@ If the user added a feature not on the list (free-text), capture it and add a So
 **Q2 prompt**:
 
 Ask the user: "Who is going to build this?" with these options:
-
 - "Just me, solo (Recommended for first-time users)" — Drives weighting toward battle-tested + popular community + agent-friendly.
 - "Small team (2–5 people)" — Slightly relaxes the agent-friendly bar; adds 'good docs' priority.
 - "Mixed-experience team" — Junior + senior together; agent-friendly + convention-based weighting goes UP, niche frameworks go DOWN.
@@ -93,7 +91,6 @@ Maps to `hints.team_size`: `solo | small | mixed`.
 **Q3a prompt** (soft preferences):
 
 Ask the user: "Any soft preferences on the stack? (e.g., 'prefer Postgres over MongoDB', 'must be TypeScript', 'stick to mainstream React'). One round, multi-select." with these options:
-
 - "TypeScript over plain JS" — Will exclude untyped JS starters.
 - "PostgreSQL as the database" — Will weight against MongoDB / DynamoDB / non-Postgres defaults.
 - "Mainstream over niche" — Will surface popular options first in alternatives.
@@ -106,7 +103,6 @@ Capture as a free-text bag (the schema doesn't carry soft preferences as typed f
 **Q3b prompt** (avoid list):
 
 Ask the user: "Anything you explicitly want to AVOID on this project? Technology avoids only — scope avoids belong in PRD's ## Non-Goals." with these options:
-
 - "Nothing explicit" — No technology avoids. Recommended unless you've been burned recently.
 - "PHP / Laravel" — Excludes Laravel and any PHP-stack alternatives from the candidate set.
 - "Monorepo / multi-package" — Excludes Turborepo / Nx defaults; favors single-package starters.
@@ -132,7 +128,6 @@ Read the chosen card's `deployment_defaults` array. The first entry is the start
 **Q4 prompt**:
 
 Ask the user: "Where will this deploy? `<starter_name>` defaults to `<deployment_defaults[0]>`." with these options:
-
 - "`<deployment_defaults[0]>` (Recommended — starter default)" — What the starter ships with. Cheapest path to first deploy.
 - "`<deployment_defaults[1]>`" — Stack-compatible alternative.
 - "`<deployment_defaults[2]>` or other from the list" — Pick from the remaining alternatives in the starter's deployment_defaults array.
@@ -153,7 +148,6 @@ The frame's "Cloudflare Pages/Workers default" applies **only** when the chosen 
 **Q5a prompt** (provider):
 
 Ask the user: "Which CI/CD provider?" with these options:
-
 - "GitHub Actions (Recommended)" — Default for all starters. Covered in M1 lesson trail.
 - "GitLab CI" — Pick if the repo lives on GitLab.
 - "CircleCI" — Pick if the team standardizes on CircleCI.
@@ -164,7 +158,6 @@ Maps to `hints.ci_provider`: `github-actions | gitlab-ci | circleci | cloudflare
 **Q5b prompt** (default flow):
 
 Ask the user: "Default deployment flow on merge?" with these options:
-
 - "Auto-deploy on merge to main (Recommended)" — PR → checks → merge → deploys. Default for solo + small teams.
 - "Manual promotion after merge" — PR → checks → merge → deploy is a separate manual step. Pick when staging gates are required.
 
@@ -211,7 +204,6 @@ Captured as a free-text bag in conversation rationale. Does NOT land in the hand
 **Q8 prompt** — surface five questions in one round (multi-select):
 
 Ask the user: "Before I write the hand-off, walk through this five-point self-check. Mark every statement that applies to your chosen starter:" with these options:
-
 - "I know this stack uses explicit types / schemas (TypeScript, Pydantic, Zod, Java types, Rust types — not duck-typed)" — Maps to self_check_answers.typed.
 - "This starts from an official starter or mature template (not a hand-rolled scaffold)" — Maps to self_check_answers.from_official_starter.
 - "Folder layout, routing, tests, and config follow conventions a stranger would recognize" — Maps to self_check_answers.conventions.
@@ -242,7 +234,6 @@ path) — but it costs you extra manual setup and ongoing care.
 Then ask:
 
 Ask the user: "Continue with `<chosen_starter>`, or switch to the recommended default `<recommended_default>`?" with these options:
-
 - "Continue with `<chosen_starter>`" — Lock in the starter you picked. The hand-off will record that you proceeded with a known-friction choice if any agent-friendly criterion was failing.
 - "Switch to `<recommended_default>` (Recommended)" — Move to the recommended default. Your deployment and CI/CD answers are kept; we'll just confirm the project name.
 
@@ -261,7 +252,6 @@ Pre-step: kebab-case the PRD's `project` field (e.g., "Recipe Fridge" → `recip
 **Project-name prompt**:
 
 Ask the user: "Project name for the hand-off (will be the directory name `/10x-bootstrapper` scaffolds)?" with these options:
-
 - "`<kebab-cased project>` (Recommended — from PRD)" — Use what's already in PRD.
 - "Override with a different name" — Capture a free-text replacement.
 
@@ -271,7 +261,7 @@ Maps to `project_name` in the hand-off frontmatter.
 
 ## Path summary
 
-| Path     | Questions asked                                                                    | Skipped                                   |
-| -------- | ---------------------------------------------------------------------------------- | ----------------------------------------- |
-| Standard | Q0 → Q4 → Q5 → project-name confirm                                                | Q1–Q3, Q6, Q7 (unless card forces it), Q8 |
-| Custom   | Q0 → Q1 → Q2 → Q3 → Q4 → Q5 → Q6 → Q7 (if card forces) → Q8 → project-name confirm | (none)                                    |
+| Path     | Questions asked                                                  | Skipped  |
+|----------|-------------------------------------------------------------------|----------|
+| Standard | Q0 → Q4 → Q5 → project-name confirm                               | Q1–Q3, Q6, Q7 (unless card forces it), Q8 |
+| Custom   | Q0 → Q1 → Q2 → Q3 → Q4 → Q5 → Q6 → Q7 (if card forces) → Q8 → project-name confirm | (none) |

@@ -28,7 +28,7 @@ Plans built on the wrong problem statement are perfect solutions to the wrong qu
 
 The shape this skill addresses is general: the user describes something (an observation, a perceived problem, a scope they want to take on) and proposes a response (a cause, an approach, a plan structure) in the same breath. The two get treated as one fact. A perfect /10x-plan then ships a perfect solution — and the actual problem remains, because the framing was wrong; the plan was right; the user lost the day.
 
-This skill is the framing step. /10x-plan answers _how to build it_. /10x-frame answers _what's actually the right thing to plan_.
+This skill is the framing step. /10x-plan answers *how to build it*. /10x-frame answers *what's actually the right thing to plan*.
 
 ## When to use, when to skip
 
@@ -42,7 +42,7 @@ When in doubt, this skill asks a short round of questions and exits cheaply if t
 
 - `/10x-research` — broad codebase exploration. Frame can consume a research doc as input but does not replace it.
 - `/10x-plan` — accepts frame output as input. The Frame Brief IS a valid first argument to /10x-plan.
-- `/10x-plan-review` — validates an existing plan. Frame validates the _premise_ before a plan exists.
+- `/10x-plan-review` — validates an existing plan. Frame validates the *premise* before a plan exists.
 
 The Frame Brief is useful standalone (as a discussion artifact, or to scope a quick fix) — it does not require /10x-plan to follow.
 
@@ -100,7 +100,7 @@ If the user did not provide a clear initial framing ("something feels off, fix i
 
 ### Step 1.5: Clarifying questions before dispatch
 
-This step always runs. Before building the dimension map (Step 2) or dispatching parallel sub-agents (Step 3), pause for one round of clarifying questions on every invocation. The goal is to disambiguate the _observation and scope_ — "which of these items is the leading concern?", "is this one observation or several?", "is the observable a single symptom or a class of symptoms?" — so the dimension map is built against a focused observation rather than a multi-pronged punch list.
+This step always runs. Before building the dimension map (Step 2) or dispatching parallel sub-agents (Step 3), pause for one round of clarifying questions on every invocation. The goal is to disambiguate the *observation and scope* — "which of these items is the leading concern?", "is this one observation or several?", "is the observable a single symptom or a class of symptoms?" — so the dimension map is built against a focused observation rather than a multi-pronged punch list.
 
 Use AskUserQuestion with **2–3 questions** in a single round. Each option describes an observation or scope position — what the user actually sees, or which slice of the work they want investigated first — never a cause, approach, or fix. Always include an "I'm not sure / haven't separated them yet" option, mirroring Step 4's certainty-as-signal rule.
 
@@ -116,11 +116,11 @@ Construct a **map** of the dimensions the observation could originate from — f
 
 How to build the map:
 
-- **Read first.** Open the files the user mentioned. Open neighbors. Trace the path from the stated cause to the observed effect — _whether that path is runtime data flow, a chain of design decisions, or a sequence of assumptions_. The dimensions fall out of what's actually there: stages of input, transformation, state, side effects; or axes of the design space; or layers of a scoping decision. Don't list dimensions you haven't seen evidence of.
+- **Read first.** Open the files the user mentioned. Open neighbors. Trace the path from the stated cause to the observed effect — *whether that path is runtime data flow, a chain of design decisions, or a sequence of assumptions*. The dimensions fall out of what's actually there: stages of input, transformation, state, side effects; or axes of the design space; or layers of a scoping decision. Don't list dimensions you haven't seen evidence of.
 - **Use sub-agents when the surface is large or unfamiliar.** Spawn one or two Explore sub-agents with prompts like: "Trace the path from <stated cause> to <observed effect>. List every distinct stage or axis the chain passes through, with file:line or document:section references." The map is what they return — not what you guessed before reading.
 - **Treat each dimension as a possible origin.** A useful dimension is one where, if the framing broke at this point, you'd see roughly this observation. Dimensions that couldn't plausibly produce the observation don't belong on the map.
 
-**Pin the observation to the map**: at which dimension does the user's framing land? Where else _could_ the observation originate? The user's framing is one node on the map; the rest of the map is the hypothesis space.
+**Pin the observation to the map**: at which dimension does the user's framing land? Where else *could* the observation originate? The user's framing is one node on the map; the rest of the map is the hypothesis space.
 
 Present the map back as text, briefly:
 
@@ -155,7 +155,7 @@ After all return, synthesize: which hypotheses have **strong**, **weak**, or **n
 
 ### Step 4: Narrowing questions (Socratic, not solution)
 
-Use AskUserQuestion. **The questions and options here are fundamentally different from /10x-plan's**: in /10x-plan, options are _solution choices_; here, options are _hypothesis disambiguators_. The user's answer narrows the hypothesis space.
+Use AskUserQuestion. **The questions and options here are fundamentally different from /10x-plan's**: in /10x-plan, options are *solution choices*; here, options are *hypothesis disambiguators*. The user's answer narrows the hypothesis space.
 
 **Rules for narrowing questions:**
 
@@ -196,10 +196,10 @@ Write the brief to `context/changes/<change-id>/frame.md` (single artifact per c
 
 Use this template:
 
-```markdown
+````markdown
 # Frame Brief: [Topic]
 
-> Framing step before /10x-plan. This document captures what is _actually_
+> Framing step before /10x-plan. This document captures what is *actually*
 > at issue, separated from what was initially assumed.
 
 ## Reported Observation
@@ -218,18 +218,18 @@ Step 1, unchanged.]
 The observation could originate at any of these dimensions:
 
 1. **[Dimension A]** — [what would go wrong / what the framing assumes here]
-2. **[Dimension B]** — [...] ← initial framing
+2. **[Dimension B]** — [...]  ← initial framing
 3. **[Dimension C]** — [...]
 4. **[Dimension D]** — [...]
 
 ## Hypothesis Investigation
 
-| Hypothesis                     | Evidence                                      | Verdict              |
-| ------------------------------ | --------------------------------------------- | -------------------- |
-| [Dimension A: brief claim]     | [file:line / document:section / observations] | STRONG / WEAK / NONE |
-| [Dimension B: initial framing] | [evidence]                                    | STRONG / WEAK / NONE |
-| [Dimension C]                  | [evidence]                                    | STRONG / WEAK / NONE |
-| [Dimension D]                  | [evidence]                                    | STRONG / WEAK / NONE |
+| Hypothesis | Evidence | Verdict |
+| --- | --- | --- |
+| [Dimension A: brief claim] | [file:line / document:section / observations] | STRONG / WEAK / NONE |
+| [Dimension B: initial framing] | [evidence] | STRONG / WEAK / NONE |
+| [Dimension C] | [evidence] | STRONG / WEAK / NONE |
+| [Dimension D] | [evidence] | STRONG / WEAK / NONE |
 
 ## Narrowing Signals
 
@@ -273,7 +273,7 @@ If reframe is "no change", state that the original framing held up.]
 - Source files: [file:line]
 - Related research: `context/changes/<change-id>/research.md` (if present)
 - Investigation tasks: [list of TaskCreate IDs from Step 3]
-```
+````
 
 Keep the brief tight — aim for ~80–150 lines. The hypothesis table is the heart; everything else supports it.
 
@@ -298,7 +298,6 @@ Print a one-screen summary, then offer the handoff:
 Then ask:
 
 AskUserQuestion:
-
 - question: "Frame done. How would you like to proceed?"
   header: "Next step"
   options:
@@ -333,7 +332,7 @@ And print: `→ /10x-plan <change-id> (✓ copied)`
 
 3. **No solution design.** This skill never picks an implementation approach. It does not propose phases, file changes, or technical decisions. It produces ONE artifact: the reframed (or confirmed) problem statement. /10x-plan owns the solution.
 
-4. **Narrowing questions ≠ solution questions.** /10x-plan asks "which approach?". /10x-frame asks "where in the dimension map does the actual problem live?". This rule binds both Step 1.5 (pre-dispatch scope/observation narrowing) and Step 4 (post-dispatch hypothesis narrowing). Options describe observations or design positions, not choices about how to address them. If you find yourself drafting a question whose answer changes the _direction_, you've crossed into /10x-plan territory — stop.
+4. **Narrowing questions ≠ solution questions.** /10x-plan asks "which approach?". /10x-frame asks "where in the dimension map does the actual problem live?". This rule binds both Step 1.5 (pre-dispatch scope/observation narrowing) and Step 4 (post-dispatch hypothesis narrowing). Options describe observations or design positions, not choices about how to address them. If you find yourself drafting a question whose answer changes the *direction*, you've crossed into /10x-plan territory — stop.
 
 5. **Read the source material before reaching for priors.** Source material means code, docs, prior decisions, or whatever the framing actually rests on. It is tempting to recognize a shape from training-data familiarity and propose a reframing before investigating. Don't. Hypotheses must come from the dimension map you constructed in Step 2 from THIS material, and evidence must come from sub-agent reads of THIS project. A confident-sounding reframe with no file:line or document:section evidence is the failure mode this skill exists to prevent.
 

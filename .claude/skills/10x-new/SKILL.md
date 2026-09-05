@@ -39,7 +39,7 @@ The change-id must be:
 - unique across `context/changes/` and `context/archive/`
 ```
 
-Then **wait** for the user to provide an argument.
+   Then **wait** for the user to provide an argument.
 
 ## Argument Parsing
 
@@ -54,13 +54,13 @@ Split the raw argument string on the first run of whitespace:
 
 Examples:
 
-| Raw input                                                           | `<change-id>`                             | Intent                                     |
-| ------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------ |
-| `feature-x`                                                         | `feature-x`                               | (empty)                                    |
-| `oauth-login add Google sign-in for faster onboarding`              | `oauth-login`                             | `add Google sign-in for faster onboarding` |
-| `@context/changes/oauth-login/`                                     | `oauth-login`                             | (empty)                                    |
-| `@context/changes/oauth-login/ revisit the token-refresh edge case` | `oauth-login`                             | `revisit the token-refresh edge case`      |
-| `My Feature add OAuth`                                              | `My Feature` (will fail kebab-case check) | `add OAuth`                                |
+| Raw input | `<change-id>` | Intent |
+|-----------|---------------|--------|
+| `feature-x` | `feature-x` | (empty) |
+| `oauth-login add Google sign-in for faster onboarding` | `oauth-login` | `add Google sign-in for faster onboarding` |
+| `@context/changes/oauth-login/` | `oauth-login` | (empty) |
+| `@context/changes/oauth-login/ revisit the token-refresh edge case` | `oauth-login` | `revisit the token-refresh edge case` |
+| `My Feature add OAuth` | `My Feature` (will fail kebab-case check) | `add OAuth` |
 
 ## Validation
 
@@ -79,7 +79,7 @@ Before creating anything:
 1. Create directory `context/changes/<change-id>/`.
 2. Derive the `<title>`:
    - If the intent string is empty, humanize the change-id: replace hyphens with spaces and capitalize the first letter (e.g., `multi-course-access` → `Multi course access`).
-   - If the intent string is non-empty, write a concise human-readable title (≤ 80 chars, sentence case, no trailing period) that captures what the change is about. The intent is _guidance_, not a literal — feel free to rephrase. Don't dump a paragraph into the title.
+   - If the intent string is non-empty, write a concise human-readable title (≤ 80 chars, sentence case, no trailing period) that captures what the change is about. The intent is *guidance*, not a literal — feel free to rephrase. Don't dump a paragraph into the title.
 3. Derive the `## Notes` body:
    - If the intent string is empty, emit the hint comment: `<!-- Free-form notes for this change: links, ad-hoc context, decisions that don't belong in research/frame/plan. -->`
    - If the intent string is non-empty, drop it verbatim as the Notes body — the user's words are the seed. Do not also emit the hint comment in that case (the user has shown they know what Notes are for).
