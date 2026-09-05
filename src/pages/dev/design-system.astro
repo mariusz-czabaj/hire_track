@@ -3,7 +3,11 @@ export const prerender = false;
 
 import Layout from "@/layouts/Layout.astro";
 import AppShell from "@/components/AppShell.astro";
+import Sidebar from "@/components/Sidebar.astro";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserMenu } from "@/components/UserMenu";
+import { SidebarToggle } from "@/components/SidebarToggle";
+import { MobileNav } from "@/components/MobileNav";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -29,8 +33,8 @@ function measure(palette: TokenPalette) {
   });
 }
 
-const lightResults = measure(lightPalette);
-const darkResults = measure(darkPalette);
+const lightResults = isDev ? measure(lightPalette) : [];
+const darkResults = isDev ? measure(darkPalette) : [];
 ---
 
 {
@@ -38,10 +42,17 @@ const darkResults = measure(darkPalette);
     <Layout title="Design System — 10x">
       <AppShell containerWidth="wide">
         <Fragment slot="nav">
-          <div class="text-muted-foreground p-4 text-sm">Design System</div>
+          <Sidebar />
+        </Fragment>
+        <Fragment slot="topbar-leading">
+          <SidebarToggle collapsed={Astro.locals.sidebarCollapsed} client:load />
+          <MobileNav client:load>
+            <Sidebar />
+          </MobileNav>
         </Fragment>
         <Fragment slot="topbar-actions">
           <ThemeToggle theme={Astro.locals.theme} client:load />
+          {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
         </Fragment>
         <Fragment slot="page-title">
           <h1 class="font-serif text-2xl font-semibold">Design system</h1>

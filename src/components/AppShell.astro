@@ -6,12 +6,15 @@ interface Props {
 }
 
 const { containerWidth = "standard" } = Astro.props;
+const { sidebarCollapsed } = Astro.locals;
 
 const containerWidthClass: Record<AppShellContainerWidth, string> = {
   narrow: "max-w-xl",
   standard: "max-w-4xl",
   wide: "max-w-6xl",
 };
+
+const navClass = sidebarCollapsed ? "hidden" : "hidden shrink-0 border-b md:block md:w-64 md:border-r md:border-b-0";
 ---
 
 <div class="bg-background text-foreground min-h-screen">
@@ -22,12 +25,17 @@ const containerWidthClass: Record<AppShellContainerWidth, string> = {
     Skip to content
   </a>
   <div class="flex min-h-screen flex-col md:flex-row">
-    <nav aria-label="Primary" class="border-border hidden shrink-0 border-b md:block md:w-64 md:border-r md:border-b-0">
+    <nav aria-label="Primary" class:list={["border-border", navClass]}>
       <slot name="nav" />
     </nav>
     <div class="flex min-w-0 flex-1 flex-col">
-      <header class="border-border flex items-center justify-end gap-2 border-b px-4 py-3 sm:px-6">
-        <slot name="topbar-actions" />
+      <header class="border-border flex items-center justify-between gap-2 border-b px-4 py-3 sm:px-6">
+        <div class="flex items-center gap-2">
+          <slot name="topbar-leading" />
+        </div>
+        <div class="flex items-center gap-2">
+          <slot name="topbar-actions" />
+        </div>
       </header>
       <main
         id="main-content"

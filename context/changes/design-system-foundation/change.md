@@ -1,7 +1,7 @@
 ---
 change_id: design-system-foundation
 title: Fundament systemu projektowego — tokeny, motywy, AppShell
-status: implemented
+status: impl_reviewed
 created: 2026-09-05
 updated: 2026-09-05
 archived_at: null

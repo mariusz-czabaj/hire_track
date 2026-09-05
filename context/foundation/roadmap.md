@@ -54,7 +54,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites | Scope anchors | Status      |
 | ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | ----------- |
 | F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
-| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | new         |
+| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | in-progress |
 | S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | new         |
 | S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new         |
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new         |
@@ -116,7 +116,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Unknowns:**
   - Pole globalnego wyszukiwania widoczne na screenshocie referencyjnym jest **świadomie poza zakresem tej iteracji** (decyzja użytkownika 2026-09-05) — topbar powstaje bez niego. — Owner: user. Block: nie.
 - **Risk:** Największa zmiana strukturalna w milestonie — dotyka wszystkich 7 plików `.astro` z powieloną powłoką naraz i usuwa trasy, więc `PROTECTED_ROUTES` w `src/middleware.ts` oraz nawigacyjne kroki w testach E2E muszą pójść w tym samym change'u. Sidebar zostaje w `.astro` (jak dzisiejszy `Topbar`), żeby nie wysyłać JS na chrome — wyjątkiem jest drobny island na chowanie sidebara i przełącznik motywu.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-09: Nagłówek rekrutacji z metadanymi i menu akcji
 

@@ -14,11 +14,15 @@ export function ThemeToggle({ theme }: ThemeToggleProps) {
   async function handleToggle() {
     setIsSaving(true);
     try {
-      await fetch("/api/preferences/theme", {
+      const response = await fetch("/api/preferences/theme", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme: nextTheme }),
       });
+      if (!response.ok) {
+        setIsSaving(false);
+        return;
+      }
       window.location.reload();
     } catch {
       setIsSaving(false);

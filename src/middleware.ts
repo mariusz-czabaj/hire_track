@@ -5,13 +5,14 @@ import { jsonError } from "@/lib/api-response";
 import type { Database } from "@/db/database.types";
 import type { Operation } from "@/types";
 import { resolveTheme, THEME_COOKIE_NAME } from "@/lib/theme";
+import { resolveSidebarCollapsed, SIDEBAR_COLLAPSED_COOKIE_NAME } from "@/lib/sidebar";
 
 const PROTECTED_ROUTES = ["/dashboard", "/recruitments", "/candidates", "/admin"];
 
 // Routes under /api/ that must stay reachable without authentication. Kept separate from
 // isAuthRoute below, which also skips resolveCallerOperations - widening it would silently
 // change permission-resolution semantics for routes that have nothing to do with auth.
-const PUBLIC_API_ROUTES = ["/api/preferences/theme"];
+const PUBLIC_API_ROUTES = ["/api/preferences/theme", "/api/preferences/sidebar"];
 
 async function resolveCallerOperations(supabase: SupabaseClient<Database>, userId: string): Promise<Operation[]> {
   const { data: memberships, error: membershipsError } = await supabase
@@ -42,6 +43,7 @@ async function resolveCallerOperations(supabase: SupabaseClient<Database>, userI
 
 export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.theme = resolveTheme(context.cookies.get(THEME_COOKIE_NAME)?.value);
+  context.locals.sidebarCollapsed = resolveSidebarCollapsed(context.cookies.get(SIDEBAR_COLLAPSED_COOKIE_NAME)?.value);
 
   const supabase = createClient(context.request.headers, context.cookies);
   const isAuthRoute = context.url.pathname.startsWith("/api/auth/");

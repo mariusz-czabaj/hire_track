@@ -3,5 +3,6 @@ declare namespace App {
     user: import("@supabase/supabase-js").User | null;
     operations: import("@/types").Operation[];
     theme: "light" | "dark" | null;
+    sidebarCollapsed: boolean;
   }
 }
