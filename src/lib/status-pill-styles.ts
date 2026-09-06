@@ -16,7 +16,7 @@ export function statusPillClasses({
     size === "default" ? "px-4 py-1.5 text-sm" : "px-3 py-1 text-xs",
     active
       ? activeColor === "green"
-        ? "border-green-600 bg-green-600 text-white"
+        ? "border-green-700 bg-green-700 text-white"
         : "border-accent bg-accent text-accent-foreground"
       : "border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
     disabled && "disabled:opacity-50",

@@ -153,6 +153,9 @@ test.describe("HR creates a recruitment and manages its status", () => {
     await expect(page.locator('[data-slot="badge"]')).toHaveText("Draft");
 
     await page.goto("/recruitments");
+    // New recruitments are created as "Draft", but the list defaults to the
+    // "Live" filter -- switch to "All" so the freshly created draft shows up.
+    await page.getByRole("button", { name: "All", exact: true }).click();
     await expect(page.getByText(title)).toBeVisible();
 
     await page.getByText(title).click();
