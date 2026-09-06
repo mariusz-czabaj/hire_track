@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useApiResource } from "@/components/hooks/useApiResource";
@@ -22,17 +21,21 @@ interface MoveCandidateDialogProps {
   triggerLabel: string;
   stages: KanbanBoardStageDto[];
   onChanged: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  initialStageId?: number;
 }
 
 interface MoveCandidateFormProps {
   candidateUrl: string;
   stages: KanbanBoardStageDto[];
+  initialStageId?: number;
   onMoved: () => void;
 }
 
 // Only mounted while the dialog is open, so useApiResource's mount-time
 // fetch happens on open rather than once per board card on page load.
-function MoveCandidateForm({ candidateUrl, stages, onMoved }: MoveCandidateFormProps) {
+function MoveCandidateForm({ candidateUrl, stages, initialStageId, onMoved }: MoveCandidateFormProps) {
   const resource = useApiResource<CandidateDetailDto>(candidateUrl);
   const detail = resource.status === "success" ? resource.data : undefined;
 
@@ -45,7 +48,7 @@ function MoveCandidateForm({ candidateUrl, stages, onMoved }: MoveCandidateFormP
 
   if (detail && detail !== seededDetail) {
     setSeededDetail(detail);
-    setToStageId(detail.currentStageId);
+    setToStageId(initialStageId ?? detail.currentStageId);
     setNote(detail.notes.find((n) => n.stageId === detail.currentStageId)?.body ?? "");
   }
 
@@ -131,23 +134,30 @@ export function MoveCandidateDialog({
   triggerLabel,
   stages,
   onChanged,
+  open,
+  onOpenChange,
+  initialStageId,
 }: MoveCandidateDialogProps) {
-  const [open, setOpen] = useState(false);
-
   const candidateUrl = `/api/recruitments/${encodeURIComponent(recruitmentId)}/candidates/${candidateRecruitmentId}`;
 
   function handleMoved() {
     onChanged();
-    setOpen(false);
+    onOpenChange(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button type="button" variant="outline" size="icon" aria-label={triggerLabel}>
-          <ArrowRightLeft className="size-4" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        aria-label={triggerLabel}
+        onClick={() => {
+          onOpenChange(true);
+        }}
+      >
+        <ArrowRightLeft className="size-4" />
+      </Button>
       <DialogContent data-testid="move-candidate-dialog">
         <DialogHeader>
           <DialogTitle>Move candidate</DialogTitle>
@@ -156,7 +166,14 @@ export function MoveCandidateDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {open && <MoveCandidateForm candidateUrl={candidateUrl} stages={stages} onMoved={handleMoved} />}
+        {open && (
+          <MoveCandidateForm
+            candidateUrl={candidateUrl}
+            stages={stages}
+            initialStageId={initialStageId}
+            onMoved={handleMoved}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

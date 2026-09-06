@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MoveCandidateDialog } from "@/components/recruitments/MoveCandidateDialog";
 import type { KanbanBoardStageDto } from "@/types";
+
+function ControlledMoveCandidateDialog(
+  props: Omit<Parameters<typeof MoveCandidateDialog>[0], "open" | "onOpenChange" | "initialStageId"> & {
+    initialStageId?: number;
+  },
+) {
+  const [open, setOpen] = useState(false);
+  return <MoveCandidateDialog {...props} open={open} onOpenChange={setOpen} />;
+}
 
 const STAGES: KanbanBoardStageDto[] = [
   { id: 10, name: "New", sortOrder: 1, candidateCount: 1, candidates: [] },
@@ -65,7 +75,7 @@ describe("MoveCandidateDialog", () => {
     const onChanged = vi.fn();
 
     render(
-      <MoveCandidateDialog
+      <ControlledMoveCandidateDialog
         recruitmentId="1"
         candidateRecruitmentId={5}
         triggerLabel="Move candidate 1: Ada Lovelace"
@@ -116,7 +126,7 @@ describe("MoveCandidateDialog", () => {
     const user = userEvent.setup();
 
     render(
-      <MoveCandidateDialog
+      <ControlledMoveCandidateDialog
         recruitmentId="1"
         candidateRecruitmentId={5}
         triggerLabel="Move candidate 1: Ada Lovelace"
@@ -147,7 +157,7 @@ describe("MoveCandidateDialog", () => {
     const user = userEvent.setup();
 
     render(
-      <MoveCandidateDialog
+      <ControlledMoveCandidateDialog
         recruitmentId="1"
         candidateRecruitmentId={5}
         triggerLabel="Move candidate 1: Ada Lovelace"

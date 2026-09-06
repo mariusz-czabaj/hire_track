@@ -164,6 +164,10 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
     useSensor(KeyboardSensor),
   );
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [moveDialogState, setMoveDialogState] = useState<{
+    candidateRecruitmentId: number;
+    initialStageId?: number;
+  } | null>(null);
 
   if (resource.status === "loading") {
     return <SkeletonColumns />;
@@ -241,9 +245,14 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
     setActiveId(event.active.id as number);
   }
 
-  function handleDragEnd(_event: DragEndEvent) {
-    // Wired up in Phase 3 (dialog integration); no-op for now.
+  function handleDragEnd(event: DragEndEvent) {
     setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+    const fromStageId = active.data.current?.fromStageId as number | undefined;
+    const toStageId = over.id as number;
+    if (fromStageId === undefined || fromStageId === toStageId) return;
+    setMoveDialogState({ candidateRecruitmentId: active.id as number, initialStageId: toStageId });
   }
 
   return (
@@ -323,6 +332,19 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
                             triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
                             stages={stages}
                             onChanged={handleChanged}
+                            open={moveDialogState?.candidateRecruitmentId === candidate.candidateRecruitmentId}
+                            initialStageId={
+                              moveDialogState?.candidateRecruitmentId === candidate.candidateRecruitmentId
+                                ? moveDialogState.initialStageId
+                                : undefined
+                            }
+                            onOpenChange={(isOpen) => {
+                              if (isOpen) {
+                                setMoveDialogState({ candidateRecruitmentId: candidate.candidateRecruitmentId });
+                              } else if (moveDialogState?.candidateRecruitmentId === candidate.candidateRecruitmentId) {
+                                setMoveDialogState(null);
+                              }
+                            }}
                           />
                         </div>
                         <p className="text-muted-foreground text-right text-xs">

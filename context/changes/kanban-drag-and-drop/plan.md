@@ -268,30 +268,30 @@ None — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 2.1 `npm run build` succeeds
-- [x] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run build` succeeds — 4a76754
+- [x] 2.2 `npm run lint` passes — 4a76754
 
 #### Manual
 
-- [x] 2.3 Dragging shows a floating overlay copy and the hovered column highlights
-- [x] 2.4 Highlight has sufficient contrast in both light and dark themes
-- [x] 2.5 Screen reader announces pickup/move/drop guidance
+- [x] 2.3 Dragging shows a floating overlay copy and the hovered column highlights — 4a76754
+- [x] 2.4 Highlight has sufficient contrast in both light and dark themes — 4a76754
+- [x] 2.5 Screen reader announces pickup/move/drop guidance — 4a76754
 
 ### Phase 3: Dialog integration
 
 #### Automated
 
-- [ ] 3.1 `npm run build` succeeds
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `KanbanBoard.test.tsx` and `MoveCandidateDialog` unit tests pass
+- [x] 3.1 `npm run build` succeeds
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `KanbanBoard.test.tsx` and `MoveCandidateDialog` unit tests pass
 
 #### Manual
 
-- [ ] 3.4 Dropping onto a different column opens the dialog pre-filled with that stage
-- [ ] 3.5 Confirming moves the card and closes the dialog
-- [ ] 3.6 Cancelling leaves the card in its original column
-- [ ] 3.7 A failed save keeps the dialog open with inline error, card unmoved
-- [ ] 3.8 The per-card Move button still opens the dialog pre-filled with the current stage
+- [x] 3.4 Dropping onto a different column opens the dialog pre-filled with that stage
+- [x] 3.5 Confirming moves the card and closes the dialog
+- [x] 3.6 Cancelling leaves the card in its original column
+- [x] 3.7 A failed save keeps the dialog open with inline error, card unmoved
+- [x] 3.8 The per-card Move button still opens the dialog pre-filled with the current stage
 
 ### Phase 4: E2E verification
 
