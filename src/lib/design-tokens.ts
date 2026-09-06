@@ -28,6 +28,18 @@ export interface TokenPalette {
   sidebarPrimaryForeground: string;
   sidebarAccent: string;
   sidebarAccentForeground: string;
+  stage1: string;
+  stage1Foreground: string;
+  stage2: string;
+  stage2Foreground: string;
+  stage3: string;
+  stage3Foreground: string;
+  stage4: string;
+  stage4Foreground: string;
+  stage5: string;
+  stage5Foreground: string;
+  stage6: string;
+  stage6Foreground: string;
 }
 
 export const lightPalette: TokenPalette = {
@@ -53,6 +65,18 @@ export const lightPalette: TokenPalette = {
   sidebarPrimaryForeground: "oklch(0.99 0 0)",
   sidebarAccent: "oklch(0.94 0.02 275)",
   sidebarAccentForeground: "oklch(0.25 0.02 275)",
+  stage1: "oklch(0.55 0.19 20)",
+  stage1Foreground: "oklch(0.99 0 0)",
+  stage2: "oklch(0.8 0.14 70)",
+  stage2Foreground: "oklch(0.22 0.02 70)",
+  stage3: "oklch(0.5 0.15 140)",
+  stage3Foreground: "oklch(0.99 0 0)",
+  stage4: "oklch(0.48 0.11 175)",
+  stage4Foreground: "oklch(0.99 0 0)",
+  stage5: "oklch(0.78 0.11 205)",
+  stage5Foreground: "oklch(0.22 0.02 205)",
+  stage6: "oklch(0.55 0.18 330)",
+  stage6Foreground: "oklch(0.99 0 0)",
 };
 
 export const darkPalette: TokenPalette = {
@@ -78,6 +102,18 @@ export const darkPalette: TokenPalette = {
   sidebarPrimaryForeground: "oklch(0.16 0.03 275)",
   sidebarAccent: "oklch(0.27 0.02 275)",
   sidebarAccentForeground: "oklch(0.96 0 0)",
+  stage1: "oklch(0.52 0.19 20)",
+  stage1Foreground: "oklch(0.99 0 0)",
+  stage2: "oklch(0.8 0.14 70)",
+  stage2Foreground: "oklch(0.2 0.02 70)",
+  stage3: "oklch(0.47 0.15 140)",
+  stage3Foreground: "oklch(0.99 0 0)",
+  stage4: "oklch(0.45 0.11 175)",
+  stage4Foreground: "oklch(0.99 0 0)",
+  stage5: "oklch(0.8 0.11 205)",
+  stage5Foreground: "oklch(0.18 0.02 205)",
+  stage6: "oklch(0.5 0.18 330)",
+  stage6Foreground: "oklch(0.99 0 0)",
 };
 
 export interface TokenPair {
@@ -120,4 +156,10 @@ export const tokenPairs: TokenPair[] = [
     foreground: "sidebarAccentForeground",
     background: "sidebarAccent",
   },
+  { label: "stage-1-foreground / stage-1", size: "normal", foreground: "stage1Foreground", background: "stage1" },
+  { label: "stage-2-foreground / stage-2", size: "normal", foreground: "stage2Foreground", background: "stage2" },
+  { label: "stage-3-foreground / stage-3", size: "normal", foreground: "stage3Foreground", background: "stage3" },
+  { label: "stage-4-foreground / stage-4", size: "normal", foreground: "stage4Foreground", background: "stage4" },
+  { label: "stage-5-foreground / stage-5", size: "normal", foreground: "stage5Foreground", background: "stage5" },
+  { label: "stage-6-foreground / stage-6", size: "normal", foreground: "stage6Foreground", background: "stage6" },
 ];

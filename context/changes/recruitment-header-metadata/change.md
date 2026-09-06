@@ -1,7 +1,7 @@
 ---
 change_id: recruitment-header-metadata
 title: Recruitment header shows location, department, employment type, opened date
-status: implemented
+status: impl_reviewed
 created: 2026-09-06
 updated: 2026-09-06
 archived_at: null

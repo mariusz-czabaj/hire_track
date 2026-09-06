@@ -12,6 +12,10 @@ import { getRecruitmentDetail } from "@/lib/services/recruitments";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
 import type { RecruitmentDetailDto } from "@/types";
 
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString("en-CA");
+}
+
 const { id } = Astro.params;
 
 const recruitmentId = Number(id);
@@ -26,7 +30,7 @@ const metadataEntries = recruitment
         label: "Employment type",
         value: recruitment.employmentType ? EMPLOYMENT_TYPE_LABELS[recruitment.employmentType] : null,
       },
-      { label: "Opened", value: recruitment.openedAt },
+      { label: "Opened", value: recruitment.openedAt ? formatDate(recruitment.openedAt) : null },
     ].filter((entry): entry is { label: string; value: string } => entry.value !== null)
   : [];
 ---
