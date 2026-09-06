@@ -684,29 +684,29 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 5.1 Unit tests pass: `npm run test`
-- [x] 5.2 E2E suite passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phase 4)
-- [x] 5.3 No repo-wide references to `LibBadge` remain
-- [x] 5.4 Type checking passes: `npm run typecheck`
-- [x] 5.5 Linting passes: `npm run lint`
-- [x] 5.6 No non-English UI strings remain in `src/lib/config-status.ts`
+- [x] 5.1 Unit tests pass: `npm run test` — fb6cd3d
+- [x] 5.2 E2E suite passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phase 4) — fb6cd3d
+- [x] 5.3 No repo-wide references to `LibBadge` remain — fb6cd3d
+- [x] 5.4 Type checking passes: `npm run typecheck` — fb6cd3d
+- [x] 5.5 Linting passes: `npm run lint` — fb6cd3d
+- [x] 5.6 No non-English UI strings remain in `src/lib/config-status.ts` — fb6cd3d
 
 #### Manual
 
-- [x] 5.7 Error toast announced immediately; success toast not disruptive
-- [x] 5.8 Both live regions coexist without visual duplication or layout shift
-- [x] 5.9 Rename and user-search inputs announce a meaningful name
-- [x] 5.10 Banner renders correct English copy when Supabase env vars absent
+- [x] 5.7 Error toast announced immediately; success toast not disruptive — fb6cd3d
+- [x] 5.8 Both live regions coexist without visual duplication or layout shift — fb6cd3d
+- [x] 5.9 Rename and user-search inputs announce a meaningful name — fb6cd3d
+- [x] 5.10 Banner renders correct English copy when Supabase env vars absent — fb6cd3d
 
 ### Phase 6: Verification Harness & Handoff
 
 #### Automated
 
-- [ ] 6.1 Full E2E suite incl. new axe spec passes: `npm run test:e2e`
-- [ ] 6.2 axe scan covers every listed screen in both themes with zero unexplained violations
-- [ ] 6.3 Unit tests pass: `npm run test`
-- [ ] 6.4 Type checking passes: `npm run typecheck`
-- [ ] 6.5 Linting passes: `npm run lint`
+- [x] 6.1 Full E2E suite incl. new axe spec passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phases 4-5)
+- [x] 6.2 axe scan covers every listed screen in both themes with zero unexplained violations
+- [x] 6.3 Unit tests pass: `npm run test`
+- [x] 6.4 Type checking passes: `npm run typecheck`
+- [x] 6.5 Linting passes: `npm run lint`
 
 #### Manual
 
