@@ -297,9 +297,9 @@ None — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 4.1 New Playwright spec `tests/e2e/kanban-drag-and-drop.spec.ts` passes
-- [x] 4.2 Full E2E suite still passes
+- [x] 4.1 New Playwright spec `tests/e2e/kanban-drag-and-drop.spec.ts` passes — e374a8e
+- [x] 4.2 Full E2E suite still passes — e374a8e
 
 #### Manual
 
-- [x] 4.3 Manually perform mouse-drag, keyboard-drag, and cancel flows against the running dev server
+- [x] 4.3 Manually perform mouse-drag, keyboard-drag, and cancel flows against the running dev server — e374a8e
