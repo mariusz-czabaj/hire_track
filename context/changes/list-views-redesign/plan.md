@@ -325,33 +325,33 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run build`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts`
+- [x] 2.1 Type checking passes: `npm run build` — a05667e
+- [x] 2.2 Linting passes: `npm run lint` — a05667e
+- [x] 2.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts` — a05667e
 
 #### Manual
 
-- [x] 2.4 Recruitment list renders shadow-based cards with accent bar in both light and dark mode
-- [x] 2.5 Page title renders in serif font at ~40px
-- [x] 2.6 Recruitment list rows stack vertically below 768px viewport width and remain readable/usable
-- [x] 2.7 Status filter pills still filter correctly and sync `?status=` in the URL
-- [x] 2.8 Both empty-state strings still render correctly for their respective conditions
+- [x] 2.4 Recruitment list renders shadow-based cards with accent bar in both light and dark mode — a05667e
+- [x] 2.5 Page title renders in serif font at ~40px — a05667e
+- [x] 2.6 Recruitment list rows stack vertically below 768px viewport width and remain readable/usable — a05667e
+- [x] 2.7 Status filter pills still filter correctly and sync `?status=` in the URL — a05667e
+- [x] 2.8 Both empty-state strings still render correctly for their respective conditions — a05667e
 
 ### Phase 3: Candidate List Redesign
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run build`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Existing candidate-history E2E spec passes unchanged: `npx playwright test tests/e2e/candidate-history.spec.ts`
+- [x] 3.1 Type checking passes: `npm run build`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Existing candidate-history E2E spec passes unchanged: `npx playwright test tests/e2e/candidate-history.spec.ts`
 
 #### Manual
 
-- [ ] 3.4 Candidate list renders shadow-based cards with accent bar in both light and dark mode
-- [ ] 3.5 Page title renders in serif font at ~40px
-- [ ] 3.6 Search-by-name still debounces and filters results correctly
-- [ ] 3.7 Truncation hint still appears when results are capped at 50
-- [ ] 3.8 Empty-state string still renders correctly when no candidates match
+- [x] 3.4 Candidate list renders shadow-based cards with accent bar in both light and dark mode
+- [x] 3.5 Page title renders in serif font at ~40px
+- [x] 3.6 Search-by-name still debounces and filters results correctly
+- [x] 3.7 Truncation hint still appears when results are capped at 50
+- [x] 3.8 Empty-state string still renders correctly when no candidates match
 
 ### Phase 4: Admin (Security Groups) List Redesign
 

@@ -76,7 +76,8 @@ export function CandidateList({ initialQuery }: CandidateListProps) {
         <div className="flex flex-col gap-3">
           {resource.data.items.map((candidate) => (
             <a key={candidate.id} href={`/candidates/${candidate.id}`} className="block">
-              <Card className="hover:bg-accent flex flex-row items-center justify-between gap-4 p-4 transition-colors">
+              <Card className="hover:bg-accent relative flex flex-col gap-4 overflow-hidden border-0 p-4 pl-6 shadow-md transition-colors sm:flex-row sm:items-center sm:justify-between">
+                <div className="bg-primary absolute inset-y-0 left-0 w-1.5" aria-hidden="true" />
                 <div>
                   <p className="font-semibold">{candidate.fullName}</p>
                   <p className="text-muted-foreground text-sm">{candidate.email}</p>
