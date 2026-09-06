@@ -399,9 +399,9 @@ the omit-empty rule.
 
 #### Automated
 
-- [ ] 3.1 Full E2E suite passes: `npx playwright test`
-- [ ] 3.2 Linting passes: `npm run lint`
+- [x] 3.1 Full E2E suite passes: `npx playwright test`
+- [x] 3.2 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.3 E2E suite passes on a re-run without manual DB cleanup between runs
+- [x] 3.3 E2E suite passes on a re-run without manual DB cleanup between runs

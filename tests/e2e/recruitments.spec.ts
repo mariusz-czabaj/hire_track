@@ -114,6 +114,8 @@ test.describe("HR creates a recruitment and manages its status", () => {
   });
 
   test("create -> appears in list -> status change persists", async ({ page }) => {
+    const title = `E2E Test Role ${Date.now()}`;
+
     await page.goto("/recruitments/new");
 
     const titleInput = page.getByLabel("Title");
@@ -126,12 +128,12 @@ test.describe("HR creates a recruitment and manages its status", () => {
     // as SignInForm (see support/auth.ts): retry until values actually
     // stick past React attaching its controlled-input onChange handlers.
     await expect(async () => {
-      await titleInput.fill("E2E Test Role");
+      await titleInput.fill(title);
       await departmentInput.fill("Engineering");
       await locationInput.fill("Remote");
       await openedAtInput.fill("2026-02-01");
       await groupCheckbox.check();
-      await expect(titleInput).toHaveValue("E2E Test Role");
+      await expect(titleInput).toHaveValue(title);
       await expect(departmentInput).toHaveValue("Engineering");
       await expect(locationInput).toHaveValue("Remote");
       await expect(openedAtInput).toHaveValue("2026-02-01");
@@ -141,13 +143,19 @@ test.describe("HR creates a recruitment and manages its status", () => {
     await page.getByRole("button", { name: "Create recruitment" }).click();
 
     await expect(page).toHaveURL(/\/recruitments\/\d+$/);
-    await expect(page.getByRole("heading", { name: "E2E Test Role" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(page.getByText("Department: Engineering")).toBeVisible();
+    await expect(page.getByText("Location: Remote")).toBeVisible();
+    await expect(page.getByText("Employment type: Full-time")).toBeVisible();
+    await expect(page.getByText("Opened: 2026-02-01")).toBeVisible();
+    await expect(page.locator('[data-slot="badge"]')).toHaveCount(1);
     await expect(page.locator('[data-slot="badge"]')).toHaveText("Draft");
 
     await page.goto("/recruitments");
-    await expect(page.getByText("E2E Test Role")).toBeVisible();
+    await expect(page.getByText(title)).toBeVisible();
 
-    await page.getByText("E2E Test Role").click();
+    await page.getByText(title).click();
     await page.getByRole("button", { name: "Live", exact: true }).click();
     await expect(page.locator('[data-slot="badge"]')).toHaveText("Live");
 
