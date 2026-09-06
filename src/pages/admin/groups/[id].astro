@@ -1,5 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import AppShell from "@/components/AppShell.astro";
+import Sidebar from "@/components/Sidebar.astro";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserMenu } from "@/components/UserMenu";
+import { SidebarToggle } from "@/components/SidebarToggle";
+import { MobileNav } from "@/components/MobileNav";
 import { SecurityGroupDetail } from "@/components/admin/SecurityGroupDetail";
 
 const isAdmin = Astro.locals.operations.includes("group.manage");
@@ -7,17 +13,31 @@ const groupId = Astro.params.id ?? "";
 ---
 
 <Layout title="Admin - Security Group">
-  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
-    <div class="mx-auto max-w-4xl">
-      {
-        isAdmin ? (
-          <SecurityGroupDetail groupId={groupId} client:load />
-        ) : (
-          <p class="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-blue-100/70">
-            You are not authorized to view this page.
-          </p>
-        )
-      }
-    </div>
-  </div>
+  <AppShell containerWidth="standard">
+    <Fragment slot="nav">
+      <Sidebar />
+    </Fragment>
+    <Fragment slot="topbar-leading">
+      <SidebarToggle collapsed={Astro.locals.sidebarCollapsed} client:load />
+      <MobileNav client:load>
+        <Sidebar />
+      </MobileNav>
+    </Fragment>
+    <Fragment slot="topbar-actions">
+      <ThemeToggle theme={Astro.locals.theme} client:load />
+      {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
+    </Fragment>
+    <Fragment slot="page-title">
+      <h1 class="text-foreground text-3xl font-bold">Security group</h1>
+    </Fragment>
+    {
+      isAdmin ? (
+        <SecurityGroupDetail groupId={groupId} client:load />
+      ) : (
+        <p class="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-6 text-center">
+          You are not authorized to view this page.
+        </p>
+      )
+    }
+  </AppShell>
 </Layout>

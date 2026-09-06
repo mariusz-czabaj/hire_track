@@ -158,9 +158,9 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
   if (resource.status === "loading") {
     return (
       <div className="flex flex-col gap-4">
-        <Skeleton className="h-10 w-full rounded-xl bg-white/10" />
-        <Skeleton className="h-40 w-full rounded-xl bg-white/10" />
-        <Skeleton className="h-40 w-full rounded-xl bg-white/10" />
+        <Skeleton className="h-10 w-full rounded-xl" />
+        <Skeleton className="h-40 w-full rounded-xl" />
+        <Skeleton className="h-40 w-full rounded-xl" />
       </div>
     );
   }
@@ -183,14 +183,10 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
             onChange={(e) => {
               setName(e.target.value);
             }}
-            className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white focus:ring-2 focus:ring-purple-400 focus:outline-none"
+            className="border-input bg-input/30 text-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 focus:ring-2 focus:outline-none"
           />
         </div>
-        <Button
-          type="submit"
-          disabled={renaming}
-          className="shrink-0 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
-        >
+        <Button type="submit" disabled={renaming} className="shrink-0">
           <span className="flex items-center gap-2">
             <Save className="size-4" />
             {renaming ? "Saving..." : "Rename"}
@@ -199,11 +195,11 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
       </form>
       <ServerError message={renameError} />
 
-      <section className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <h2 className="mb-3 text-lg font-semibold text-white">Operations</h2>
+      <section className="border-border bg-card rounded-xl border p-4">
+        <h2 className="text-foreground mb-3 text-lg font-semibold">Operations</h2>
         <div className="flex flex-col gap-2">
           {operationSchema.options.map((operation) => (
-            <label key={operation} className="flex items-center gap-2 text-sm text-blue-100/80">
+            <label key={operation} className="text-muted-foreground flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={operations.includes(operation)}
@@ -211,7 +207,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
                 onChange={(e) => {
                   void handleToggleOperation(operation, e.target.checked);
                 }}
-                className="size-4 rounded border-white/30 bg-white/10"
+                className="border-input bg-input/30 size-4 rounded"
               />
               {OPERATION_LABELS[operation]}
             </label>
@@ -220,19 +216,19 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
         <ServerError message={operationError} />
       </section>
 
-      <section className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <h2 className="mb-3 text-lg font-semibold text-white">Members</h2>
+      <section className="border-border bg-card rounded-xl border p-4">
+        <h2 className="text-foreground mb-3 text-lg font-semibold">Members</h2>
         {members.length === 0 ? (
-          <p className="text-sm text-blue-100/50">No members yet.</p>
+          <p className="text-muted-foreground text-sm">No members yet.</p>
         ) : (
           <ul className="mb-4 flex flex-col gap-1">
             {members.map((member) => (
               <li
                 key={member.userId}
-                className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-white"
+                className="border-border bg-muted text-foreground flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
               >
                 <span className="flex items-center gap-2">
-                  <Check className="size-3.5 text-green-300" />
+                  <Check className="text-primary size-3.5" />
                   {member.email}
                 </span>
                 <button
@@ -241,7 +237,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
                   onClick={() => {
                     void handleRemoveMember(member.userId);
                   }}
-                  className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xs transition-colors hover:bg-white/20 disabled:opacity-50"
+                  className="border-input bg-input/30 hover:bg-accent flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="size-3.5" />
                   Remove

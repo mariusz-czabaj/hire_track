@@ -77,7 +77,7 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
   return (
     <div className="flex flex-col gap-2">
       <div className="relative">
-        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-white/40" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <input
           type="text"
           value={query}
@@ -85,18 +85,18 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
             setQuery(e.target.value);
           }}
           placeholder="Search users by email"
-          className="w-full rounded-lg border border-white/20 bg-white/10 py-2 pr-3 pl-10 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="border-input bg-input/30 text-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-lg border py-2 pr-3 pl-10 focus:ring-2 focus:outline-none"
         />
       </div>
 
       {state.status === "below-minimum" && (
-        <p className="text-xs text-blue-100/50">Type at least {MIN_QUERY_LENGTH} characters to search.</p>
+        <p className="text-muted-foreground text-xs">Type at least {MIN_QUERY_LENGTH} characters to search.</p>
       )}
 
-      {state.status === "loading" && <p className="text-xs text-blue-100/50">Searching...</p>}
+      {state.status === "loading" && <p className="text-muted-foreground text-xs">Searching...</p>}
 
       {state.status === "success" && state.data.length === 0 && (
-        <p className="text-xs text-blue-100/50">No matching users found.</p>
+        <p className="text-muted-foreground text-xs">No matching users found.</p>
       )}
 
       {state.status === "success" && state.data.length > 0 && (
@@ -106,11 +106,11 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
             return (
               <li
                 key={user.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                className="border-border bg-muted text-foreground flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
               >
                 <span>{user.email}</span>
                 {alreadyMember ? (
-                  <span className="text-xs text-blue-100/50">Already a member</span>
+                  <span className="text-muted-foreground text-xs">Already a member</span>
                 ) : (
                   <button
                     type="button"
@@ -118,7 +118,7 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
                     onClick={() => {
                       void handleAdd(user);
                     }}
-                    className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xs transition-colors hover:bg-white/20 disabled:opacity-50"
+                    className="border-input bg-input/30 hover:bg-accent flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors disabled:opacity-50"
                   >
                     <UserPlus className="size-3.5" />
                     Add

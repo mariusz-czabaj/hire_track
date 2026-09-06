@@ -758,17 +758,17 @@ existing sessions get the default with no special handling.
 
 #### Automated
 
-- [ ] 5.1 Build succeeds: `npm run build`
-- [ ] 5.2 Linting passes: `npm run lint`
-- [ ] 5.3 Unit tests pass, including the admin component tests: `npx vitest run`
-- [ ] 5.4 Full E2E suite passes: `npx playwright test`
-- [ ] 5.5 Integration tests pass: `npx vitest run src/pages/api`
-- [ ] 5.6 No `bg-cosmic` reference remains outside the auth pages
-- [ ] 5.7 No page still declares its own shell (`min-h-screen` only under `src/pages/auth/`)
+- [x] 5.1 Build succeeds: `npm run build`
+- [x] 5.2 Linting passes: `npm run lint`
+- [x] 5.3 Unit tests pass, including the admin component tests: `npx vitest run`
+- [x] 5.4 Full E2E suite passes: `npx playwright test`
+- [x] 5.5 Integration tests pass: `npx vitest run src/pages/api`
+- [x] 5.6 No `bg-cosmic` reference remains outside the auth pages
+- [x] 5.7 No page still declares its own shell (`min-h-screen` only under `src/pages/auth/`)
 
 #### Manual
 
-- [ ] 5.8 Both admin pages render inside the shell and are readable in both themes
-- [ ] 5.9 Non-admin sees a readable not-authorized message and no Administration entry
-- [ ] 5.10 Admin can still create a group, manage members, and grant operations
-- [ ] 5.11 All eight product pages show one consistent shell at desktop and mobile widths
+- [x] 5.8 Both admin pages render inside the shell and are readable in both themes
+- [x] 5.9 Non-admin sees a readable not-authorized message and no Administration entry
+- [x] 5.10 Admin can still create a group, manage members, and grant operations
+- [x] 5.11 All eight product pages show one consistent shell at desktop and mobile widths

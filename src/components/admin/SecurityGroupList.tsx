@@ -40,15 +40,11 @@ export function SecurityGroupList() {
               setName(e.target.value);
             }}
             placeholder="New group name"
-            className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+            className="border-input bg-input/30 text-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 focus:ring-2 focus:outline-none"
           />
-          {fieldErrors?.name ? <p className="mt-1 text-xs text-red-300">{fieldErrors.name}</p> : null}
+          {fieldErrors?.name ? <p className="text-destructive mt-1 text-xs">{fieldErrors.name}</p> : null}
         </div>
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="shrink-0 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
-        >
+        <Button type="submit" disabled={submitting} className="shrink-0">
           <span className="flex items-center gap-2">
             <Plus className="size-4" />
             {submitting ? "Creating..." : "Create group"}
@@ -61,13 +57,13 @@ export function SecurityGroupList() {
       {groups.status === "loading" && (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-16 w-full rounded-xl bg-white/10" />
+            <Skeleton key={i} className="h-16 w-full rounded-xl" />
           ))}
         </div>
       )}
 
       {groups.status === "success" && groups.data.length === 0 && (
-        <p className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-blue-100/70">
+        <p className="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-6 text-center">
           No security groups yet.
         </p>
       )}
@@ -76,8 +72,8 @@ export function SecurityGroupList() {
         <div className="flex flex-col gap-3">
           {groups.data.map((group) => (
             <a key={group.id} href={`/admin/groups/${group.id}`} className="block">
-              <Card className="flex flex-row items-center gap-3 border-white/10 bg-white/10 p-4 text-white transition-colors hover:bg-white/15">
-                <Shield className="size-4 text-purple-300" />
+              <Card className="hover:bg-accent flex flex-row items-center gap-3 p-4 transition-colors">
+                <Shield className="text-primary size-4" />
                 <span className="font-semibold">{group.name}</span>
               </Card>
             </a>
