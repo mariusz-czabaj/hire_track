@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_FILTER_OPTIONS, STATUS_PRESENTATION } from "@/lib/recruitment-status";
-import { cn } from "@/lib/utils";
+import { statusPillClasses } from "@/lib/status-pill-styles";
 import { recruitmentStatusSchema, type RecruitmentListItemDto, type RecruitmentStatus } from "@/types";
 
 interface RecruitmentListProps {
@@ -56,12 +56,7 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
             onClick={() => {
               handleFilterChange(option.value);
             }}
-            className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
-              status === option.value
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-            )}
+            className={statusPillClasses({ active: status === option.value, size: "default" })}
           >
             {option.label}
           </button>

@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { STATUS_PRESENTATION } from "@/lib/recruitment-status";
 import { stageClassesForSortOrder } from "@/lib/stage-palette";
+import { statusPillClasses } from "@/lib/status-pill-styles";
 import {
   recruitmentStatusSchema,
   type KanbanBoardDto,
@@ -140,12 +141,11 @@ function StatusControl({
             onClick={() => {
               void handleChange(option);
             }}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50",
-              option === status
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-            )}
+            className={statusPillClasses({
+              active: option === status,
+              disabled: mutationStatus === "loading",
+              size: "sm",
+            })}
           >
             {STATUS_PRESENTATION[option].label}
           </button>
