@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp, ListOrdered, Plus, Settings, Trash2 } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
-import { ServerError } from "@/components/auth/ServerError";
+import { FormField } from "@/components/ui/form-field";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -208,8 +208,8 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
               Add stage
             </Button>
 
-            <ServerError message={replaceStages.status === "error" ? replaceStages.error : null} />
-            <ServerError message={resetStages.status === "error" ? resetStages.error : null} />
+            <Alert variant="error" message={replaceStages.status === "error" ? replaceStages.error : null} />
+            <Alert variant="error" message={resetStages.status === "error" ? resetStages.error : null} />
 
             <DialogFooter className="gap-2 sm:justify-between">
               {stagesSource === "custom" ? (

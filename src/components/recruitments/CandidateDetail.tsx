@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Mail, Pencil, Phone, User } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -141,7 +141,7 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
   }
 
   if (resource.status === "error") {
-    return <ServerError message={resource.message} />;
+    return <Alert variant="error" message={resource.message} />;
   }
 
   const { data: candidate } = resource;
@@ -216,7 +216,7 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
       </div>
 
       {editingStageId !== null && upsertNote.status === "error" && !upsertNote.fieldErrors && (
-        <ServerError message={upsertNote.error} />
+        <Alert variant="error" message={upsertNote.error} />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useDebouncedValue } from "@/components/hooks/useDebouncedValue";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,8 +96,8 @@ export function CandidateList({ initialQuery }: CandidateListProps) {
         </div>
       )}
 
-      {resource.status === "not-found" && <ServerError message="Candidates could not be found." />}
-      {resource.status === "error" && <ServerError message={resource.message} />}
+      {resource.status === "not-found" && <Alert variant="info" message="Candidates could not be found." />}
+      {resource.status === "error" && <Alert variant="error" message={resource.message} />}
     </div>
   );
 }

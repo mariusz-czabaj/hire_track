@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, Save, Trash2 } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UserSearchPicker } from "@/components/admin/UserSearchPicker";
@@ -166,11 +166,11 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
   }
 
   if (resource.status === "not-found") {
-    return <ServerError message="Security group could not be found." />;
+    return <Alert variant="info" message="Security group could not be found." />;
   }
 
   if (resource.status === "error") {
-    return <ServerError message={resource.message} />;
+    return <Alert variant="error" message={resource.message} />;
   }
 
   return (
@@ -193,7 +193,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
           </span>
         </Button>
       </form>
-      <ServerError message={renameError} />
+      <Alert variant="error" message={renameError} />
 
       <section className="border-border bg-card rounded-xl border p-4">
         <h2 className="text-foreground mb-3 text-lg font-semibold">Operations</h2>
@@ -213,7 +213,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
             </label>
           ))}
         </div>
-        <ServerError message={operationError} />
+        <Alert variant="error" message={operationError} />
       </section>
 
       <section className="border-border bg-card rounded-xl border p-4">
@@ -246,7 +246,7 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
             ))}
           </ul>
         )}
-        <ServerError message={memberError} />
+        <Alert variant="error" message={memberError} />
         <UserSearchPicker existingUserIds={members.map((m) => m.userId)} onAdd={handleAddMember} />
       </section>
     </div>

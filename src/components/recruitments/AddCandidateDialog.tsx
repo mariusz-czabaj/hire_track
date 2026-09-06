@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mail, Phone, Plus, User } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
-import { ServerError } from "@/components/auth/ServerError";
+import { FormField } from "@/components/ui/form-field";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -125,7 +125,8 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
           />
         </div>
 
-        <ServerError
+        <Alert
+          variant="error"
           message={addCandidate.status === "error" && !addCandidate.fieldErrors ? addCandidate.error : null}
         />
 

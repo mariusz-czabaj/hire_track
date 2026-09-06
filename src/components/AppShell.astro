@@ -1,4 +1,6 @@
 ---
+import { Toaster } from "@/components/ui/toaster";
+
 export type AppShellContainerWidth = "narrow" | "standard" | "wide";
 
 interface Props {
@@ -18,6 +20,7 @@ const navClass = sidebarCollapsed ? "hidden" : "hidden shrink-0 border-b md:bloc
 ---
 
 <div class="bg-background text-foreground min-h-screen">
+  <Toaster client:load />
   <a
     href="#main-content"
     class="bg-background text-foreground focus-visible:ring-ring sr-only focus:not-sr-only focus-visible:absolute focus-visible:top-2 focus-visible:left-2 focus-visible:z-50 focus-visible:rounded-md focus-visible:px-4 focus-visible:py-2 focus-visible:ring-2 focus-visible:outline-none"

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRightLeft } from "lucide-react";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,9 +73,12 @@ function MoveCandidateForm({ candidateUrl, stages, initialStageId, onMoved }: Mo
     return <p className="text-muted-foreground text-sm">Loading...</p>;
   }
 
-  if (resource.status === "not-found" || resource.status === "error") {
-    const message = resource.status === "error" ? resource.message : "Could not load this candidate.";
-    return <ServerError message={message} />;
+  if (resource.status === "not-found") {
+    return <Alert variant="info" message="Could not load this candidate." />;
+  }
+
+  if (resource.status === "error") {
+    return <Alert variant="error" message={resource.message} />;
   }
 
   return (
@@ -109,7 +112,8 @@ function MoveCandidateForm({ candidateUrl, stages, initialStageId, onMoved }: Mo
         placeholder="What happened at this stage?"
       />
 
-      <ServerError
+      <Alert
+        variant="error"
         message={moveCandidate.status === "error" && !moveCandidate.fieldErrors?.note ? moveCandidate.error : null}
       />
 

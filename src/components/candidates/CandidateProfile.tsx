@@ -3,8 +3,8 @@ import { Download, Mail, Pencil, Phone, Repeat } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { useCvUpload } from "@/components/hooks/useCvUpload";
-import { ServerError } from "@/components/auth/ServerError";
-import { FormField } from "@/components/auth/FormField";
+import { Alert } from "@/components/ui/alert";
+import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -172,7 +172,7 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
   }
 
   if (resource.status === "error") {
-    return <ServerError message={resource.message} />;
+    return <Alert variant="error" message={resource.message} />;
   }
 
   const { data: candidate } = resource;
@@ -238,7 +238,7 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
               </Button>
             </div>
             {updateProfile.status === "error" && !updateProfile.fieldErrors && (
-              <ServerError message={updateProfile.error} />
+              <Alert variant="error" message={updateProfile.error} />
             )}
           </div>
         ) : (

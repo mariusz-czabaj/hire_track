@@ -11,7 +11,7 @@ interface TextareaProps {
   rows?: number;
 }
 
-// Mirrors FormField's label/id pairing and inline error markup (no icon --
+// Mirrors ui/form-field's label/id pairing and inline error markup (no icon --
 // notes are multi-line and don't need one) so getByLabel works the same
 // way in both RTL and Playwright.
 export function Textarea({ id, label, value, onChange, placeholder, error, rows = 4 }: TextareaProps) {

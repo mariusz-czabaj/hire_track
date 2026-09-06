@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
 import { useDebouncedValue } from "@/components/hooks/useDebouncedValue";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import type { UserSearchResultDto } from "@/types";
 
 const MIN_QUERY_LENGTH = 2;
@@ -130,7 +130,7 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
         </ul>
       )}
 
-      {state.status === "error" && <ServerError message={state.message} />}
+      {state.status === "error" && <Alert variant="error" message={state.message} />}
     </div>
   );
 }

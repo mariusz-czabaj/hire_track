@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Shield } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ export function SecurityGroupList() {
             }}
             placeholder="New group name"
           />
-          {fieldErrors?.name ? <p className="text-destructive mt-1 text-xs">{fieldErrors.name}</p> : null}
+          {fieldErrors?.name ? <Alert variant="error" message={fieldErrors.name} className="mt-1" /> : null}
         </div>
         <Button type="submit" disabled={submitting} className="shrink-0">
           <span className="flex items-center gap-2">
@@ -52,7 +52,7 @@ export function SecurityGroupList() {
         </Button>
       </form>
 
-      <ServerError message={status === "error" && !fieldErrors ? error : null} />
+      <Alert variant="error" message={status === "error" && !fieldErrors ? error : null} />
 
       {groups.status === "loading" && (
         <div className="flex flex-col gap-3">
@@ -82,7 +82,7 @@ export function SecurityGroupList() {
         </div>
       )}
 
-      {groups.status === "error" && <ServerError message={groups.message} />}
+      {groups.status === "error" && <Alert variant="error" message={groups.message} />}
     </div>
   );
 }

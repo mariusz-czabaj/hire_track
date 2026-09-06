@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useApiResource } from "@/components/hooks/useApiResource";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -102,8 +102,8 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
         </div>
       )}
 
-      {resource.status === "not-found" && <ServerError message="Recruitments could not be found." />}
-      {resource.status === "error" && <ServerError message={resource.message} />}
+      {resource.status === "not-found" && <Alert variant="info" message="Recruitments could not be found." />}
+      {resource.status === "error" && <Alert variant="error" message={resource.message} />}
     </div>
   );
 }

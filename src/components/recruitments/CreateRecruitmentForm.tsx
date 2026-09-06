@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Briefcase, Building2, Calendar, MapPin, Plus, Users } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
-import { ServerError } from "@/components/auth/ServerError";
+import { FormField } from "@/components/ui/form-field";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiResource } from "@/components/hooks/useApiResource";
@@ -167,7 +167,7 @@ export function CreateRecruitmentForm() {
               <Skeleton className="h-5 w-full" />
             </div>
           )}
-          {groupsResource.status === "error" && <ServerError message={groupsResource.message} />}
+          {groupsResource.status === "error" && <Alert variant="error" message={groupsResource.message} />}
           {groupsResource.status === "success" && (
             <div className="flex flex-col gap-2 py-1">
               {groupsResource.data.map((group) => (
@@ -189,10 +189,10 @@ export function CreateRecruitmentForm() {
             </div>
           )}
         </div>
-        {errors.groupIds ? <p className="text-destructive mt-1 text-xs">{errors.groupIds}</p> : null}
+        {errors.groupIds ? <Alert variant="error" message={errors.groupIds} className="mt-1" /> : null}
       </div>
 
-      <ServerError message={status === "error" ? error : null} />
+      <Alert variant="error" message={status === "error" ? error : null} />
 
       <Button type="submit" disabled={submitting} className="w-full">
         {submitting ? (

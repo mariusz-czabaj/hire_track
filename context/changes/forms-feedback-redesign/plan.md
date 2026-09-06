@@ -550,24 +550,24 @@ Phase 3 and must not survive into the final state.
 
 #### Automated
 
-- [x] 2.1 New and existing unit tests pass: `npm test`
-- [x] 2.2 Type checking passes: `npm run typecheck`
-- [x] 2.3 Linting passes, including `jsx-a11y` rules: `npm run lint`
-- [x] 2.4 Existing E2E suite still green: `npm run test:e2e`
+- [x] 2.1 New and existing unit tests pass: `npm test` — 4fc639d
+- [x] 2.2 Type checking passes: `npm run typecheck` — 4fc639d
+- [x] 2.3 Linting passes, including `jsx-a11y` rules: `npm run lint` — 4fc639d
+- [x] 2.4 Existing E2E suite still green: `npm run test:e2e` — 4fc639d
 
 #### Manual
 
-- [x] 2.5 No visual change anywhere yet, except `ServerError` in token colors
+- [x] 2.5 No visual change anywhere yet, except `ServerError` in token colors — 4fc639d
 
 ### Phase 3: Migration
 
 #### Automated
 
-- [ ] 3.1 All unit tests pass, including the 10 existing component suites: `npm test`
-- [ ] 3.2 Full E2E suite passes with its 53 `getByLabel` locators unmodified: `npm run test:e2e`
-- [ ] 3.3 Type checking passes: `npm run typecheck`
-- [ ] 3.4 Linting passes: `npm run lint`
-- [ ] 3.5 No stale references remain: `grep -r "ServerError\|auth/FormField" src/`
+- [x] 3.1 All unit tests pass, including the 10 existing component suites: `npm test`
+- [x] 3.2 Full E2E suite passes with its 53 `getByLabel` locators unmodified: `npm run test:e2e`
+- [x] 3.3 Type checking passes: `npm run typecheck`
+- [x] 3.4 Linting passes: `npm run lint`
+- [x] 3.5 No stale references remain: `grep -r "ServerError\|auth/FormField" src/`
 
 #### Manual
 

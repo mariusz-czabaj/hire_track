@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Mail, Lock, UserPlus } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
+import { FormField } from "@/components/ui/form-field";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -124,7 +124,7 @@ export default function SignUpForm({ serverError }: Props) {
         }
       />
 
-      <ServerError message={serverError} />
+      <Alert variant="error" message={serverError} />
 
       <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />}>
         Create account

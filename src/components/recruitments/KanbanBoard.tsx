@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
-import { ServerError } from "@/components/auth/ServerError";
+import { Alert } from "@/components/ui/alert";
 import { AddCandidateDialog } from "@/components/recruitments/AddCandidateDialog";
 import { MoveCandidateDialog } from "@/components/recruitments/MoveCandidateDialog";
 import { StageEditor } from "@/components/recruitments/StageEditor";
@@ -151,7 +151,7 @@ function StatusControl({
           </button>
         ))}
       </div>
-      {mutationStatus === "error" && <ServerError message={error} />}
+      {mutationStatus === "error" && <Alert variant="error" message={error} />}
     </div>
   );
 }
@@ -178,7 +178,7 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   }
 
   if (resource.status === "error") {
-    return <ServerError message={resource.message} />;
+    return <Alert variant="error" message={resource.message} />;
   }
 
   const { recruitment, stages, stagesSource } = resource.data;

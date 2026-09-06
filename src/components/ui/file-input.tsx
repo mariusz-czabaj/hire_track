@@ -10,7 +10,7 @@ interface FileInputProps {
   onFileSelected: (file: File) => void;
 }
 
-// Mirrors Textarea/FormField's label/id pairing and inline error markup so
+// Mirrors Textarea/ui/form-field's label/id pairing and inline error markup so
 // getByLabelText works the same way in both RTL and Playwright.
 export function FileInput({ id, label, accept, error, disabled, onFileSelected }: FileInputProps) {
   return (
