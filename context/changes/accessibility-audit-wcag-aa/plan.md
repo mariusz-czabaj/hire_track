@@ -652,33 +652,33 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `npm run test`
-- [x] 3.2 Existing form tests still pass unmodified in intent
-- [x] 3.3 Existing E2E suite still passes: `npm run test:e2e`
-- [x] 3.4 Type checking passes: `npm run typecheck`
-- [x] 3.5 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test` — 619d892
+- [x] 3.2 Existing form tests still pass unmodified in intent — 619d892
+- [x] 3.3 Existing E2E suite still passes: `npm run test:e2e` — 619d892
+- [x] 3.4 Type checking passes: `npm run typecheck` — 619d892
+- [x] 3.5 Linting passes: `npm run lint` — 619d892
 
 #### Manual
 
-- [x] 3.6 Empty submit moves focus to first invalid field, keyboard-only, in every form
-- [x] 3.7 Dialog forms keep focus inside the dialog on validation failure
-- [x] 3.8 No error message wording changed
+- [x] 3.6 Empty submit moves focus to first invalid field, keyboard-only, in every form — 619d892
+- [x] 3.7 Dialog forms keep focus inside the dialog on validation failure — 619d892
+- [x] 3.8 No error message wording changed — 619d892
 
 ### Phase 4: Kanban Drag Handle
 
 #### Automated
 
-- [ ] 4.1 E2E suite passes incl. `kanban-drag-and-drop.spec.ts`: `npm run test:e2e`
-- [ ] 4.2 Unit tests pass: `npm run test`
-- [ ] 4.3 Type checking passes: `npm run typecheck`
-- [ ] 4.4 Linting (incl. `jsx-a11y`) passes: `npm run lint`
+- [x] 4.1 E2E suite passes incl. `kanban-drag-and-drop.spec.ts`: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts` confirmed unrelated — reproduce identically on `main` before this phase's changes)
+- [x] 4.2 Unit tests pass: `npm run test`
+- [x] 4.3 Type checking passes: `npm run typecheck`
+- [x] 4.4 Linting (incl. `jsx-a11y`) passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.5 Pointer drag works from handle; link and move button clickable without dragging
-- [ ] 4.6 Sensible tab order, no phantom button stop on the card wrapper
-- [ ] 4.7 Keyboard drag still moves the candidate and is announced
-- [ ] 4.8 Handle visible and hit-target-sized on touch widths
+- [x] 4.5 Pointer drag works from handle; link and move button clickable without dragging
+- [x] 4.6 Sensible tab order, no phantom button stop on the card wrapper
+- [x] 4.7 Keyboard drag still moves the candidate and is announced
+- [x] 4.8 Handle visible and hit-target-sized on touch widths
 
 ### Phase 5: Semantics Cleanup
 

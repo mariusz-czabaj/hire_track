@@ -20,21 +20,34 @@ async function addCandidate(page: Page, recruitmentId: number, fullName: string,
 // moves past its activation distance -- Playwright's dragTo() moves in a
 // single jump and never crosses that threshold, so onDragEnd sees the same
 // column it started in. Stepping the mouse mirrors an actual drag gesture.
-async function dragCardOnto(page: Page, card: Locator, target: Locator): Promise<void> {
-  const from = await card.boundingBox();
+//
+// The pointer must go down on the drag handle (that's where dnd-kit's
+// listeners live), but collision detection translates the *whole card's*
+// rect by the pointer delta -- not the handle's. The handle sits at the
+// card's right edge, so a delta measured from the handle undershoots how
+// far the card itself needs to move to land in the target column. Measure
+// the delta from the card's own center and apply that same delta to the
+// handle's pointer coordinates.
+async function dragCardOnto(page: Page, handle: Locator, target: Locator): Promise<void> {
+  const handleBox = await handle.boundingBox();
+  const cardBox = await handle.locator("xpath=..").boundingBox();
   const to = await target.boundingBox();
-  if (!from || !to) throw new Error("Could not resolve drag source/target bounding boxes");
+  if (!handleBox || !cardBox || !to) throw new Error("Could not resolve drag source/target bounding boxes");
 
-  const fromX = from.x + from.width / 2;
-  const fromY = from.y + from.height / 2;
+  const handleX = handleBox.x + handleBox.width / 2;
+  const handleY = handleBox.y + handleBox.height / 2;
+  const cardCenterX = cardBox.x + cardBox.width / 2;
+  const cardCenterY = cardBox.y + cardBox.height / 2;
   const toX = to.x + to.width / 2;
   const toY = to.y + to.height / 2;
+  const deltaX = toX - cardCenterX;
+  const deltaY = toY - cardCenterY;
 
-  await page.mouse.move(fromX, fromY);
+  await page.mouse.move(handleX, handleY);
   await page.mouse.down();
   const steps = 10;
   for (let i = 1; i <= steps; i++) {
-    await page.mouse.move(fromX + ((toX - fromX) * i) / steps, fromY + ((toY - fromY) * i) / steps);
+    await page.mouse.move(handleX + (deltaX * i) / steps, handleY + (deltaY * i) / steps);
   }
   await page.mouse.up();
 }
@@ -81,10 +94,10 @@ test.describe("HR recruiter drags a candidate card between kanban columns", () =
     await addCandidate(page, recruitmentId, fullName, `mouse.drag.${Date.now()}@example.com`);
     await page.goto(`/recruitments/${recruitmentId}`);
 
-    const card = page.locator('[aria-roledescription="draggable"]', { has: page.getByText(fullName) });
+    const handle = page.getByRole("button", { name: new RegExp(`Drag candidate \\d+: ${fullName}`) });
     const screeningHeading = page.getByRole("heading", { name: "Screening" });
 
-    await dragCardOnto(page, card, screeningHeading);
+    await dragCardOnto(page, handle, screeningHeading);
 
     const dialog = page.getByTestId("move-candidate-dialog");
     await expect(dialog.getByLabel("Target stage").locator("option:checked")).toHaveText("Screening");
@@ -107,8 +120,8 @@ test.describe("HR recruiter drags a candidate card between kanban columns", () =
     await addCandidate(page, recruitmentId, fullName, `keyboard.drag.${Date.now()}@example.com`);
     await page.goto(`/recruitments/${recruitmentId}`);
 
-    const draggableCard = page.locator('[aria-roledescription="draggable"]', { has: page.getByText(fullName) });
-    await draggableCard.focus();
+    const handle = page.getByRole("button", { name: new RegExp(`Drag candidate \\d+: ${fullName}`) });
+    await handle.focus();
     await page.keyboard.press("Space");
     // dnd-kit's default keyboard sensor moves a fixed distance per press;
     // enough presses are needed to cross from the New column into the
@@ -143,10 +156,10 @@ test.describe("HR recruiter drags a candidate card between kanban columns", () =
     await addCandidate(page, recruitmentId, fullName, `cancel.drag.${Date.now()}@example.com`);
     await page.goto(`/recruitments/${recruitmentId}`);
 
-    const card = page.locator('[aria-roledescription="draggable"]', { has: page.getByText(fullName) });
+    const handle = page.getByRole("button", { name: new RegExp(`Drag candidate \\d+: ${fullName}`) });
     const screeningHeading = page.getByRole("heading", { name: "Screening" });
 
-    await dragCardOnto(page, card, screeningHeading);
+    await dragCardOnto(page, handle, screeningHeading);
 
     const dialog = page.getByTestId("move-candidate-dialog");
     await expect(dialog.getByLabel("Target stage").locator("option:checked")).toHaveText("Screening");

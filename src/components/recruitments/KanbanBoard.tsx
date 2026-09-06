@@ -12,6 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { GripVertical } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { toast } from "@/lib/toast-store";
@@ -85,10 +86,12 @@ function DroppableColumn({
 function DraggableCard({
   candidateRecruitmentId,
   fromStageId,
+  handleLabel,
   children,
 }: {
   candidateRecruitmentId: number;
   fromStageId: number;
+  handleLabel: string;
   children: React.ReactNode;
 }) {
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
@@ -96,8 +99,20 @@ function DraggableCard({
     data: { fromStageId },
   });
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes} className={cn(isDragging ? "cursor-move" : "cursor-grab")}>
-      {children}
+    <div ref={setNodeRef} className="flex items-stretch gap-1">
+      <div className="min-w-0 flex-1">{children}</div>
+      <button
+        type="button"
+        aria-label={handleLabel}
+        {...listeners}
+        {...attributes}
+        className={cn(
+          "text-muted-foreground hover:text-foreground focus-visible:ring-ring flex w-6 shrink-0 touch-none items-center justify-center rounded-md focus-visible:ring-2 focus-visible:outline-none",
+          isDragging ? "cursor-move" : "cursor-grab",
+        )}
+      >
+        <GripVertical className="size-4" aria-hidden="true" />
+      </button>
     </div>
   );
 }
@@ -314,6 +329,7 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
                       key={candidate.id}
                       candidateRecruitmentId={candidate.candidateRecruitmentId}
                       fromStageId={stage.id}
+                      handleLabel={`Drag candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
                     >
                       <Card className="relative gap-1 overflow-hidden border-0 p-3 pl-4 shadow-md">
                         <div
