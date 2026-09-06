@@ -303,38 +303,38 @@ None. No schema, DTO, or API change; no stored data carries color. A rollback is
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run build`
-- [x] 2.2 Linting passes with no new `jsx-a11y` warnings: `npm run lint`
-- [x] 2.3 Unit tests pass: `npm run test`
-- [x] 2.4 Existing E2E suite passes unchanged: `npm run test:e2e`
-- [x] 2.5 No raw Tailwind palette literal or hex value in the diff (self-audit)
-- [x] 2.6 All nine `data-testid` anchors still resolve
+- [x] 2.1 Type checking passes: `npm run build` — 95ff2d9
+- [x] 2.2 Linting passes with no new `jsx-a11y` warnings: `npm run lint` — 95ff2d9
+- [x] 2.3 Unit tests pass: `npm run test` — 95ff2d9
+- [x] 2.4 Existing E2E suite passes unchanged: `npm run test:e2e` — 95ff2d9
+- [x] 2.5 No raw Tailwind palette literal or hex value in the diff (self-audit) — 95ff2d9
+- [x] 2.6 All nine `data-testid` anchors still resolve — 95ff2d9
 
 #### Manual
 
-- [x] 2.7 All stages visible without horizontal scrolling on desktop
-- [x] 2.8 Min-width floor engages and container scrolls when stage count overflows
-- [x] 2.9 Header pills render six distinct colors, cycling correctly past the palette size
-- [x] 2.10 Custom stages from `StageEditor` colored coherently
-- [x] 2.11 Cards show accent bar in column color with D4 name/date layout
-- [x] 2.12 Zero-candidate stage still renders a column with the dashed placeholder
-- [x] 2.13 Board reads correctly in both themes
-- [x] 2.14 Skeleton matches loaded layout with no jump
-- [x] 2.15 Keyboard reaches every card link and move trigger; columns announced as named regions
+- [x] 2.7 All stages visible without horizontal scrolling on desktop — 95ff2d9
+- [x] 2.8 Min-width floor engages and container scrolls when stage count overflows — 95ff2d9
+- [x] 2.9 Header pills render six distinct colors, cycling correctly past the palette size — 95ff2d9
+- [x] 2.10 Custom stages from `StageEditor` colored coherently — 95ff2d9
+- [x] 2.11 Cards show accent bar in column color with D4 name/date layout — 95ff2d9
+- [x] 2.12 Zero-candidate stage still renders a column with the dashed placeholder — 95ff2d9
+- [x] 2.13 Board reads correctly in both themes — 95ff2d9
+- [x] 2.14 Skeleton matches loaded layout with no jump — 95ff2d9
+- [x] 2.15 Keyboard reaches every card link and move trigger; columns announced as named regions — 95ff2d9
 
 ### Phase 3: Test alignment and verification
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run build`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Full unit suite passes including both new test files: `npm run test`
-- [ ] 3.4 Full E2E suite passes: `npm run test:e2e`
-- [ ] 3.5 Board E2E specs pass with no assertion-layer edits
+- [x] 3.1 Type checking passes: `npm run build`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Full unit suite passes including both new test files: `npm run test`
+- [x] 3.4 Full E2E suite passes: `npm run test:e2e`
+- [x] 3.5 Board E2E specs pass with no assertion-layer edits
 
 #### Manual
 
-- [ ] 3.6 AA tables still green in both themes after any hue retuning
-- [ ] 3.7 Screen reader announces each column region by stage name before its cards
-- [ ] 3.8 Stage determinable without color rendering
-- [ ] 3.9 No visual regression on the candidate-detail page
+- [x] 3.6 AA tables still green in both themes after any hue retuning
+- [x] 3.7 Screen reader announces each column region by stage name before its cards
+- [x] 3.8 Stage determinable without color rendering
+- [x] 3.9 No visual regression on the candidate-detail page
