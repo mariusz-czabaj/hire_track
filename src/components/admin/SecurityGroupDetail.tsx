@@ -5,6 +5,8 @@ import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { UserSearchPicker } from "@/components/admin/UserSearchPicker";
+import { toast } from "@/lib/toast-store";
+import { DEFAULT_ERROR_MESSAGE } from "@/components/hooks/useMutation";
 import { operationSchema, type Operation, type SecurityGroupDetailDto, type UserSearchResultDto } from "@/types";
 
 interface SecurityGroupDetailProps {
@@ -22,9 +24,9 @@ const OPERATION_LABELS: Record<Operation, string> = {
 async function readErrorMessage(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { error: { message: string } };
-    return body.error.message || "Something went wrong. Please try again.";
+    return body.error.message || DEFAULT_ERROR_MESSAGE;
   } catch {
-    return "Something went wrong. Please try again.";
+    return DEFAULT_ERROR_MESSAGE;
   }
 }
 
@@ -66,8 +68,9 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
       }
       const updated = (await response.json()) as { name: string };
       setName(updated.name);
+      toast({ variant: "success", message: "Security group renamed." });
     } catch {
-      setRenameError("Something went wrong. Please try again.");
+      setRenameError(DEFAULT_ERROR_MESSAGE);
     } finally {
       setRenaming(false);
     }
@@ -102,9 +105,10 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
       }
       const body = (await response.json()) as { operations: Operation[] };
       setOperations(body.operations);
+      toast({ variant: "success", message: "Operations updated." });
     } catch {
       revert();
-      setOperationError("Something went wrong. Please try again.");
+      setOperationError(DEFAULT_ERROR_MESSAGE);
     } finally {
       setPendingOperations((prev) => {
         const next = new Set(prev);
@@ -128,8 +132,9 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
       }
       const body = (await response.json()) as { members: SecurityGroupDetailDto["members"] };
       setMembers(body.members);
+      toast({ variant: "success", message: "Member added." });
     } catch {
-      setMemberError("Something went wrong. Please try again.");
+      setMemberError(DEFAULT_ERROR_MESSAGE);
     }
   }
 
@@ -148,8 +153,9 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
       }
       const body = (await response.json()) as { members: SecurityGroupDetailDto["members"] };
       setMembers(body.members);
+      toast({ variant: "success", message: "Member removed." });
     } catch {
-      setMemberError("Something went wrong. Please try again.");
+      setMemberError(DEFAULT_ERROR_MESSAGE);
     } finally {
       setPendingMemberId(null);
     }

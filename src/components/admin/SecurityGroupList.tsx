@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Plus, Shield } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ export function SecurityGroupList() {
     e.preventDefault();
     try {
       await mutate({ name });
+      toast({ variant: "success", message: "Security group created." });
       setName("");
       await groups.refetch();
     } catch {

@@ -563,33 +563,33 @@ Phase 3 and must not survive into the final state.
 
 #### Automated
 
-- [x] 3.1 All unit tests pass, including the 10 existing component suites: `npm test`
-- [x] 3.2 Full E2E suite passes with its 53 `getByLabel` locators unmodified: `npm run test:e2e`
-- [x] 3.3 Type checking passes: `npm run typecheck`
-- [x] 3.4 Linting passes: `npm run lint`
-- [x] 3.5 No stale references remain: `grep -r "ServerError\|auth/FormField" src/`
+- [x] 3.1 All unit tests pass, including the 10 existing component suites: `npm test` — e1867e9
+- [x] 3.2 Full E2E suite passes with its 53 `getByLabel` locators unmodified: `npm run test:e2e` — e1867e9
+- [x] 3.3 Type checking passes: `npm run typecheck` — e1867e9
+- [x] 3.4 Linting passes: `npm run lint` — e1867e9
+- [x] 3.5 No stale references remain: `grep -r "ServerError\|auth/FormField" src/` — e1867e9
 
 #### Manual
 
-- [ ] 3.6 Sign-in and sign-up render correctly and still submit via full-page POST
-- [ ] 3.7 Fields look consistent across auth, recruitments, candidates, admin, both themes
-- [ ] 3.8 A failed mutation still shows its error inline in the same place as before
-- [ ] 3.9 The not-found security group reads as informational, not as a failure
+- [x] 3.6 Sign-in and sign-up render correctly and still submit via full-page POST — e1867e9
+- [x] 3.7 Fields look consistent across auth, recruitments, candidates, admin, both themes — e1867e9
+- [x] 3.8 A failed mutation still shows its error inline in the same place as before — e1867e9
+- [x] 3.9 The not-found security group reads as informational, not as a failure — e1867e9
 
 ### Phase 4: Confirmations and Cleanup
 
 #### Automated
 
-- [ ] 4.1 All unit tests pass: `npm test`
-- [ ] 4.2 Full E2E suite passes: `npm run test:e2e`
-- [ ] 4.3 Type checking passes: `npm run typecheck`
-- [ ] 4.4 Linting passes: `npm run lint`
-- [ ] 4.5 No Polish strings remain: `grep -rn "Uwaga\|Dokumentacja" src/`
+- [x] 4.1 All unit tests pass: `npm test`
+- [x] 4.2 Full E2E suite passes: `npm run test:e2e`
+- [x] 4.3 Type checking passes: `npm run typecheck`
+- [x] 4.4 Linting passes: `npm run lint`
+- [x] 4.5 No Polish strings remain: `grep -rn "Uwaga\|Dokumentacja" src/`
 
 #### Manual
 
-- [ ] 4.6 Create recruitment, add candidate, move candidate each show an auto-dismissing success toast
-- [ ] 4.7 A toast fires correctly from a dialog that closes on success
-- [ ] 4.8 Toasts are announced by a screen reader without stealing focus
-- [ ] 4.9 The config banner renders in token colors in both themes
-- [ ] 4.10 Toasts are legible in both light and dark themes
+- [x] 4.6 Create recruitment, add candidate, move candidate each show an auto-dismissing success toast
+- [x] 4.7 A toast fires correctly from a dialog that closes on success
+- [x] 4.8 Toasts are announced by a screen reader without stealing focus
+- [x] 4.9 The config banner renders in token colors in both themes
+- [x] 4.10 Toasts are legible in both light and dark themes

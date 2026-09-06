@@ -3,7 +3,7 @@ import type { ApiErrorBody } from "@/types";
 
 export type MutationStatus = "idle" | "loading" | "success" | "error";
 
-const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
+export const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
 /**
  * Fetch-based imperative mutation hook (POST/PATCH), sibling to the

@@ -24,12 +24,12 @@ const theme = Astro.locals.theme;
     {
       missingConfigs.map((cfg) => (
         <Banner variant="error">
-          <strong>Uwaga:</strong> {cfg.message}
+          <strong>Note:</strong> {cfg.message}
           {cfg.docsUrl && (
             <>
               {" "}
               <a href={cfg.docsUrl} target="_blank" rel="noopener noreferrer">
-                {cfg.docsLabel ?? "Dokumentacja"}
+                {cfg.docsLabel ?? "Documentation"}
               </a>
               .
             </>

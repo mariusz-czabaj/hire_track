@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
 import {
   employmentTypeSchema,
@@ -74,6 +75,7 @@ export function CreateRecruitmentForm() {
 
     try {
       const created = await mutate({ title, department, location, employmentType, openedAt, groupIds });
+      toast({ variant: "success", message: "Recruitment created." });
       window.location.href = `/recruitments/${created.id}`;
     } catch {
       // status/error state from useMutation renders the failure; nothing else to do here.

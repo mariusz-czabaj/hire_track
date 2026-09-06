@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import type { KanbanBoardStageDto, RecruitmentStagesDto } from "@/types";
 
 interface StageEditorProps {
@@ -101,6 +102,7 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
     if (!validateRows()) return;
     try {
       await replaceStages.mutate({ stages: rows.map((row) => ({ name: row.name })) });
+      toast({ variant: "success", message: "Stages saved." });
       onChanged();
       setOpen(false);
     } catch {
@@ -111,6 +113,7 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
   async function handleReset() {
     try {
       await resetStages.mutate(undefined);
+      toast({ variant: "success", message: "Stages reset to defaults." });
       onChanged();
       setOpen(false);
     } catch {

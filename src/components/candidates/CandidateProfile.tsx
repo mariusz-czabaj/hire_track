@@ -3,6 +3,7 @@ import { Download, Mail, Pencil, Phone, Repeat } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { useCvUpload } from "@/components/hooks/useCvUpload";
+import { toast } from "@/lib/toast-store";
 import { Alert } from "@/components/ui/alert";
 import { FormField } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
@@ -69,6 +70,7 @@ function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
   async function handleFileSelected(file: File) {
     const uploaded = await cvUpload.upload(file);
     if (uploaded) {
+      toast({ variant: "success", message: "CV uploaded." });
       setReplacing(false);
       await onUploaded();
     }
@@ -190,6 +192,7 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
   async function saveEdit() {
     try {
       await updateProfile.mutate({ fullName: draftFullName, phone: draftPhone || undefined });
+      toast({ variant: "success", message: "Profile updated." });
       setEditing(false);
       await resource.refetch();
     } catch {

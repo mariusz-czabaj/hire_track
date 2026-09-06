@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import type { CandidateDetailDto, KanbanBoardStageDto, MoveCandidateCommand } from "@/types";
 
 interface MoveCandidateDialogProps {
@@ -61,6 +62,7 @@ function MoveCandidateForm({ candidateUrl, stages, initialStageId, onMoved }: Mo
     if (toStageId === undefined) return;
     try {
       await moveCandidate.mutate({ toStageId, note: note.trim() || undefined });
+      toast({ variant: "success", message: "Candidate moved." });
       onMoved();
     } catch {
       // moveCandidate.error/fieldErrors render the failure below.

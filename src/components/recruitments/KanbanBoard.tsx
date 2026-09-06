@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import { Alert } from "@/components/ui/alert";
 import { AddCandidateDialog } from "@/components/recruitments/AddCandidateDialog";
 import { MoveCandidateDialog } from "@/components/recruitments/MoveCandidateDialog";
@@ -123,6 +124,7 @@ function StatusControl({
     if (next === status) return;
     try {
       await mutate({ status: next });
+      toast({ variant: "success", message: "Recruitment status updated." });
       onChanged();
     } catch {
       // error state below renders the failure; nothing else to do here.

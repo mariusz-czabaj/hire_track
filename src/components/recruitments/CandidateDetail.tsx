@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Mail, Pencil, Phone, User } from "lucide-react";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { toast } from "@/lib/toast-store";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -158,6 +159,7 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
   async function saveEdit(stageId: number) {
     try {
       await upsertNote.mutate({ stageId, body: draftBody });
+      toast({ variant: "success", message: "Note saved." });
       setEditingStageId(null);
       await resource.refetch();
     } catch {
