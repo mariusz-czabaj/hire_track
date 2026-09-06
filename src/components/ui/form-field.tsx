@@ -53,7 +53,7 @@ export function FormField({
         {endContent}
       </div>
       {error ? (
-        <p id={`${id}-error`} className="text-destructive mt-1 flex items-center gap-1 text-xs">
+        <p id={`${id}-error`} className="text-destructive-text mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>

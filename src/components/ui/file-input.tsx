@@ -36,7 +36,7 @@ export function FileInput({ id, label, accept, error, disabled, onFileSelected }
         )}
       />
       {error && (
-        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
+        <p className="text-destructive-text mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>

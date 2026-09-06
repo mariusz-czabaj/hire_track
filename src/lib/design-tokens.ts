@@ -22,6 +22,9 @@ export interface TokenPalette {
   accentForeground: string;
   destructive: string;
   destructiveForeground: string;
+  destructiveText: string;
+  border: string;
+  input: string;
   sidebar: string;
   sidebarForeground: string;
   sidebarPrimary: string;
@@ -65,6 +68,9 @@ export const lightPalette: TokenPalette = {
   accentForeground: "oklch(0.25 0.02 275)",
   destructive: "oklch(0.5 0.22 27.325)",
   destructiveForeground: "oklch(1 0 0)",
+  destructiveText: "oklch(0.5 0.22 27.325)",
+  border: "oklch(0.62 0.01 275)",
+  input: "oklch(0.62 0.01 275)",
   sidebar: "oklch(0.985 0.005 275)",
   sidebarForeground: "oklch(0.145 0.01 275)",
   sidebarPrimary: "oklch(0.47 0.19 275)",
@@ -108,6 +114,9 @@ export const darkPalette: TokenPalette = {
   accentForeground: "oklch(0.96 0 0)",
   destructive: "oklch(0.55 0.22 25)",
   destructiveForeground: "oklch(1 0 0)",
+  destructiveText: "oklch(0.72 0.16 25)",
+  border: "oklch(1 0 0 / 10%)",
+  input: "oklch(1 0 0 / 15%)",
   sidebar: "oklch(0.19 0.015 275)",
   sidebarForeground: "oklch(0.96 0 0)",
   sidebarPrimary: "oklch(0.75 0.15 275)",
@@ -161,6 +170,17 @@ export const tokenPairs: TokenPair[] = [
     foreground: "destructiveForeground",
     background: "destructive",
   },
+  {
+    label: "destructive-text / background",
+    size: "normal",
+    foreground: "destructiveText",
+    background: "background",
+  },
+  { label: "destructive-text / card", size: "normal", foreground: "destructiveText", background: "card" },
+  { label: "muted-foreground / muted", size: "normal", foreground: "mutedForeground", background: "muted" },
+  { label: "primary / background", size: "normal", foreground: "primary", background: "background" },
+  { label: "border / background", size: "large", foreground: "border", background: "background" },
+  { label: "input / background", size: "large", foreground: "input", background: "background" },
   { label: "sidebar-foreground / sidebar", size: "normal", foreground: "sidebarForeground", background: "sidebar" },
   {
     label: "sidebar-primary-foreground / sidebar-primary",
