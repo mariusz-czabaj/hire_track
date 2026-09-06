@@ -386,14 +386,14 @@ the omit-empty rule.
 
 #### Manual
 
-- [x] 2.5 Board page shows title and metadata row with all four fields for a fully-populated recruitment
-- [x] 2.6 A recruitment with some null fields shows only the populated ones, with no gaps or stray separators
-- [x] 2.7 Page source (JS disabled) contains the title and metadata — confirming server render
-- [x] 2.8 Browser tab shows the recruitment title
-- [x] 2.9 Exactly one `<h1>` on the page, and the status badge appears exactly once
-- [x] 2.10 Changing status via `StatusControl` updates the badge without a page reload and leaves the header intact
-- [x] 2.11 An unknown recruitment id shows the not-found block and no Kanban board
-- [x] 2.12 Header is readable in both light and dark themes, and wraps sensibly at mobile width
+- [x] 2.5 Board page shows title and metadata row with all four fields for a fully-populated recruitment — 84fc85b
+- [x] 2.6 A recruitment with some null fields shows only the populated ones, with no gaps or stray separators — 84fc85b
+- [x] 2.7 Page source (JS disabled) contains the title and metadata — confirming server render — 84fc85b
+- [x] 2.8 Browser tab shows the recruitment title — 84fc85b
+- [x] 2.9 Exactly one `<h1>` on the page, and the status badge appears exactly once — 84fc85b
+- [x] 2.10 Changing status via `StatusControl` updates the badge without a page reload and leaves the header intact — 84fc85b
+- [x] 2.11 An unknown recruitment id shows the not-found block and no Kanban board — 84fc85b
+- [x] 2.12 Header is readable in both light and dark themes, and wraps sensibly at mobile width — 84fc85b
 
 ### Phase 3: End-to-end coverage
 
