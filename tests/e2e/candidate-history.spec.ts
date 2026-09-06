@@ -47,4 +47,59 @@ test.describe("Candidates history search", () => {
     await expect(page.getByText("Backend Engineer")).not.toBeVisible();
     await expect(page.getByText("Added to New")).toBeVisible();
   });
+
+  test("shows the empty-state message when no candidate matches the search", async ({ page }) => {
+    await signInAs(page, "hr");
+    await page.goto("/candidates");
+
+    await page.getByLabel("Search candidates by name").fill("Zzzznonexistent");
+    await expect(page.getByText("No candidates match this search.")).toBeVisible();
+  });
+
+  test("shows the truncation hint when a search exceeds the candidate list cap", async ({ page }) => {
+    await signInAs(page, "hr");
+
+    // A dedicated recruitment (rather than a seeded one shared with other
+    // specs, e.g. recruitments.spec.ts's candidate-count assertions) keeps
+    // this test's 51 candidates from polluting other tests' fixtures.
+    const recruitmentResponse = await page.request.post("/api/recruitments", {
+      data: {
+        title: `Truncation Fixture ${Date.now()}`,
+        department: "Engineering",
+        location: "Remote",
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+        groupIds: [1], // HR Recruiter -- see supabase/seed.sql
+      },
+    });
+    expect(recruitmentResponse.ok()).toBe(true);
+    const recruitment = (await recruitmentResponse.json()) as { id: number };
+    const recruitmentId = recruitment.id;
+
+    // Recruitments default to "draft" status, which would otherwise show up
+    // in recruitments.spec.ts's "Draft" status-filter assertions -- flip it
+    // to "live" so this fixture stays invisible to that unrelated filter.
+    const statusResponse = await page.request.patch(`/api/recruitments/${recruitmentId}`, {
+      data: { status: "live" },
+    });
+    expect(statusResponse.ok()).toBe(true);
+
+    // CANDIDATE_LIST_RESULT_CAP is 50; a shared name prefix + unique suffix
+    // per candidate lets one search term match 51 rows without colliding
+    // with other tests' candidates or requiring UI-driven creation.
+    const namePrefix = `Trunc${Date.now()}`;
+    for (let i = 0; i < 51; i++) {
+      const response = await page.request.post(`/api/recruitments/${recruitmentId}/candidates`, {
+        data: {
+          fullName: `${namePrefix} Candidate ${i}`,
+          email: `${namePrefix.toLowerCase()}-${i}@example.com`,
+        },
+      });
+      expect(response.ok()).toBe(true);
+    }
+
+    await page.goto("/candidates");
+    await page.getByLabel("Search candidates by name").fill(namePrefix);
+    await expect(page.getByText("Showing the first matches. Refine your search to narrow the list.")).toBeVisible();
+  });
 });

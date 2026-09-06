@@ -357,25 +357,25 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run build`
-- [x] 4.2 Linting passes: `npm run lint`
+- [x] 4.1 Type checking passes: `npm run build` — d4d40ee
+- [x] 4.2 Linting passes: `npm run lint` — d4d40ee
 
 #### Manual
 
-- [x] 4.3 Admin security-groups list renders shadow-based cards with accent bar in both light and dark mode
-- [x] 4.4 Page title renders in serif font at ~40px
-- [x] 4.5 Create-group form's input renders and behaves identically using the shared `Input` component
-- [x] 4.6 Unauthorized users still see the authorization-gate message unchanged
-- [x] 4.7 Empty-state string still renders correctly when no groups exist
+- [x] 4.3 Admin security-groups list renders shadow-based cards with accent bar in both light and dark mode — d4d40ee
+- [x] 4.4 Page title renders in serif font at ~40px — d4d40ee
+- [x] 4.5 Create-group form's input renders and behaves identically using the shared `Input` component — d4d40ee
+- [x] 4.6 Unauthorized users still see the authorization-gate message unchanged — d4d40ee
+- [x] 4.7 Empty-state string still renders correctly when no groups exist — d4d40ee
 
 ### Phase 5: Test Coverage Backfill
 
 #### Automated
 
-- [ ] 5.1 New and existing Playwright specs pass: `npx playwright test tests/e2e/candidate-history.spec.ts tests/e2e/admin-groups.spec.ts`
-- [ ] 5.2 Full E2E suite passes: `npx playwright test`
-- [ ] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 New and existing Playwright specs pass: `npx playwright test tests/e2e/candidate-history.spec.ts tests/e2e/admin-groups.spec.ts`
+- [x] 5.2 Full E2E suite passes: `npx playwright test`
+- [x] 5.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 5.4 New admin E2E spec correctly fails if the authorization gate or empty-state string is changed (spot-check by temporarily breaking one and confirming the test catches it, then reverting)
+- [x] 5.4 New admin E2E spec correctly fails if the authorization gate or empty-state string is changed (spot-check by temporarily breaking one and confirming the test catches it, then reverting)
