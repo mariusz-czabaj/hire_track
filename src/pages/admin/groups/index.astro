@@ -27,7 +27,7 @@ const isAdmin = Astro.locals.operations.includes("group.manage");
       {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
     </Fragment>
     <Fragment slot="page-title">
-      <h1 class="text-foreground text-3xl font-bold">Security groups</h1>
+      <h1 class="text-foreground font-serif text-4xl font-bold">Security groups</h1>
     </Fragment>
     {
       isAdmin ? (

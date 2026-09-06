@@ -341,32 +341,32 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npm run build`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Existing candidate-history E2E spec passes unchanged: `npx playwright test tests/e2e/candidate-history.spec.ts`
+- [x] 3.1 Type checking passes: `npm run build` — 703acf9
+- [x] 3.2 Linting passes: `npm run lint` — 703acf9
+- [x] 3.3 Existing candidate-history E2E spec passes unchanged: `npx playwright test tests/e2e/candidate-history.spec.ts` — 703acf9
 
 #### Manual
 
-- [x] 3.4 Candidate list renders shadow-based cards with accent bar in both light and dark mode
-- [x] 3.5 Page title renders in serif font at ~40px
-- [x] 3.6 Search-by-name still debounces and filters results correctly
-- [x] 3.7 Truncation hint still appears when results are capped at 50
-- [x] 3.8 Empty-state string still renders correctly when no candidates match
+- [x] 3.4 Candidate list renders shadow-based cards with accent bar in both light and dark mode — 703acf9
+- [x] 3.5 Page title renders in serif font at ~40px — 703acf9
+- [x] 3.6 Search-by-name still debounces and filters results correctly — 703acf9
+- [x] 3.7 Truncation hint still appears when results are capped at 50 — 703acf9
+- [x] 3.8 Empty-state string still renders correctly when no candidates match — 703acf9
 
 ### Phase 4: Admin (Security Groups) List Redesign
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npm run build`
-- [ ] 4.2 Linting passes: `npm run lint`
+- [x] 4.1 Type checking passes: `npm run build`
+- [x] 4.2 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.3 Admin security-groups list renders shadow-based cards with accent bar in both light and dark mode
-- [ ] 4.4 Page title renders in serif font at ~40px
-- [ ] 4.5 Create-group form's input renders and behaves identically using the shared `Input` component
-- [ ] 4.6 Unauthorized users still see the authorization-gate message unchanged
-- [ ] 4.7 Empty-state string still renders correctly when no groups exist
+- [x] 4.3 Admin security-groups list renders shadow-based cards with accent bar in both light and dark mode
+- [x] 4.4 Page title renders in serif font at ~40px
+- [x] 4.5 Create-group form's input renders and behaves identically using the shared `Input` component
+- [x] 4.6 Unauthorized users still see the authorization-gate message unchanged
+- [x] 4.7 Empty-state string still renders correctly when no groups exist
 
 ### Phase 5: Test Coverage Backfill
 

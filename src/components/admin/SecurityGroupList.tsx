@@ -5,6 +5,7 @@ import { useMutation } from "@/components/hooks/useMutation";
 import { ServerError } from "@/components/auth/ServerError";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SecurityGroupDto } from "@/types";
 
@@ -33,14 +34,13 @@ export function SecurityGroupList() {
     <div className="flex flex-col gap-6">
       <form onSubmit={handleCreate} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="flex-1">
-          <input
+          <Input
             type="text"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
             }}
             placeholder="New group name"
-            className="border-input bg-input/30 text-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 focus:ring-2 focus:outline-none"
           />
           {fieldErrors?.name ? <p className="text-destructive mt-1 text-xs">{fieldErrors.name}</p> : null}
         </div>
@@ -72,7 +72,8 @@ export function SecurityGroupList() {
         <div className="flex flex-col gap-3">
           {groups.data.map((group) => (
             <a key={group.id} href={`/admin/groups/${group.id}`} className="block">
-              <Card className="hover:bg-accent flex flex-row items-center gap-3 p-4 transition-colors">
+              <Card className="hover:bg-accent relative flex flex-row items-center gap-3 overflow-hidden border-0 p-4 pl-6 shadow-md transition-colors">
+                <div className="bg-primary absolute inset-y-0 left-0 w-1.5" aria-hidden="true" />
                 <Shield className="text-primary size-4" />
                 <span className="font-semibold">{group.name}</span>
               </Card>
