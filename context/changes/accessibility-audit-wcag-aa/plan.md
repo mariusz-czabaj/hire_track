@@ -621,16 +621,16 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 New contrast table test covers every `tokenPairs` entry in both palettes and passes
-- [x] 1.3 Type checking passes: `npm run typecheck`
-- [x] 1.4 Linting passes: `npm run lint` (pre-existing unrelated error in kanban-drag-and-drop.spec.ts not caused by this phase)
+- [x] 1.1 Unit tests pass: `npm run test` — b91a1bf
+- [x] 1.2 New contrast table test covers every `tokenPairs` entry in both palettes and passes — b91a1bf
+- [x] 1.3 Type checking passes: `npm run typecheck` — b91a1bf
+- [x] 1.4 Linting passes: `npm run lint` (pre-existing unrelated error in kanban-drag-and-drop.spec.ts not caused by this phase) — b91a1bf
 
 #### Manual
 
-- [x] 1.5 Error text legible in dark and light mode
-- [x] 1.6 Destructive buttons and `aria-invalid` rings visually unchanged
-- [x] 1.7 `/dev/design-system` renders new pairs, all green
+- [x] 1.5 Error text legible in dark and light mode — b91a1bf
+- [x] 1.6 Destructive buttons and `aria-invalid` rings visually unchanged — b91a1bf
+- [x] 1.7 `/dev/design-system` renders new pairs, all green — b91a1bf
 
 ### Phase 2: Shared Form Primitives
 
