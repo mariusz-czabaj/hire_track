@@ -743,16 +743,16 @@ existing sessions get the default with no special handling.
 
 #### Automated
 
-- [x] 4.1 Build succeeds: `npm run build`
-- [x] 4.2 Linting passes: `npm run lint`
-- [x] 4.3 Unit tests pass: `npx vitest run`
-- [x] 4.4 E2E suite passes, including the three candidate specs: `npx playwright test`
-- [x] 4.5 No colour literal remains in the candidate components and pages
+- [x] 4.1 Build succeeds: `npm run build` — 48ae145
+- [x] 4.2 Linting passes: `npm run lint` — 48ae145
+- [x] 4.3 Unit tests pass: `npx vitest run` — 48ae145
+- [x] 4.4 E2E suite passes, including the three candidate specs: `npx playwright test` — 48ae145
+- [x] 4.5 No colour literal remains in the candidate components and pages — 48ae145
 
 #### Manual
 
-- [x] 4.6 Both candidate pages render inside the shell and are readable in both themes
-- [x] 4.7 Candidate search still filters; CV upload and download still work with a readable file input
+- [x] 4.6 Both candidate pages render inside the shell and are readable in both themes — 48ae145
+- [x] 4.7 Candidate search still filters; CV upload and download still work with a readable file input — 48ae145
 
 ### Phase 5: Admin Area
 
