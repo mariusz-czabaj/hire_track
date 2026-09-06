@@ -281,25 +281,25 @@ None — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 3.1 `npm run build` succeeds
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `KanbanBoard.test.tsx` and `MoveCandidateDialog` unit tests pass
+- [x] 3.1 `npm run build` succeeds — 487a90c
+- [x] 3.2 `npm run lint` passes — 487a90c
+- [x] 3.3 `KanbanBoard.test.tsx` and `MoveCandidateDialog` unit tests pass — 487a90c
 
 #### Manual
 
-- [x] 3.4 Dropping onto a different column opens the dialog pre-filled with that stage
-- [x] 3.5 Confirming moves the card and closes the dialog
-- [x] 3.6 Cancelling leaves the card in its original column
-- [x] 3.7 A failed save keeps the dialog open with inline error, card unmoved
-- [x] 3.8 The per-card Move button still opens the dialog pre-filled with the current stage
+- [x] 3.4 Dropping onto a different column opens the dialog pre-filled with that stage — 487a90c
+- [x] 3.5 Confirming moves the card and closes the dialog — 487a90c
+- [x] 3.6 Cancelling leaves the card in its original column — 487a90c
+- [x] 3.7 A failed save keeps the dialog open with inline error, card unmoved — 487a90c
+- [x] 3.8 The per-card Move button still opens the dialog pre-filled with the current stage — 487a90c
 
 ### Phase 4: E2E verification
 
 #### Automated
 
-- [ ] 4.1 New Playwright spec `tests/e2e/kanban-drag-and-drop.spec.ts` passes
-- [ ] 4.2 Full E2E suite still passes
+- [x] 4.1 New Playwright spec `tests/e2e/kanban-drag-and-drop.spec.ts` passes
+- [x] 4.2 Full E2E suite still passes
 
 #### Manual
 
-- [ ] 4.3 Manually perform mouse-drag, keyboard-drag, and cancel flows against the running dev server
+- [x] 4.3 Manually perform mouse-drag, keyboard-drag, and cancel flows against the running dev server
