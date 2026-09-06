@@ -50,9 +50,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPublicApiRoute = PUBLIC_API_ROUTES.some((route) => context.url.pathname.startsWith(route));
 
   if (supabase) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // A stale/invalid refresh-token cookie (e.g. after a manual cookie wipe or
+    // an expired local session) makes the underlying refresh call throw rather
+    // than resolve with an error field. Treat that the same as "no session"
+    // instead of taking the whole app down.
+    let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
+    try {
+      ({
+        data: { user },
+      } = await supabase.auth.getUser());
+    } catch (error) {
+      console.error("Failed to resolve the current user", error);
+    }
     context.locals.user = user ?? null;
 
     // A failure here must not take the whole app down: this signal only

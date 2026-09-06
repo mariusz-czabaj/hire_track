@@ -38,6 +38,7 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onKeyDown,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -51,6 +52,15 @@ function DialogContent({
           "bg-background data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 outline-none sm:max-w-lg",
           className,
         )}
+        onKeyDown={(event) => {
+          // React portals stay in the React tree for event bubbling even though
+          // their DOM node lives elsewhere (e.g. document.body). A dialog opened
+          // from inside a dnd-kit draggable (KanbanBoard's MoveCandidateDialog)
+          // would otherwise have its keydowns bubble up to the drag handle's
+          // keyboard-sensor listener and hijack Space/Enter as drag activation.
+          onKeyDown?.(event);
+          event.stopPropagation();
+        }}
         {...props}
       >
         {children}
