@@ -42,7 +42,7 @@ export function CandidateList({ initialQuery }: CandidateListProps) {
   return (
     <div className="flex flex-col gap-4" data-testid="candidate-list">
       <div>
-        <label htmlFor="candidate-search" className="mb-1 block text-sm text-blue-100/80">
+        <label htmlFor="candidate-search" className="text-muted-foreground mb-1 block text-sm">
           Search by name
         </label>
         <Input
@@ -55,20 +55,19 @@ export function CandidateList({ initialQuery }: CandidateListProps) {
           onChange={(e) => {
             setTerm(e.target.value);
           }}
-          className="border-white/20 bg-white/10 text-white placeholder:text-white/40"
         />
       </div>
 
       {resource.status === "loading" && (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-16 w-full rounded-xl bg-white/10" />
+            <Skeleton key={i} className="h-16 w-full rounded-xl" />
           ))}
         </div>
       )}
 
       {resource.status === "success" && resource.data.items.length === 0 && (
-        <p className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-blue-100/70">
+        <p className="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-6 text-center">
           No candidates match this search.
         </p>
       )}
@@ -77,19 +76,19 @@ export function CandidateList({ initialQuery }: CandidateListProps) {
         <div className="flex flex-col gap-3">
           {resource.data.items.map((candidate) => (
             <a key={candidate.id} href={`/candidates/${candidate.id}`} className="block">
-              <Card className="flex flex-row items-center justify-between gap-4 border-white/10 bg-white/10 p-4 text-white transition-colors hover:bg-white/15">
+              <Card className="hover:bg-accent flex flex-row items-center justify-between gap-4 p-4 transition-colors">
                 <div>
                   <p className="font-semibold">{candidate.fullName}</p>
-                  <p className="text-sm text-blue-100/60">{candidate.email}</p>
+                  <p className="text-muted-foreground text-sm">{candidate.email}</p>
                 </div>
-                <span className="text-sm text-blue-100/60">
+                <span className="text-muted-foreground text-sm">
                   {candidate.recruitmentCount} recruitment{candidate.recruitmentCount === 1 ? "" : "s"}
                 </span>
               </Card>
             </a>
           ))}
           {resource.data.truncated && (
-            <p className="text-center text-sm text-blue-100/50">
+            <p className="text-muted-foreground text-center text-sm">
               Showing the first matches. Refine your search to narrow the list.
             </p>
           )}

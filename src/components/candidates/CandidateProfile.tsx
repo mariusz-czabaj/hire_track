@@ -28,16 +28,16 @@ function formatSize(bytes: number): string {
 function SkeletonProfile() {
   return (
     <div className="flex flex-col gap-4">
-      <Skeleton className="h-8 w-48 bg-white/10" />
-      <Skeleton className="h-24 w-full rounded-lg bg-white/10" />
-      <Skeleton className="h-24 w-full rounded-lg bg-white/10" />
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-24 w-full rounded-lg" />
+      <Skeleton className="h-24 w-full rounded-lg" />
     </div>
   );
 }
 
 function NotFoundState() {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-blue-100/70">
+    <div className="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-10 text-center">
       <p>This candidate could not be found.</p>
     </div>
   );
@@ -45,7 +45,7 @@ function NotFoundState() {
 
 function HistoryEntry({ entry }: { entry: CandidateStatusHistoryEntryDto }) {
   return (
-    <li className="flex items-center justify-between gap-2 text-xs text-blue-100/60">
+    <li className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
       <span>
         {entry.fromStageName === null
           ? `Added to ${entry.toStageName}`
@@ -77,21 +77,21 @@ function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
   const showUploadControl = cv === null || cv.state === "expired" || replacing;
 
   return (
-    <Card className="flex flex-col gap-3 border-white/10 bg-white/5 p-4 text-white">
-      <h2 className="text-sm font-semibold text-blue-100/90">CV</h2>
+    <Card className="flex flex-col gap-3 p-4">
+      <h2 className="text-foreground text-sm font-semibold">CV</h2>
 
       {cv?.state === "available" && (
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-sm text-blue-100/90">{cv.originalFilename}</p>
-            <p className="text-xs text-blue-100/50">
+            <p className="text-foreground text-sm">{cv.originalFilename}</p>
+            <p className="text-muted-foreground text-xs">
               {formatSize(cv.sizeBytes)} &middot; uploaded {formatDate(cv.uploadedAt)}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <a
               href={`/api/candidates/${candidateId}/cv`}
-              className="inline-flex items-center gap-1 text-sm text-purple-300 hover:underline"
+              className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
             >
               <Download className="size-4" />
               Download
@@ -115,13 +115,13 @@ function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
       )}
 
       {cv?.state === "expired" && (
-        <p className="text-sm text-blue-100/70">
+        <p className="text-muted-foreground text-sm">
           This CV was removed after 12 months, on {formatDate(cv.expiresAt)}. It was originally uploaded on{" "}
           {formatDate(cv.uploadedAt)}.
         </p>
       )}
 
-      {cv === null && <p className="text-sm text-blue-100/40 italic">No CV uploaded yet</p>}
+      {cv === null && <p className="text-muted-foreground text-sm italic">No CV uploaded yet</p>}
 
       {showUploadControl && (
         <div className="flex flex-col gap-2">
@@ -243,10 +243,8 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
           </div>
         ) : (
           <>
-            <h1 className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-              {candidate.fullName}
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-blue-100/70">
+            <h1 className="text-foreground text-2xl font-bold">{candidate.fullName}</h1>
+            <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-4 text-sm">
               <span className="flex items-center gap-1">
                 <Mail className="size-4" />
                 {candidate.email}
@@ -271,24 +269,24 @@ export function CandidateProfile({ candidateId }: CandidateProfileProps) {
         )}
       </div>
 
-      <Card className="flex flex-col gap-2 border-white/10 bg-white/5 p-4 text-white">
-        <h2 className="text-sm font-semibold text-blue-100/90">Recruitments</h2>
+      <Card className="flex flex-col gap-2 p-4">
+        <h2 className="text-foreground text-sm font-semibold">Recruitments</h2>
         {candidate.recruitments.length === 0 ? (
-          <p className="text-sm text-blue-100/40 italic">Not part of any recruitment yet</p>
+          <p className="text-muted-foreground text-sm italic">Not part of any recruitment yet</p>
         ) : (
           <ul className="flex flex-col gap-1">
             {candidate.recruitments.map((r) => (
               <li key={r.candidateRecruitmentId}>
                 <a
                   href={`/recruitments/${r.recruitmentId}/candidates/${r.candidateRecruitmentId}`}
-                  className="text-sm text-purple-300 hover:underline"
+                  className="text-primary text-sm hover:underline"
                 >
                   {r.title} &mdash; {r.stageName}
                 </a>
                 {r.history.length === 0 ? (
-                  <p className="mt-1 text-xs text-blue-100/40 italic">No status history yet</p>
+                  <p className="text-muted-foreground mt-1 text-xs italic">No status history yet</p>
                 ) : (
-                  <ul className="mt-1 flex flex-col gap-0.5 border-l border-white/10 pl-3">
+                  <ul className="border-border mt-1 flex flex-col gap-0.5 border-l pl-3">
                     {r.history.map((entry) => (
                       <HistoryEntry key={entry.id} entry={entry} />
                     ))}

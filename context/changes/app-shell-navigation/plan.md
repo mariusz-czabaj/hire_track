@@ -725,34 +725,34 @@ existing sessions get the default with no special handling.
 
 #### Automated
 
-- [x] 3.1 Build succeeds: `npm run build`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Unit tests pass, including the swept islands' component tests: `npx vitest run`
-- [x] 3.4 E2E suite passes: `npx playwright test`
-- [x] 3.5 No colour literal remains in the swept recruitment files and shared primitives
+- [x] 3.1 Build succeeds: `npm run build` — ddc6f08
+- [x] 3.2 Linting passes: `npm run lint` — ddc6f08
+- [x] 3.3 Unit tests pass, including the swept islands' component tests: `npx vitest run` — ddc6f08
+- [x] 3.4 E2E suite passes: `npx playwright test` — ddc6f08
+- [x] 3.5 No colour literal remains in the swept recruitment files and shared primitives — ddc6f08
 
 #### Manual
 
-- [ ] 3.6 All four recruitment pages render inside the shell with consistent width
-- [ ] 3.7 Every recruitment screen is readable in both themes, including dialogs and error states
-- [ ] 3.8 Candidate detail page still offers its route back to the board
-- [ ] 3.9 Creating a recruitment, moving a candidate, and editing stages still work
-- [ ] 3.10 No visual regression beyond colour
+- [x] 3.6 All four recruitment pages render inside the shell with consistent width — ddc6f08
+- [x] 3.7 Every recruitment screen is readable in both themes, including dialogs and error states — ddc6f08
+- [x] 3.8 Candidate detail page still offers its route back to the board — ddc6f08
+- [x] 3.9 Creating a recruitment, moving a candidate, and editing stages still work — ddc6f08
+- [x] 3.10 No visual regression beyond colour — ddc6f08
 
 ### Phase 4: Candidates Area
 
 #### Automated
 
-- [ ] 4.1 Build succeeds: `npm run build`
-- [ ] 4.2 Linting passes: `npm run lint`
-- [ ] 4.3 Unit tests pass: `npx vitest run`
-- [ ] 4.4 E2E suite passes, including the three candidate specs: `npx playwright test`
-- [ ] 4.5 No colour literal remains in the candidate components and pages
+- [x] 4.1 Build succeeds: `npm run build`
+- [x] 4.2 Linting passes: `npm run lint`
+- [x] 4.3 Unit tests pass: `npx vitest run`
+- [x] 4.4 E2E suite passes, including the three candidate specs: `npx playwright test`
+- [x] 4.5 No colour literal remains in the candidate components and pages
 
 #### Manual
 
-- [ ] 4.6 Both candidate pages render inside the shell and are readable in both themes
-- [ ] 4.7 Candidate search still filters; CV upload and download still work with a readable file input
+- [x] 4.6 Both candidate pages render inside the shell and are readable in both themes
+- [x] 4.7 Candidate search still filters; CV upload and download still work with a readable file input
 
 ### Phase 5: Admin Area
 
