@@ -1,7 +1,7 @@
 ---
 change_id: accessibility-audit-wcag-aa
 title: Accessibility audit against WCAG 2.1 AA
-status: implementing
+status: implemented
 created: 2026-09-06
 updated: 2026-09-06
 archived_at: null

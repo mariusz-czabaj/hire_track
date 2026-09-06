@@ -702,14 +702,14 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 6.1 Full E2E suite incl. new axe spec passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phases 4-5)
-- [x] 6.2 axe scan covers every listed screen in both themes with zero unexplained violations
-- [x] 6.3 Unit tests pass: `npm run test`
-- [x] 6.4 Type checking passes: `npm run typecheck`
-- [x] 6.5 Linting passes: `npm run lint`
+- [x] 6.1 Full E2E suite incl. new axe spec passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phases 4-5) — 3f7ed00
+- [x] 6.2 axe scan covers every listed screen in both themes with zero unexplained violations — 3f7ed00
+- [x] 6.3 Unit tests pass: `npm run test` — 3f7ed00
+- [x] 6.4 Type checking passes: `npm run typecheck` — 3f7ed00
+- [x] 6.5 Linting passes: `npm run lint` — 3f7ed00
 
 #### Manual
 
-- [ ] 6.6 Reverting one earlier fix makes the harness fail (gate proven)
-- [ ] 6.7 `deferred-findings.md` accounts for every unfixed audit finding
-- [ ] 6.8 `lessons.md` entry reads as actionable for S-08..S-13 planning
+- [x] 6.6 Reverting one earlier fix makes the harness fail (gate proven) — 3f7ed00
+- [x] 6.7 `deferred-findings.md` accounts for every unfixed audit finding — 3f7ed00
+- [x] 6.8 `lessons.md` entry reads as actionable for S-08..S-13 planning — 3f7ed00
