@@ -17,7 +17,7 @@ const ALLOWED_MIME_TYPES = [
 ];
 
 export interface UseCvUploadResult {
-  upload: (file: File) => Promise<CandidateCvDto | undefined>;
+  upload: (candidateId: string, file: File) => Promise<CandidateCvDto | undefined>;
   status: CvUploadStatus;
   error: string | null;
   fieldErrors: Record<string, string> | undefined;
@@ -48,12 +48,12 @@ async function readErrorMessage(response: Response): Promise<{ message: string; 
  * Worker), then confirm. The signed URL is requested immediately before the
  * PUT, never earlier, since its TTL is short and not configurable.
  */
-export function useCvUpload(candidateId: string): UseCvUploadResult {
+export function useCvUpload(): UseCvUploadResult {
   const [status, setStatus] = useState<CvUploadStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string> | undefined>(undefined);
 
-  async function upload(file: File): Promise<CandidateCvDto | undefined> {
+  async function upload(candidateId: string, file: File): Promise<CandidateCvDto | undefined> {
     setError(null);
     setFieldErrors(undefined);
 

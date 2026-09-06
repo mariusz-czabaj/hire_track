@@ -8,7 +8,7 @@ import { SidebarToggle } from "@/components/SidebarToggle";
 import { MobileNav } from "@/components/MobileNav";
 import { RecruitmentList } from "@/components/recruitments/RecruitmentList";
 
-const initialStatus = Astro.url.searchParams.get("status") ?? undefined;
+const initialStatus = Astro.url.searchParams.get("status") ?? "live";
 ---
 
 <Layout title="Recruitments">

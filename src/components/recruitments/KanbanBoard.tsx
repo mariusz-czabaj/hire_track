@@ -20,11 +20,11 @@ import { Alert } from "@/components/ui/alert";
 import { AddCandidateDialog } from "@/components/recruitments/AddCandidateDialog";
 import { MoveCandidateDialog } from "@/components/recruitments/MoveCandidateDialog";
 import { StageEditor } from "@/components/recruitments/StageEditor";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { STATUS_PRESENTATION } from "@/lib/recruitment-status";
+import { dispatchRecruitmentStatusChanged } from "@/lib/recruitment-status-events";
 import { stageClassesForSortOrder } from "@/lib/stage-palette";
 import { statusPillClasses } from "@/lib/status-pill-styles";
 import {
@@ -140,6 +140,7 @@ function StatusControl({
     try {
       await mutate({ status: next });
       toast({ variant: "success", message: "Recruitment status updated." });
+      dispatchRecruitmentStatusChanged({ recruitmentId, status: next });
       onChanged();
     } catch {
       // error state below renders the failure; nothing else to do here.
@@ -275,9 +276,6 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Badge variant={STATUS_PRESENTATION[recruitment.status].variant}>
-          {STATUS_PRESENTATION[recruitment.status].label}
-        </Badge>
         <StatusControl recruitmentId={String(recruitment.id)} status={recruitment.status} onChanged={handleChanged} />
         <StageEditor
           recruitmentId={String(recruitment.id)}

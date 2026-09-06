@@ -56,7 +56,7 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
             onClick={() => {
               handleFilterChange(option.value);
             }}
-            className={statusPillClasses({ active: status === option.value, size: "default" })}
+            className={statusPillClasses({ active: status === option.value, size: "default", activeColor: "green" })}
           >
             {option.label}
           </button>

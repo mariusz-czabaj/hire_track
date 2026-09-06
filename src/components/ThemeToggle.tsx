@@ -38,8 +38,8 @@ export function ThemeToggle({ theme }: ThemeToggleProps) {
       disabled={isSaving}
       aria-label={`Switch to ${nextTheme} theme`}
     >
-      {isDark ? <Moon className="size-4" /> : <Sun className="size-4" />}
-      <span>{isDark ? "Dark theme" : "Light theme"}</span>
+      {nextTheme === "dark" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+      <span>{nextTheme === "dark" ? "Dark theme" : "Light theme"}</span>
     </Button>
   );
 }

@@ -64,11 +64,11 @@ interface CvPanelProps {
 }
 
 function CvPanel({ candidateId, cv, onUploaded }: CvPanelProps) {
-  const cvUpload = useCvUpload(candidateId);
+  const cvUpload = useCvUpload();
   const [replacing, setReplacing] = useState(false);
 
   async function handleFileSelected(file: File) {
-    const uploaded = await cvUpload.upload(file);
+    const uploaded = await cvUpload.upload(candidateId, file);
     if (uploaded) {
       toast({ variant: "success", message: "CV uploaded." });
       setReplacing(false);

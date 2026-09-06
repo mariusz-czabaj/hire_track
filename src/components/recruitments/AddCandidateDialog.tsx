@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Phone, Plus, User } from "lucide-react";
 import { FormField } from "@/components/ui/form-field";
+import { FileInput } from "@/components/ui/file-input";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,9 +14,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation } from "@/components/hooks/useMutation";
+import { useCvUpload } from "@/components/hooks/useCvUpload";
 import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import type { AddCandidateCommand, CandidateCardDto } from "@/types";
+
+const CV_ACCEPT = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 interface AddCandidateDialogProps {
   recruitmentId: string;
@@ -41,16 +45,19 @@ const EMPTY_FORM: FormState = { fullName: "", email: "", phone: "" };
 export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDialogProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [cvFile, setCvFile] = useState<File | null>(null);
   const { errors: localErrors, setErrors: setLocalErrors } = useFormErrors<ErrorKey>();
 
   const addCandidate = useMutation<AddCandidateCommand, CandidateCardDto>(
     `/api/recruitments/${encodeURIComponent(recruitmentId)}/candidates`,
     "POST",
   );
+  const cvUpload = useCvUpload();
 
   function handleOpenChange(next: boolean) {
     if (next) {
       setForm(EMPTY_FORM);
+      setCvFile(null);
       setLocalErrors({}, FIELD_ORDER);
     }
     setOpen(next);
@@ -71,11 +78,14 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
   async function handleSubmit() {
     if (!validate()) return;
     try {
-      await addCandidate.mutate({
+      const candidate = await addCandidate.mutate({
         fullName: form.fullName,
         email: form.email,
         phone: form.phone.trim() || undefined,
       });
+      if (cvFile) {
+        await cvUpload.upload(String(candidate.id), cvFile);
+      }
       toast({ variant: "success", message: "Candidate added." });
       onChanged();
       setOpen(false);
@@ -84,7 +94,7 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
     }
   }
 
-  const saving = addCandidate.status === "loading";
+  const saving = addCandidate.status === "loading" || cvUpload.status === "loading";
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -136,6 +146,15 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
             error={fieldErrorFor("phone")}
             icon={<Phone className="size-4" />}
           />
+          <FileInput
+            id="add-candidate-cv"
+            label="CV (optional, PDF or DOCX, up to 5 MB)"
+            accept={CV_ACCEPT}
+            disabled={saving}
+            error={cvUpload.fieldErrors ? undefined : (cvUpload.error ?? undefined)}
+            onFileSelected={setCvFile}
+          />
+          {cvFile && <p className="text-muted-foreground text-xs">Selected: {cvFile.name}</p>}
         </div>
 
         <Alert

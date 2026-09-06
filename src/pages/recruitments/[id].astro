@@ -7,6 +7,7 @@ import { UserMenu } from "@/components/UserMenu";
 import { SidebarToggle } from "@/components/SidebarToggle";
 import { MobileNav } from "@/components/MobileNav";
 import { KanbanBoard } from "@/components/recruitments/KanbanBoard";
+import { RecruitmentStatusBadge } from "@/components/recruitments/RecruitmentStatusBadge";
 import { createClient } from "@/lib/supabase";
 import { getRecruitmentDetail } from "@/lib/services/recruitments";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
@@ -53,7 +54,10 @@ const metadataEntries = recruitment
     {
       recruitment && (
         <Fragment slot="page-title">
-          <h1 class="text-foreground text-2xl font-bold">{recruitment.title}</h1>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-foreground text-2xl font-bold">{recruitment.title}</h1>
+            <RecruitmentStatusBadge recruitmentId={id} initialStatus={recruitment.status} client:load />
+          </div>
           {metadataEntries.length > 0 && (
             <div class="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               {metadataEntries.map((entry) => (

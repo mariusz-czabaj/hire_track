@@ -196,25 +196,27 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
       </div>
 
       <div className="flex flex-col gap-3">
-        {candidate.notes.map((note) => (
-          <NoteCard
-            key={note.stageId}
-            note={note}
-            isCurrentStage={note.stageId === candidate.currentStageId}
-            isEditing={editingStageId === note.stageId}
-            draftBody={draftBody}
-            onDraftChange={setDraftBody}
-            onStartEdit={() => {
-              startEdit(note);
-            }}
-            onCancelEdit={cancelEdit}
-            onSave={() => {
-              void saveEdit(note.stageId);
-            }}
-            saving={upsertNote.status === "loading"}
-            error={editingStageId === note.stageId ? upsertNote.fieldErrors?.body : undefined}
-          />
-        ))}
+        {candidate.notes
+          .filter((note) => note.body !== null || note.stageId === candidate.currentStageId)
+          .map((note) => (
+            <NoteCard
+              key={note.stageId}
+              note={note}
+              isCurrentStage={note.stageId === candidate.currentStageId}
+              isEditing={editingStageId === note.stageId}
+              draftBody={draftBody}
+              onDraftChange={setDraftBody}
+              onStartEdit={() => {
+                startEdit(note);
+              }}
+              onCancelEdit={cancelEdit}
+              onSave={() => {
+                void saveEdit(note.stageId);
+              }}
+              saving={upsertNote.status === "loading"}
+              error={editingStageId === note.stageId ? upsertNote.fieldErrors?.body : undefined}
+            />
+          ))}
       </div>
 
       {editingStageId !== null && upsertNote.status === "error" && !upsertNote.fieldErrors && (
