@@ -372,10 +372,10 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 5.1 New and existing Playwright specs pass: `npx playwright test tests/e2e/candidate-history.spec.ts tests/e2e/admin-groups.spec.ts`
-- [x] 5.2 Full E2E suite passes: `npx playwright test`
-- [x] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 New and existing Playwright specs pass: `npx playwright test tests/e2e/candidate-history.spec.ts tests/e2e/admin-groups.spec.ts` — 7876bf2
+- [x] 5.2 Full E2E suite passes: `npx playwright test` — 7876bf2
+- [x] 5.3 Linting passes: `npm run lint` — 7876bf2
 
 #### Manual
 
-- [x] 5.4 New admin E2E spec correctly fails if the authorization gate or empty-state string is changed (spot-check by temporarily breaking one and confirming the test catches it, then reverting)
+- [x] 5.4 New admin E2E spec correctly fails if the authorization gate or empty-state string is changed (spot-check by temporarily breaking one and confirming the test catches it, then reverting) — 7876bf2
