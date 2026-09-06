@@ -326,15 +326,15 @@ None. No schema, DTO, or API change; no stored data carries color. A rollback is
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npm run build`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Full unit suite passes including both new test files: `npm run test`
-- [x] 3.4 Full E2E suite passes: `npm run test:e2e`
-- [x] 3.5 Board E2E specs pass with no assertion-layer edits
+- [x] 3.1 Type checking passes: `npm run build` — 8911a85
+- [x] 3.2 Linting passes: `npm run lint` — 8911a85
+- [x] 3.3 Full unit suite passes including both new test files: `npm run test` — 8911a85
+- [x] 3.4 Full E2E suite passes: `npm run test:e2e` — 8911a85
+- [x] 3.5 Board E2E specs pass with no assertion-layer edits — 8911a85
 
 #### Manual
 
-- [x] 3.6 AA tables still green in both themes after any hue retuning
-- [x] 3.7 Screen reader announces each column region by stage name before its cards
-- [x] 3.8 Stage determinable without color rendering
-- [x] 3.9 No visual regression on the candidate-detail page
+- [x] 3.6 AA tables still green in both themes after any hue retuning — 8911a85
+- [x] 3.7 Screen reader announces each column region by stage name before its cards — 8911a85
+- [x] 3.8 Stage determinable without color rendering — 8911a85
+- [x] 3.9 No visual regression on the candidate-detail page — 8911a85

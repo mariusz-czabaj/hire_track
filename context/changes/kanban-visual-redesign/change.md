@@ -1,6 +1,6 @@
 ---
 id: kanban-visual-redesign
-status: implementing
+status: implemented
 created: 2026-09-06
 updated: 2026-09-06
 ---
