@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { STATUS_PRESENTATION } from "@/lib/recruitment-status";
+import { stageClassesForSortOrder } from "@/lib/stage-palette";
 import {
   recruitmentStatusSchema,
   type KanbanBoardDto,
@@ -29,10 +30,12 @@ function SkeletonColumns() {
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
       {[0, 1, 2, 3].map((i) => (
-        <div key={i} className="border-border bg-muted w-64 shrink-0 rounded-xl border p-3">
-          <Skeleton className="mb-3 h-5 w-24" />
-          <Skeleton className="mb-2 h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
+        <div key={i} className="min-w-48 flex-1 shrink-0">
+          <Skeleton className="mb-3 h-8 w-full rounded-full" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
         </div>
       ))}
     </div>
@@ -151,41 +154,57 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
       </div>
 
       <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
-        {stages.map((stage) => (
-          <div key={stage.id} className="border-border bg-muted w-64 shrink-0 rounded-xl border p-3">
-            <div className="mb-3 flex items-center justify-between px-1">
-              <h2 className="text-foreground text-sm font-semibold">{stage.name}</h2>
-              <span className="text-muted-foreground text-xs">{stage.candidateCount}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              {stage.candidates.length === 0 && (
-                <p className="border-border text-muted-foreground rounded-lg border border-dashed px-2 py-4 text-center text-xs">
-                  No candidates
-                </p>
-              )}
-              {stage.candidates.map((candidate) => (
-                <Card key={candidate.id} className="gap-1 p-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <a
-                      href={`/recruitments/${recruitment.id}/candidates/${candidate.candidateRecruitmentId}`}
-                      className="text-sm font-medium hover:underline"
-                    >
-                      {candidate.fullName}
-                    </a>
-                    <MoveCandidateDialog
-                      recruitmentId={String(recruitment.id)}
-                      candidateRecruitmentId={candidate.candidateRecruitmentId}
-                      triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
-                      stages={stages}
-                      onChanged={handleChanged}
+        {stages.map((stage) => {
+          const stageClasses = stageClassesForSortOrder(stage.sortOrder);
+          const headingId = `stage-heading-${stage.id}`;
+          return (
+            <div key={stage.id} className="min-w-48 flex-1 shrink-0" role="region" aria-labelledby={headingId}>
+              <div
+                className={cn(
+                  "mb-3 flex items-center justify-between gap-2 rounded-full px-3 py-1.5",
+                  stageClasses.background,
+                  stageClasses.foreground,
+                )}
+              >
+                <h2 id={headingId} className="truncate text-xs font-bold tracking-wide uppercase">
+                  {stage.name}
+                </h2>
+                <span className="text-xs font-bold">{stage.candidateCount}</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {stage.candidates.length === 0 && (
+                  <p className="border-border text-muted-foreground rounded-lg border border-dashed px-2 py-4 text-center text-xs">
+                    No candidates
+                  </p>
+                )}
+                {stage.candidates.map((candidate) => (
+                  <Card key={candidate.id} className="relative gap-1 overflow-hidden border-0 p-3 pl-4 shadow-md">
+                    <div
+                      className={cn("absolute inset-y-0 left-0 w-1.5", stageClasses.background)}
+                      aria-hidden="true"
                     />
-                  </div>
-                  <p className="text-muted-foreground text-xs">Added {formatDate(candidate.addedAt)}</p>
-                </Card>
-              ))}
+                    <div className="flex items-start justify-between gap-2">
+                      <a
+                        href={`/recruitments/${recruitment.id}/candidates/${candidate.candidateRecruitmentId}`}
+                        className="text-sm font-bold hover:underline"
+                      >
+                        {candidate.fullName}
+                      </a>
+                      <MoveCandidateDialog
+                        recruitmentId={String(recruitment.id)}
+                        candidateRecruitmentId={candidate.candidateRecruitmentId}
+                        triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
+                        stages={stages}
+                        onChanged={handleChanged}
+                      />
+                    </div>
+                    <p className="text-muted-foreground text-right text-xs">Added {formatDate(candidate.addedAt)}</p>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -56,7 +56,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
 | S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | in-progress |
 | S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | in-progress |
-| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new         |
+| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | in-progress |
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new         |
 | S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new         |
 | S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new         |
@@ -141,7 +141,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Unknowns:**
   - Zachowanie kanbana na wąskim ekranie: poziomy scroll (jak dziś i jak na screenshocie) czy widok listowy per etap. — Owner: user. Block: nie (rozstrzygane na poziomie `/10x-plan`).
 - **Risk:** To gwiazda przewodnia M-2 — najgęstszy ekran, najwięcej decyzji projektowych. Główne ryzyko jest kontrastowe: biały tekst na pigułkach nagłówków musi przejść AA dla **każdego** koloru palety w **obu** motywach; odcienie bursztynowe i cyjanowe są tu najbardziej zagrożone i mogą wymusić ciemniejsze warianty lub ciemny tekst. Drugie ryzyko: kolor nie może być jedynym nośnikiem informacji o etapie — nazwa etapu na pigułce to zapewnia, ale pasek akcentu na karcie potrzebuje tekstowego odpowiednika dostępnego dla czytnika ekranu. Kotwice `data-testid="kanban-columns"` przenoszone dosłownie.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-11: Przeciąganie kart kandydatów między etapami
 

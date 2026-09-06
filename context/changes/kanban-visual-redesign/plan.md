@@ -286,41 +286,41 @@ None. No schema, DTO, or API change; no stored data carries color. A rollback is
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run build`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Unit tests pass: `npm run test`
-- [x] 1.4 `design-tokens.ts` declares twelve stage keys in both palettes and six new `tokenPairs`
-- [x] 1.5 `global.css` declares twelve stage tokens in all three theme blocks and maps them in `@theme inline`
+- [x] 1.1 Type checking passes: `npm run build` — 01b088e
+- [x] 1.2 Linting passes: `npm run lint` — 01b088e
+- [x] 1.3 Unit tests pass: `npm run test` — 01b088e
+- [x] 1.4 `design-tokens.ts` declares twelve stage keys in both palettes and six new `tokenPairs` — 01b088e
+- [x] 1.5 `global.css` declares twelve stage tokens in all three theme blocks and maps them in `@theme inline` — 01b088e
 
 #### Manual
 
-- [ ] 1.6 Light-mode contrast table shows PASS for all six stage pairs
-- [ ] 1.7 Dark-mode contrast table shows PASS for all six stage pairs
-- [ ] 1.8 Six hues visually distinguishable in both themes, none clashing with `--primary`
-- [ ] 1.9 Theme toggle recolors stage samples, confirming the `.dark` block
+- [x] 1.6 Light-mode contrast table shows PASS for all six stage pairs — 01b088e
+- [x] 1.7 Dark-mode contrast table shows PASS for all six stage pairs — 01b088e
+- [x] 1.8 Six hues visually distinguishable in both themes, none clashing with `--primary` — 01b088e
+- [x] 1.9 Theme toggle recolors stage samples, confirming the `.dark` block — 01b088e
 
 ### Phase 2: Board redesign
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run build`
-- [ ] 2.2 Linting passes with no new `jsx-a11y` warnings: `npm run lint`
-- [ ] 2.3 Unit tests pass: `npm run test`
-- [ ] 2.4 Existing E2E suite passes unchanged: `npm run test:e2e`
-- [ ] 2.5 No raw Tailwind palette literal or hex value in the diff (self-audit)
-- [ ] 2.6 All nine `data-testid` anchors still resolve
+- [x] 2.1 Type checking passes: `npm run build`
+- [x] 2.2 Linting passes with no new `jsx-a11y` warnings: `npm run lint`
+- [x] 2.3 Unit tests pass: `npm run test`
+- [x] 2.4 Existing E2E suite passes unchanged: `npm run test:e2e`
+- [x] 2.5 No raw Tailwind palette literal or hex value in the diff (self-audit)
+- [x] 2.6 All nine `data-testid` anchors still resolve
 
 #### Manual
 
-- [ ] 2.7 All stages visible without horizontal scrolling on desktop
-- [ ] 2.8 Min-width floor engages and container scrolls when stage count overflows
-- [ ] 2.9 Header pills render six distinct colors, cycling correctly past the palette size
-- [ ] 2.10 Custom stages from `StageEditor` colored coherently
-- [ ] 2.11 Cards show accent bar in column color with D4 name/date layout
-- [ ] 2.12 Zero-candidate stage still renders a column with the dashed placeholder
-- [ ] 2.13 Board reads correctly in both themes
-- [ ] 2.14 Skeleton matches loaded layout with no jump
-- [ ] 2.15 Keyboard reaches every card link and move trigger; columns announced as named regions
+- [x] 2.7 All stages visible without horizontal scrolling on desktop
+- [x] 2.8 Min-width floor engages and container scrolls when stage count overflows
+- [x] 2.9 Header pills render six distinct colors, cycling correctly past the palette size
+- [x] 2.10 Custom stages from `StageEditor` colored coherently
+- [x] 2.11 Cards show accent bar in column color with D4 name/date layout
+- [x] 2.12 Zero-candidate stage still renders a column with the dashed placeholder
+- [x] 2.13 Board reads correctly in both themes
+- [x] 2.14 Skeleton matches loaded layout with no jump
+- [x] 2.15 Keyboard reaches every card link and move trigger; columns announced as named regions
 
 ### Phase 3: Test alignment and verification
 
