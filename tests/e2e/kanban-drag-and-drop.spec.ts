@@ -112,10 +112,16 @@ test.describe("HR recruiter drags a candidate card between kanban columns", () =
     await page.keyboard.press("Space");
     // dnd-kit's default keyboard sensor moves a fixed distance per press;
     // enough presses are needed to cross from the New column into the
-    // adjacent Screening column's droppable rect.
+    // adjacent Screening column's droppable rect. Collision detection runs
+    // asynchronously after each press, so wait for the live-region
+    // announcement to confirm dnd-kit has registered "Screening" as the
+    // current droppable before dropping -- pressing the final Space
+    // immediately after the last arrow key races that state update and
+    // intermittently drops onto no column at all.
     for (let i = 0; i < 10; i++) {
       await page.keyboard.press("ArrowRight");
     }
+    await expect(page.getByRole("status")).toHaveText(/is over the Screening column/);
     await page.keyboard.press("Space");
 
     const dialog = page.getByTestId("move-candidate-dialog");
@@ -123,9 +129,7 @@ test.describe("HR recruiter drags a candidate card between kanban columns", () =
 
     await expect(async () => {
       await dialog.getByLabel("Note for the stage being left").fill("Moved forward via keyboard drag.");
-      await expect(dialog.getByLabel("Note for the stage being left")).toHaveValue(
-        "Moved forward via keyboard drag.",
-      );
+      await expect(dialog.getByLabel("Note for the stage being left")).toHaveValue("Moved forward via keyboard drag.");
     }).toPass({ timeout: 10_000 });
     await dialog.getByRole("button", { name: "Move" }).click();
     await expect(dialog).not.toBeVisible();

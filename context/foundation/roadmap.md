@@ -60,7 +60,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | in-progress |
 | S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | in-progress |
 | S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | in-progress |
-| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new         |
+| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | in-progress |
 
 ## Streams
 
@@ -191,7 +191,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** WCAG AA jest twardym kryterium odbioru M-2 (decyzja użytkownika 2026-09-05), więc ten wycinek może **cofnąć** decyzje kolorystyczne podjęte w F-02 i S-10 — dlatego każdy wcześniejszy wycinek ma mierzyć kontrast u siebie, a nie odkładać go tutaj. S-14 jest siecią bezpieczeństwa, nie jedyną bramką; jeśli wykryje systemowy problem palety, koszt poprawki rośnie z każdym już domkniętym wycinkiem. `eslint-plugin-jsx-a11y` jest w zależnościach — do potwierdzenia, czy jest faktycznie włączony w `eslint.config.js`, zanim się na nim oprzemy.
-- **Status:** new
+- **Status:** in-progress
 
 ## Backlog Handoff
 

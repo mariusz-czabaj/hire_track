@@ -636,17 +636,17 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 New `Textarea`/`FileInput` ARIA tests pass
-- [ ] 2.3 Existing E2E suite still passes: `npm run test:e2e`
-- [ ] 2.4 Type checking passes: `npm run typecheck`
-- [ ] 2.5 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 New `Textarea`/`FileInput` ARIA tests pass
+- [x] 2.3 Existing E2E suite still passes: `npm run test:e2e`
+- [x] 2.4 Type checking passes: `npm run typecheck`
+- [x] 2.5 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.6 Screen reader announces label, invalid state and error text on an errored textarea
-- [ ] 2.7 Required fields visibly marked before submit
-- [ ] 2.8 `MoveCandidateDialog` note field and `CvPanel` file input unchanged
+- [x] 2.6 Screen reader announces label, invalid state and error text on an errored textarea
+- [x] 2.7 Required fields visibly marked before submit
+- [x] 2.8 `MoveCandidateDialog` note field and `CvPanel` file input unchanged
 
 ### Phase 3: `useFormErrors` Hook & Focus-to-Error
 

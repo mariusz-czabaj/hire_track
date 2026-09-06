@@ -7,16 +7,25 @@ interface FileInputProps {
   accept?: string;
   error?: string;
   disabled?: boolean;
+  required?: boolean;
   onFileSelected: (file: File) => void;
 }
 
 // Mirrors Textarea/ui/form-field's label/id pairing and inline error markup so
 // getByLabelText works the same way in both RTL and Playwright.
-export function FileInput({ id, label, accept, error, disabled, onFileSelected }: FileInputProps) {
+export function FileInput({ id, label, accept, error, disabled, required, onFileSelected }: FileInputProps) {
   return (
     <div>
       <label htmlFor={id} className="text-muted-foreground mb-1 block text-sm">
         {label}
+        {required && (
+          <>
+            <span aria-hidden="true" className="text-destructive-text ml-0.5">
+              *
+            </span>
+            <span className="sr-only"> (required)</span>
+          </>
+        )}
       </label>
       <input
         id={id}
@@ -24,6 +33,9 @@ export function FileInput({ id, label, accept, error, disabled, onFileSelected }
         type="file"
         accept={accept}
         disabled={disabled}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-error` : undefined}
+        aria-required={required}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) onFileSelected(file);
@@ -36,7 +48,7 @@ export function FileInput({ id, label, accept, error, disabled, onFileSelected }
         )}
       />
       {error && (
-        <p className="text-destructive-text mt-1 flex items-center gap-1 text-xs">
+        <p id={`${id}-error`} className="text-destructive-text mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>

@@ -29,4 +29,11 @@ describe("FormField", () => {
     expect(input).toHaveAttribute("aria-invalid", "false");
     expect(input).not.toHaveAttribute("aria-describedby");
   });
+
+  it("marks the control and label as required", () => {
+    render(<FormField id="email" label="Email" value="" onChange={vi.fn()} icon={<Mail />} required />);
+    const input = screen.getByLabelText(/Email/);
+    expect(input).toHaveAttribute("aria-required", "true");
+    expect(screen.getByText("(required)")).toBeInTheDocument();
+  });
 });
