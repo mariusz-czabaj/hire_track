@@ -79,7 +79,9 @@ for (const theme of ["light", "dark"] as const) {
     test(`recruitments list has no WCAG 2 A/AA violations`, async ({ page }) => {
       await setTheme(page, theme);
       await signInAs(page, "hr");
-      await page.goto("/recruitments");
+      // This fixture recruitment is "closed", but the list defaults to the
+      // "Live" filter -- request the closed view directly so it's visible.
+      await page.goto("/recruitments?status=closed");
       await expect(page.getByText(recruitmentTitle)).toBeVisible();
       await scanForViolations(page);
     });

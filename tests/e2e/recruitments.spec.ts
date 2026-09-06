@@ -99,6 +99,10 @@ test("Administrator sees an empty list and a not-found board", async ({ page }) 
   await signInAs(page, "admin");
 
   await page.goto("/recruitments");
+  // The list defaults to the "Live" filter, which renders a "no match"
+  // message instead of the "no access at all" one this test checks -- clear
+  // the filter first so the assertion reflects the admin's actual access.
+  await page.getByRole("button", { name: "All", exact: true }).click();
   await expect(page.getByText("No recruitments are visible to you.")).toBeVisible();
 
   await page.goto(`/recruitments/${recruitmentId}`);
