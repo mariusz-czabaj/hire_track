@@ -668,35 +668,35 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 4.1 E2E suite passes incl. `kanban-drag-and-drop.spec.ts`: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts` confirmed unrelated — reproduce identically on `main` before this phase's changes)
-- [x] 4.2 Unit tests pass: `npm run test`
-- [x] 4.3 Type checking passes: `npm run typecheck`
-- [x] 4.4 Linting (incl. `jsx-a11y`) passes: `npm run lint`
+- [x] 4.1 E2E suite passes incl. `kanban-drag-and-drop.spec.ts`: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts` confirmed unrelated — reproduce identically on `main` before this phase's changes) — a49e07c
+- [x] 4.2 Unit tests pass: `npm run test` — a49e07c
+- [x] 4.3 Type checking passes: `npm run typecheck` — a49e07c
+- [x] 4.4 Linting (incl. `jsx-a11y`) passes: `npm run lint` — a49e07c
 
 #### Manual
 
-- [x] 4.5 Pointer drag works from handle; link and move button clickable without dragging
-- [x] 4.6 Sensible tab order, no phantom button stop on the card wrapper
-- [x] 4.7 Keyboard drag still moves the candidate and is announced
-- [x] 4.8 Handle visible and hit-target-sized on touch widths
+- [x] 4.5 Pointer drag works from handle; link and move button clickable without dragging — a49e07c
+- [x] 4.6 Sensible tab order, no phantom button stop on the card wrapper — a49e07c
+- [x] 4.7 Keyboard drag still moves the candidate and is announced — a49e07c
+- [x] 4.8 Handle visible and hit-target-sized on touch widths — a49e07c
 
 ### Phase 5: Semantics Cleanup
 
 #### Automated
 
-- [ ] 5.1 Unit tests pass: `npm run test`
-- [ ] 5.2 E2E suite passes: `npm run test:e2e`
-- [ ] 5.3 No repo-wide references to `LibBadge` remain
-- [ ] 5.4 Type checking passes: `npm run typecheck`
-- [ ] 5.5 Linting passes: `npm run lint`
-- [ ] 5.6 No non-English UI strings remain in `src/lib/config-status.ts`
+- [x] 5.1 Unit tests pass: `npm run test`
+- [x] 5.2 E2E suite passes: `npm run test:e2e` (2 pre-existing failures in `recruitments.spec.ts`, same as flagged unrelated in Phase 4)
+- [x] 5.3 No repo-wide references to `LibBadge` remain
+- [x] 5.4 Type checking passes: `npm run typecheck`
+- [x] 5.5 Linting passes: `npm run lint`
+- [x] 5.6 No non-English UI strings remain in `src/lib/config-status.ts`
 
 #### Manual
 
-- [ ] 5.7 Error toast announced immediately; success toast not disruptive
-- [ ] 5.8 Both live regions coexist without visual duplication or layout shift
-- [ ] 5.9 Rename and user-search inputs announce a meaningful name
-- [ ] 5.10 Banner renders correct English copy when Supabase env vars absent
+- [x] 5.7 Error toast announced immediately; success toast not disruptive
+- [x] 5.8 Both live regions coexist without visual duplication or layout shift
+- [x] 5.9 Rename and user-search inputs announce a meaningful name
+- [x] 5.10 Banner renders correct English copy when Supabase env vars absent
 
 ### Phase 6: Verification Harness & Handoff
 

@@ -77,8 +77,12 @@ export function UserSearchPicker({ existingUserIds, onAdd }: UserSearchPickerPro
   return (
     <div className="flex flex-col gap-2">
       <div className="relative">
+        <label htmlFor="user-search" className="sr-only">
+          Search users by email
+        </label>
         <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
         <input
+          id="user-search"
           type="text"
           value={query}
           onChange={(e) => {

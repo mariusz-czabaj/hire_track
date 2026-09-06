@@ -15,40 +15,42 @@ const variantIcon: Record<ToastVariant, typeof CircleCheck> = {
   info: Info,
 };
 
-export function Toaster() {
-  const toasts = useSyncExternalStore(subscribe, getSnapshot, () => []);
-
+function renderToast(t: ReturnType<typeof getSnapshot>[number]) {
+  const Icon = variantIcon[t.variant];
   return (
     <div
-      aria-live="polite"
-      aria-atomic="false"
-      className="fixed right-4 bottom-4 z-50 flex w-full max-w-sm flex-col gap-2"
+      key={t.id}
+      className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 text-sm shadow-lg", variantStyles[t.variant])}
     >
-      {toasts.map((t) => {
-        const Icon = variantIcon[t.variant];
-        return (
-          <div
-            key={t.id}
-            className={cn(
-              "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm shadow-lg",
-              variantStyles[t.variant],
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            <span className="flex-1">{t.message}</span>
-            <button
-              type="button"
-              onClick={() => {
-                dismiss(t.id);
-              }}
-              aria-label="Dismiss notification"
-              className="shrink-0 rounded-sm opacity-70 transition-opacity hover:opacity-100"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        );
-      })}
+      <Icon className="size-4 shrink-0" />
+      <span className="flex-1">{t.message}</span>
+      <button
+        type="button"
+        onClick={() => {
+          dismiss(t.id);
+        }}
+        aria-label="Dismiss notification"
+        className="shrink-0 rounded-sm opacity-70 transition-opacity hover:opacity-100"
+      >
+        <X className="size-4" />
+      </button>
+    </div>
+  );
+}
+
+export function Toaster() {
+  const toasts = useSyncExternalStore(subscribe, getSnapshot, () => []);
+  const errorToasts = toasts.filter((t) => t.variant === "error");
+  const politeToasts = toasts.filter((t) => t.variant !== "error");
+
+  return (
+    <div className="fixed right-4 bottom-4 z-50 flex w-full max-w-sm flex-col gap-2">
+      <div aria-live="polite" aria-atomic="false" className="flex flex-col gap-2">
+        {politeToasts.map(renderToast)}
+      </div>
+      <div aria-live="assertive" aria-atomic="false" className="flex flex-col gap-2">
+        {errorToasts.map(renderToast)}
+      </div>
     </div>
   );
 }

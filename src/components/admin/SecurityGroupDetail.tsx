@@ -183,7 +183,11 @@ export function SecurityGroupDetail({ groupId }: SecurityGroupDetailProps) {
     <div className="flex flex-col gap-6">
       <form onSubmit={handleRename} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="flex-1">
+          <label htmlFor="security-group-name" className="sr-only">
+            Security group name
+          </label>
           <input
+            id="security-group-name"
             type="text"
             value={name}
             onChange={(e) => {
