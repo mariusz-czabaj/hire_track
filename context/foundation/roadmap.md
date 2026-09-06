@@ -59,7 +59,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | in-progress |
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | in-progress |
 | S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | in-progress |
-| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new         |
+| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | in-progress |
 | S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new         |
 
 ## Streams
@@ -179,7 +179,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Unknowns:**
   - Wybór mechanizmu potwierdzeń (toast globalny vs. komunikat inline przy akcji). — Owner: team. Block: nie (rozstrzygane na poziomie `/10x-plan`).
 - **Risk:** `ServerError` jest **jedyną** powierzchnią błędu w całej aplikacji — jego zmiana dotyka każdego ekranu naraz, więc jest to jednocześnie najtańszy moment na dodanie `role="alert"` (dziś nieobecnego) i największe ryzyko regresji, jeśli asercje E2E opierają się na jego strukturze. Drugie: `FormField` ma własne stylowanie pola równoległe do `ui/input.tsx` — konsolidacja musi zachować ikonę wiodącą, przełącznik widoczności hasła i powiązanie `label`/`htmlFor`, na których stoi 37 lokatorów `getByLabel`. Przy okazji: `Banner.astro` zawiera polskie stringi ("Uwaga:", "Dokumentacja") łamiące regułę English-only z `context/foundation/lessons.md` — do naprawy w tym wycinku.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-14: Audyt dostępności WCAG 2.1 AA
 

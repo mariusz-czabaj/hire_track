@@ -537,27 +537,27 @@ Phase 3 and must not survive into the final state.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass, including new contrast assertions: `npm test`
-- [x] 1.2 Type checking passes: `npm run typecheck`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass, including new contrast assertions: `npm test` — 27ad6fd
+- [x] 1.2 Type checking passes: `npm run typecheck` — 27ad6fd
+- [x] 1.3 Linting passes: `npm run lint` — 27ad6fd
 
 #### Manual
 
-- [ ] 1.4 `/dev/design-system` shows the three new swatches legibly in light and dark
-- [ ] 1.5 Toggling the theme changes all three; none stays fixed
+- [x] 1.4 `/dev/design-system` shows the three new swatches legibly in light and dark — 27ad6fd
+- [x] 1.5 Toggling the theme changes all three; none stays fixed — 27ad6fd
 
 ### Phase 2: Primitives
 
 #### Automated
 
-- [ ] 2.1 New and existing unit tests pass: `npm test`
-- [ ] 2.2 Type checking passes: `npm run typecheck`
-- [ ] 2.3 Linting passes, including `jsx-a11y` rules: `npm run lint`
-- [ ] 2.4 Existing E2E suite still green: `npm run test:e2e`
+- [x] 2.1 New and existing unit tests pass: `npm test`
+- [x] 2.2 Type checking passes: `npm run typecheck`
+- [x] 2.3 Linting passes, including `jsx-a11y` rules: `npm run lint`
+- [x] 2.4 Existing E2E suite still green: `npm run test:e2e`
 
 #### Manual
 
-- [ ] 2.5 No visual change anywhere yet, except `ServerError` in token colors
+- [x] 2.5 No visual change anywhere yet, except `ServerError` in token colors
 
 ### Phase 3: Migration
 
