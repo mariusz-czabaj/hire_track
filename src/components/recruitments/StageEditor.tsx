@@ -124,12 +124,7 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className="gap-2 border-white/10 bg-white/5 text-blue-100/80 hover:bg-white/10"
-          data-testid="stage-editor-trigger"
-        >
+        <Button type="button" variant="outline" className="gap-2" data-testid="stage-editor-trigger">
           <Settings className="size-4" />
           Edit stages
         </Button>
@@ -145,7 +140,7 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
         </DialogHeader>
 
         {hasCandidates ? (
-          <p className="text-sm text-blue-100/70" data-testid="stages-locked-message">
+          <p className="text-muted-foreground text-sm" data-testid="stages-locked-message">
             This recruitment already has candidates, so its stages can no longer be changed.
           </p>
         ) : (

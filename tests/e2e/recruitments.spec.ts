@@ -92,7 +92,7 @@ test("Hiring Manager sees the identical read-only board", async ({ page }) => {
   // Confirm the denial didn't silently persist: the recruitment's status
   // is still "live" after a reload.
   await page.reload();
-  await expect(statusControl.getByRole("button", { name: "Live" })).toHaveClass(/bg-white\/20/);
+  await expect(statusControl.getByRole("button", { name: "Live" })).toHaveAttribute("aria-pressed", "true");
 });
 
 test("Administrator sees an empty list and a not-found board", async ({ page }) => {
@@ -103,7 +103,9 @@ test("Administrator sees an empty list and a not-found board", async ({ page }) 
 
   await page.goto(`/recruitments/${recruitmentId}`);
   await expect(page.getByText("This recruitment could not be found.")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Back to recruitments/ }).first()).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Recruitments" }),
+  ).toBeVisible();
 });
 
 test.describe("HR creates a recruitment and manages its status", () => {

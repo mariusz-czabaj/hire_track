@@ -710,26 +710,26 @@ existing sessions get the default with no special handling.
 
 #### Automated
 
-- [x] 2.1 Build succeeds with no unresolved imports after the deletions: `npm run build`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 No source reference to the deleted modules or route remains
-- [x] 2.4 E2E suite still passes: `npx playwright test`
+- [x] 2.1 Build succeeds with no unresolved imports after the deletions: `npm run build` — 601f155
+- [x] 2.2 Linting passes: `npm run lint` — 601f155
+- [x] 2.3 No source reference to the deleted modules or route remains — 601f155
+- [x] 2.4 E2E suite still passes: `npx playwright test` — 601f155
 
 #### Manual
 
-- [x] 2.5 `/` while signed out lands on `/auth/signin`
-- [x] 2.6 `/` while signed in lands on `/recruitments`
-- [x] 2.7 `/dashboard` returns a 404
+- [x] 2.5 `/` while signed out lands on `/auth/signin` — 601f155
+- [x] 2.6 `/` while signed in lands on `/recruitments` — 601f155
+- [x] 2.7 `/dashboard` returns a 404 — 601f155
 
 ### Phase 3: Recruitments Area
 
 #### Automated
 
-- [ ] 3.1 Build succeeds: `npm run build`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Unit tests pass, including the swept islands' component tests: `npx vitest run`
-- [ ] 3.4 E2E suite passes: `npx playwright test`
-- [ ] 3.5 No colour literal remains in the swept recruitment files and shared primitives
+- [x] 3.1 Build succeeds: `npm run build`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Unit tests pass, including the swept islands' component tests: `npx vitest run`
+- [x] 3.4 E2E suite passes: `npx playwright test`
+- [x] 3.5 No colour literal remains in the swept recruitment files and shared primitives
 
 #### Manual
 

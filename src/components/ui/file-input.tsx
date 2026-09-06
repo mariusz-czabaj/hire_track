@@ -15,7 +15,7 @@ interface FileInputProps {
 export function FileInput({ id, label, accept, error, disabled, onFileSelected }: FileInputProps) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-sm text-blue-100/80">
+      <label htmlFor={id} className="text-muted-foreground mb-1 block text-sm">
         {label}
       </label>
       <input
@@ -30,13 +30,13 @@ export function FileInput({ id, label, accept, error, disabled, onFileSelected }
           e.target.value = "";
         }}
         className={cn(
-          "block w-full text-sm text-blue-100/80 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-500/30 file:px-3 file:py-2 file:text-sm file:text-white hover:file:bg-purple-500/40",
-          "rounded-lg border bg-white/10 px-3 py-2 transition-colors focus:ring-2 focus:outline-none",
-          error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",
+          "text-muted-foreground file:bg-primary/20 hover:file:bg-primary/30 file:text-foreground block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-2 file:text-sm",
+          "bg-input/30 rounded-lg border px-3 py-2 transition-colors focus:ring-2 focus:outline-none",
+          error ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring",
         )}
       />
       {error && (
-        <p className="mt-1 flex items-center gap-1 text-xs text-red-300">
+        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>

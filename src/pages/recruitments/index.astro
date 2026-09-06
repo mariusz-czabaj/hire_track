@@ -1,25 +1,42 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import AppShell from "@/components/AppShell.astro";
+import Sidebar from "@/components/Sidebar.astro";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserMenu } from "@/components/UserMenu";
+import { SidebarToggle } from "@/components/SidebarToggle";
+import { MobileNav } from "@/components/MobileNav";
 import { RecruitmentList } from "@/components/recruitments/RecruitmentList";
 
 const initialStatus = Astro.url.searchParams.get("status") ?? undefined;
 ---
 
 <Layout title="Recruitments">
-  <div class="bg-cosmic min-h-screen p-4 text-white sm:p-8">
-    <div class="mx-auto max-w-4xl">
-      <div class="mb-6 flex items-center justify-between gap-4">
-        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-          Recruitments
-        </h1>
-        <a
-          href="/recruitments/new"
-          class="shrink-0 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
-        >
-          New recruitment
-        </a>
-      </div>
-      <RecruitmentList initialStatus={initialStatus} client:load />
-    </div>
-  </div>
+  <AppShell containerWidth="standard">
+    <Fragment slot="nav">
+      <Sidebar />
+    </Fragment>
+    <Fragment slot="topbar-leading">
+      <SidebarToggle collapsed={Astro.locals.sidebarCollapsed} client:load />
+      <MobileNav client:load>
+        <Sidebar />
+      </MobileNav>
+    </Fragment>
+    <Fragment slot="topbar-actions">
+      <ThemeToggle theme={Astro.locals.theme} client:load />
+      {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
+    </Fragment>
+    <Fragment slot="page-title">
+      <h1 class="text-foreground text-3xl font-bold">Recruitments</h1>
+    </Fragment>
+    <Fragment slot="page-actions">
+      <a
+        href="/recruitments/new"
+        class="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+      >
+        New recruitment
+      </a>
+    </Fragment>
+    <RecruitmentList initialStatus={initialStatus} client:load />
+  </AppShell>
 </Layout>

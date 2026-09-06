@@ -21,17 +21,17 @@ function formatDateTime(value: string): string {
 function SkeletonDetail() {
   return (
     <div className="flex flex-col gap-4">
-      <Skeleton className="h-8 w-48 bg-white/10" />
-      <Skeleton className="h-24 w-full rounded-lg bg-white/10" />
-      <Skeleton className="h-24 w-full rounded-lg bg-white/10" />
-      <Skeleton className="h-24 w-full rounded-lg bg-white/10" />
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-24 w-full rounded-lg" />
+      <Skeleton className="h-24 w-full rounded-lg" />
+      <Skeleton className="h-24 w-full rounded-lg" />
     </div>
   );
 }
 
 function NotFoundState() {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-blue-100/70">
+    <div className="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-10 text-center">
       <p>This candidate could not be found.</p>
     </div>
   );
@@ -63,18 +63,18 @@ function NoteCard({
   error,
 }: NoteCardProps) {
   return (
-    <Card className="gap-2 border-white/10 bg-white/5 p-4 text-white" data-testid={`note-${note.stageId}`}>
+    <Card className="gap-2 p-4" data-testid={`note-${note.stageId}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-blue-100/90">{note.stageName}</span>
+          <span className="text-foreground text-sm font-semibold">{note.stageName}</span>
           {isCurrentStage && (
-            <span className="rounded-full border border-purple-400/40 bg-purple-500/20 px-2 py-0.5 text-xs text-purple-200">
+            <span className="border-accent bg-accent text-accent-foreground rounded-full border px-2 py-0.5 text-xs">
               Current stage
             </span>
           )}
         </div>
         {note.authorEmail && note.updatedAt && (
-          <span className="text-xs text-blue-100/50">
+          <span className="text-muted-foreground text-xs">
             {note.authorEmail} &middot; {formatDateTime(note.updatedAt)}
           </span>
         )}
@@ -101,9 +101,9 @@ function NoteCard({
       ) : (
         <div className="flex items-start justify-between gap-2">
           {note.body !== null ? (
-            <p className="text-sm text-blue-100/80">{note.body}</p>
+            <p className="text-foreground text-sm">{note.body}</p>
           ) : (
-            <p className="text-sm text-blue-100/40 italic">No note yet</p>
+            <p className="text-muted-foreground text-sm italic">No note yet</p>
           )}
           <Button
             type="button"
@@ -168,10 +168,8 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-          {candidate.fullName}
-        </h1>
-        <div className="mt-2 flex flex-wrap gap-4 text-sm text-blue-100/70">
+        <h1 className="text-foreground text-2xl font-bold">{candidate.fullName}</h1>
+        <div className="text-muted-foreground mt-2 flex flex-wrap gap-4 text-sm">
           <span className="flex items-center gap-1">
             <Mail className="size-4" />
             {candidate.email}
@@ -189,7 +187,7 @@ export function CandidateDetail({ recruitmentId, candidateRecruitmentId }: Candi
         </div>
         <a
           href={`/candidates/${candidate.candidateId}`}
-          className="mt-2 inline-block text-sm text-purple-300 hover:underline"
+          className="text-primary mt-2 inline-block text-sm hover:underline"
         >
           View full profile &rarr;
         </a>

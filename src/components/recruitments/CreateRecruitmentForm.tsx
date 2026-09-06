@@ -15,7 +15,7 @@ import {
 } from "@/types";
 
 const inputBase =
-  "w-full rounded-lg bg-white/10 border px-3 py-2 pl-10 text-white placeholder-white/40 focus:outline-none focus:ring-2 transition-colors";
+  "w-full rounded-lg bg-input/30 border px-3 py-2 pl-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-colors";
 
 const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
   "full-time": "Full-time",
@@ -130,7 +130,7 @@ export function CreateRecruitmentForm() {
       />
 
       <div>
-        <label htmlFor="employmentType" className="mb-1 block text-sm text-blue-100/80">
+        <label htmlFor="employmentType" className="text-muted-foreground mb-1 block text-sm">
           Employment type
         </label>
         <select
@@ -139,10 +139,10 @@ export function CreateRecruitmentForm() {
           onChange={(e) => {
             setEmploymentType(e.target.value as EmploymentType);
           }}
-          className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="border-input bg-input/30 text-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 focus:ring-2 focus:outline-none"
         >
           {employmentTypeSchema.options.map((option) => (
-            <option key={option} value={option} className="bg-slate-900">
+            <option key={option} value={option} className="bg-popover text-popover-foreground">
               {EMPLOYMENT_TYPE_LABELS[option]}
             </option>
           ))}
@@ -163,14 +163,14 @@ export function CreateRecruitmentForm() {
       />
 
       <div>
-        <label className="mb-1 block text-sm text-blue-100/80">Security groups</label>
+        <label className="text-muted-foreground mb-1 block text-sm">Security groups</label>
         <div
-          className={inputBase.replace("pl-10", "pl-3") + (errors.groupIds ? " border-red-400/60" : " border-white/20")}
+          className={inputBase.replace("pl-10", "pl-3") + (errors.groupIds ? " border-destructive" : " border-input")}
         >
           {groupsResource.status === "loading" && (
             <div className="flex flex-col gap-2 py-1">
-              <Skeleton className="h-5 w-full bg-white/10" />
-              <Skeleton className="h-5 w-full bg-white/10" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
             </div>
           )}
           {groupsResource.status === "error" && <ServerError message={groupsResource.message} />}
@@ -184,7 +184,7 @@ export function CreateRecruitmentForm() {
                     onChange={() => {
                       toggleGroup(group.id);
                     }}
-                    className="size-4 rounded border-white/30 bg-white/10"
+                    className="border-input bg-input/30 size-4 rounded"
                   />
                   <span className="flex items-center gap-1">
                     <Users className="size-3.5" />
@@ -195,19 +195,15 @@ export function CreateRecruitmentForm() {
             </div>
           )}
         </div>
-        {errors.groupIds ? <p className="mt-1 text-xs text-red-300">{errors.groupIds}</p> : null}
+        {errors.groupIds ? <p className="text-destructive mt-1 text-xs">{errors.groupIds}</p> : null}
       </div>
 
       <ServerError message={status === "error" ? error : null} />
 
-      <Button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500"
-      >
+      <Button type="submit" disabled={submitting} className="w-full">
         {submitting ? (
           <span className="flex items-center gap-2">
-            <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            <span className="border-primary-foreground/30 border-t-primary-foreground size-4 animate-spin rounded-full border-2" />
             Creating...
           </span>
         ) : (

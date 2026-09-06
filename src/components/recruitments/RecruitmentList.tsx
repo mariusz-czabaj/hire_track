@@ -59,8 +59,8 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
               status === option.value
-                ? "border-white/30 bg-white/20 text-white"
-                : "border-white/10 bg-white/5 text-blue-100/70 hover:bg-white/10",
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground",
             )}
           >
             {option.label}
@@ -71,13 +71,13 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
       {resource.status === "loading" && (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-xl bg-white/10" />
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}
         </div>
       )}
 
       {resource.status === "success" && resource.data.length === 0 && (
-        <p className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-blue-100/70">
+        <p className="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-6 text-center">
           {status ? "No recruitments match this filter." : "No recruitments are visible to you."}
         </p>
       )}
@@ -86,16 +86,16 @@ export function RecruitmentList({ initialStatus }: RecruitmentListProps) {
         <div className="flex flex-col gap-3">
           {resource.data.map((recruitment) => (
             <a key={recruitment.id} href={`/recruitments/${recruitment.id}`} className="block">
-              <Card className="flex flex-row items-center justify-between gap-4 border-white/10 bg-white/10 p-4 text-white transition-colors hover:bg-white/15">
+              <Card className="hover:bg-accent flex flex-row items-center justify-between gap-4 p-4 transition-colors">
                 <div>
                   <p className="font-semibold">{recruitment.title}</p>
-                  <p className="text-sm text-blue-100/60">
+                  <p className="text-muted-foreground text-sm">
                     {recruitment.department ?? "—"} · {recruitment.location ?? "—"}
                   </p>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-blue-100/60">{formatDate(recruitment.openedAt)}</span>
-                  <span className="text-blue-100/60">{recruitment.candidateCount} candidates</span>
+                  <span className="text-muted-foreground">{formatDate(recruitment.openedAt)}</span>
+                  <span className="text-muted-foreground">{recruitment.candidateCount} candidates</span>
                   <Badge variant={STATUS_PRESENTATION[recruitment.status].variant}>
                     {STATUS_PRESENTATION[recruitment.status].label}
                   </Badge>

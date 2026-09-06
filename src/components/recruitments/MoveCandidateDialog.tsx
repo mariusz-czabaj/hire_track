@@ -67,7 +67,7 @@ function MoveCandidateForm({ candidateUrl, stages, onMoved }: MoveCandidateFormP
   const moving = moveCandidate.status === "loading";
 
   if (resource.status === "loading") {
-    return <p className="text-sm text-blue-100/70">Loading...</p>;
+    return <p className="text-muted-foreground text-sm">Loading...</p>;
   }
 
   if (resource.status === "not-found" || resource.status === "error") {
@@ -78,7 +78,7 @@ function MoveCandidateForm({ candidateUrl, stages, onMoved }: MoveCandidateFormP
   return (
     <>
       <div>
-        <label htmlFor="move-candidate-target-stage" className="mb-1 block text-sm text-blue-100/80">
+        <label htmlFor="move-candidate-target-stage" className="text-muted-foreground mb-1 block text-sm">
           Target stage
         </label>
         <select
@@ -87,10 +87,10 @@ function MoveCandidateForm({ candidateUrl, stages, onMoved }: MoveCandidateFormP
           onChange={(e) => {
             setToStageId(Number(e.target.value));
           }}
-          className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="border-input bg-input/30 text-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 focus:ring-2 focus:outline-none"
         >
           {stages.map((stage) => (
-            <option key={stage.id} value={stage.id} className="bg-slate-900">
+            <option key={stage.id} value={stage.id} className="bg-popover text-popover-foreground">
               {stage.name}
             </option>
           ))}
