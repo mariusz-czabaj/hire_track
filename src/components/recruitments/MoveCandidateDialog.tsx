@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRightLeft } from "lucide-react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { focusFirstInvalidField } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import type { CandidateDetailDto, KanbanBoardStageDto, MoveCandidateCommand } from "@/types";
 
@@ -57,6 +58,12 @@ function MoveCandidateForm({ candidateUrl, stages, initialStageId, onMoved }: Mo
     candidateUrl,
     "PATCH",
   );
+
+  useEffect(() => {
+    if (moveCandidate.fieldErrors?.note) {
+      focusFirstInvalidField(moveCandidate.fieldErrors, [{ key: "note", id: "move-candidate-note" }]);
+    }
+  }, [moveCandidate.fieldErrors]);
 
   async function handleMove() {
     if (toStageId === undefined) return;

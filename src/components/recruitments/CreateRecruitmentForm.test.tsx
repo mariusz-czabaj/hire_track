@@ -26,10 +26,10 @@ function mockFetch(config: { createResponse?: { status: number; body: unknown } 
 }
 
 async function fillValidFields(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText("Title"), "Backend Engineer");
-  await user.type(screen.getByLabelText("Department"), "Engineering");
-  await user.type(screen.getByLabelText("Location"), "Remote");
-  const dateInput = screen.getByLabelText("Opened date");
+  await user.type(screen.getByLabelText("Title", { exact: false }), "Backend Engineer");
+  await user.type(screen.getByLabelText("Department", { exact: false }), "Engineering");
+  await user.type(screen.getByLabelText("Location", { exact: false }), "Remote");
+  const dateInput = screen.getByLabelText("Opened date", { exact: false });
   await user.clear(dateInput);
   await user.type(dateInput, "2026-01-01");
 }
@@ -64,7 +64,7 @@ describe("CreateRecruitmentForm", () => {
     await user.click(screen.getByRole("button", { name: /create recruitment/i }));
     expect(await screen.findByText("Title is required")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Title"), "B");
+    await user.type(screen.getByLabelText("Title", { exact: false }), "B");
     expect(screen.queryByText("Title is required")).not.toBeInTheDocument();
   });
 

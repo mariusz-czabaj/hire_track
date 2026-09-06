@@ -19,7 +19,7 @@ export async function signInAs(page: Page, user: SeededUserKey): Promise<void> {
   await page.goto("/auth/signin");
   const email = SEEDED_USERS[user];
   const emailInput = page.getByLabel("Email");
-  const passwordInput = page.getByLabel("Password", { exact: true });
+  const passwordInput = page.getByRole("textbox", { name: /^Password/ });
 
   // The sign-in form is a client:load island; if it fills in before hydration
   // attaches React's onChange, the controlled input resets to empty once

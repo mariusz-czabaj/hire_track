@@ -636,33 +636,33 @@ revert — no phase depends on a deployed state of a prior one beyond source.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 New `Textarea`/`FileInput` ARIA tests pass
-- [x] 2.3 Existing E2E suite still passes: `npm run test:e2e`
-- [x] 2.4 Type checking passes: `npm run typecheck`
-- [x] 2.5 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — 4ca6b8a
+- [x] 2.2 New `Textarea`/`FileInput` ARIA tests pass — 4ca6b8a
+- [x] 2.3 Existing E2E suite still passes: `npm run test:e2e` — 4ca6b8a
+- [x] 2.4 Type checking passes: `npm run typecheck` — 4ca6b8a
+- [x] 2.5 Linting passes: `npm run lint` — 4ca6b8a
 
 #### Manual
 
-- [x] 2.6 Screen reader announces label, invalid state and error text on an errored textarea
-- [x] 2.7 Required fields visibly marked before submit
-- [x] 2.8 `MoveCandidateDialog` note field and `CvPanel` file input unchanged
+- [x] 2.6 Screen reader announces label, invalid state and error text on an errored textarea — 4ca6b8a
+- [x] 2.7 Required fields visibly marked before submit — 4ca6b8a
+- [x] 2.8 `MoveCandidateDialog` note field and `CvPanel` file input unchanged — 4ca6b8a
 
 ### Phase 3: `useFormErrors` Hook & Focus-to-Error
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `npm run test`
-- [ ] 3.2 Existing form tests still pass unmodified in intent
-- [ ] 3.3 Existing E2E suite still passes: `npm run test:e2e`
-- [ ] 3.4 Type checking passes: `npm run typecheck`
-- [ ] 3.5 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test`
+- [x] 3.2 Existing form tests still pass unmodified in intent
+- [x] 3.3 Existing E2E suite still passes: `npm run test:e2e`
+- [x] 3.4 Type checking passes: `npm run typecheck`
+- [x] 3.5 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.6 Empty submit moves focus to first invalid field, keyboard-only, in every form
-- [ ] 3.7 Dialog forms keep focus inside the dialog on validation failure
-- [ ] 3.8 No error message wording changed
+- [x] 3.6 Empty submit moves focus to first invalid field, keyboard-only, in every form
+- [x] 3.7 Dialog forms keep focus inside the dialog on validation failure
+- [x] 3.8 No error message wording changed
 
 ### Phase 4: Kanban Drag Handle
 

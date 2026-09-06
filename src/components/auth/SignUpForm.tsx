@@ -4,8 +4,17 @@ import { FormField } from "@/components/ui/form-field";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Alert } from "@/components/ui/alert";
+import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 
 const MIN_PASSWORD_LENGTH = 6;
+
+type ErrorKey = "email" | "password" | "confirmPassword";
+
+const FIELD_ORDER: FieldOrderEntry<ErrorKey>[] = [
+  { key: "email", id: "email" },
+  { key: "password", id: "password" },
+  { key: "confirmPassword", id: "confirmPassword" },
+];
 
 interface Props {
   serverError?: string | null;
@@ -17,10 +26,10 @@ export default function SignUpForm({ serverError }: Props) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const { errors, setErrors, clearError } = useFormErrors<ErrorKey>();
 
   function validate() {
-    const next: typeof errors = {};
+    const next: Partial<Record<ErrorKey, string>> = {};
 
     if (!email.trim()) {
       next.email = "Email is required";
@@ -40,12 +49,8 @@ export default function SignUpForm({ serverError }: Props) {
       next.confirmPassword = "Passwords do not match";
     }
 
-    setErrors(next);
+    setErrors(next, FIELD_ORDER);
     return Object.keys(next).length === 0;
-  }
-
-  function clearError(field: keyof typeof errors) {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -73,6 +78,7 @@ export default function SignUpForm({ serverError }: Props) {
           setEmail(v);
           clearError("email");
         }}
+        required
         placeholder="you@example.com"
         error={errors.email}
         icon={<Mail className="size-4" />}
@@ -87,6 +93,7 @@ export default function SignUpForm({ serverError }: Props) {
           setPassword(v);
           clearError("password");
         }}
+        required
         placeholder="Min. 6 characters"
         error={errors.password}
         hint={passwordHint}
@@ -111,6 +118,7 @@ export default function SignUpForm({ serverError }: Props) {
           setConfirmPassword(v);
           clearError("confirmPassword");
         }}
+        required
         placeholder="Re-enter your password"
         error={errors.confirmPassword}
         icon={<Lock className="size-4" />}

@@ -71,7 +71,7 @@ describe("StageEditor", () => {
 
     // Add a third row and name it.
     await user.click(screen.getByRole("button", { name: /add stage/i }));
-    await user.type(screen.getByLabelText("Stage 3 name"), "Offer");
+    await user.type(screen.getByLabelText("Stage 3 name", { exact: false }), "Offer");
 
     // Remove the first row ("New").
     await user.click(screen.getByRole("button", { name: "Remove stage 1" }));
@@ -123,7 +123,7 @@ describe("StageEditor", () => {
     await user.click(screen.getByRole("button", { name: /^save$/i }));
 
     expect(await screen.findByText("Stage name is invalid")).toBeInTheDocument();
-    const secondRowInput = screen.getByLabelText("Stage 2 name");
+    const secondRowInput = screen.getByLabelText("Stage 2 name", { exact: false });
     expect(secondRowInput.closest("div")?.parentElement).toHaveTextContent("Stage name is invalid");
   });
 

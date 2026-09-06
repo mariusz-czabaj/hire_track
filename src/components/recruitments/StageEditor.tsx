@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation } from "@/components/hooks/useMutation";
+import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import type { KanbanBoardStageDto, RecruitmentStagesDto } from "@/types";
 
@@ -31,7 +32,7 @@ interface StageRowState {
 export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: StageEditorProps) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<StageRowState[]>([]);
-  const [localErrors, setLocalErrors] = useState<Record<number, string>>({});
+  const { errors: localErrors, setErrors: setLocalErrors, clearError: clearLocalErrorForRow } = useFormErrors<string>();
   const nextLocalId = useRef(0);
 
   // The editor is UX-only read-only guidance -- the server-side
@@ -51,7 +52,7 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
   function handleOpenChange(next: boolean) {
     if (next) {
       setRows(stages.map((stage) => ({ localId: nextLocalId.current++, name: stage.name })));
-      setLocalErrors({});
+      setLocalErrors({}, []);
     }
     setOpen(next);
   }
@@ -78,23 +79,18 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
     setRows((prev) => prev.map((row) => (row.localId === localId ? { ...row, name } : row)));
   }
 
-  function clearLocalError(index: number) {
-    setLocalErrors((prev) => {
-      if (!(index in prev)) return prev;
-      return Object.fromEntries(Object.entries(prev).filter(([key]) => Number(key) !== index));
-    });
-  }
-
-  function fieldErrorForRow(index: number): string | undefined {
-    return localErrors[index] ?? replaceStages.fieldErrors?.[`stages.${index}.name`];
+  function fieldErrorForRow(row: StageRowState, index: number): string | undefined {
+    return localErrors[String(row.localId)] ?? replaceStages.fieldErrors?.[`stages.${index}.name`];
   }
 
   function validateRows(): boolean {
-    const errors: Record<number, string> = {};
-    rows.forEach((row, index) => {
-      if (!row.name.trim()) errors[index] = "Stage name is required";
+    const errors: Partial<Record<string, string>> = {};
+    const order: FieldOrderEntry[] = [];
+    rows.forEach((row) => {
+      order.push({ key: String(row.localId), id: `stage-${row.localId}-name` });
+      if (!row.name.trim()) errors[String(row.localId)] = "Stage name is required";
     });
-    setLocalErrors(errors);
+    setLocalErrors(errors, order);
     return Object.keys(errors).length === 0;
   }
 
@@ -158,10 +154,11 @@ export function StageEditor({ recruitmentId, stages, stagesSource, onChanged }: 
                       value={row.name}
                       onChange={(value) => {
                         updateName(row.localId, value);
-                        clearLocalError(index);
+                        clearLocalErrorForRow(String(row.localId));
                       }}
-                      error={fieldErrorForRow(index)}
+                      error={fieldErrorForRow(row, index)}
                       icon={<ListOrdered className="size-4" />}
+                      required
                     />
                   </div>
                   <div className="flex gap-1 pb-1">

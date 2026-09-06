@@ -4,6 +4,14 @@ import { FormField } from "@/components/ui/form-field";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Alert } from "@/components/ui/alert";
+import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
+
+type ErrorKey = "email" | "password";
+
+const FIELD_ORDER: FieldOrderEntry<ErrorKey>[] = [
+  { key: "email", id: "email" },
+  { key: "password", id: "password" },
+];
 
 interface Props {
   serverError?: string | null;
@@ -13,10 +21,10 @@ export default function SignInForm({ serverError }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const { errors, setErrors, clearError } = useFormErrors<ErrorKey>();
 
   function validate() {
-    const next: typeof errors = {};
+    const next: Partial<Record<ErrorKey, string>> = {};
     if (!email.trim()) {
       next.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -25,12 +33,8 @@ export default function SignInForm({ serverError }: Props) {
     if (!password) {
       next.password = "Password is required";
     }
-    setErrors(next);
+    setErrors(next, FIELD_ORDER);
     return Object.keys(next).length === 0;
-  }
-
-  function clearError(field: keyof typeof errors) {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -50,6 +54,7 @@ export default function SignInForm({ serverError }: Props) {
           setEmail(v);
           clearError("email");
         }}
+        required
         placeholder="you@example.com"
         error={errors.email}
         icon={<Mail className="size-4" />}
@@ -64,6 +69,7 @@ export default function SignInForm({ serverError }: Props) {
           setPassword(v);
           clearError("password");
         }}
+        required
         placeholder="Your password"
         error={errors.password}
         icon={<Lock className="size-4" />}

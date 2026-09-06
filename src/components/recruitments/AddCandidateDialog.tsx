@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useMutation } from "@/components/hooks/useMutation";
+import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import type { AddCandidateCommand, CandidateCardDto } from "@/types";
 
@@ -27,12 +28,20 @@ interface FormState {
   phone: string;
 }
 
+type ErrorKey = keyof FormState;
+
+const FIELD_ORDER: FieldOrderEntry<ErrorKey>[] = [
+  { key: "fullName", id: "add-candidate-full-name" },
+  { key: "email", id: "add-candidate-email" },
+  { key: "phone", id: "add-candidate-phone" },
+];
+
 const EMPTY_FORM: FormState = { fullName: "", email: "", phone: "" };
 
 export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDialogProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const { errors: localErrors, setErrors: setLocalErrors } = useFormErrors<ErrorKey>();
 
   const addCandidate = useMutation<AddCandidateCommand, CandidateCardDto>(
     `/api/recruitments/${encodeURIComponent(recruitmentId)}/candidates`,
@@ -42,20 +51,20 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
   function handleOpenChange(next: boolean) {
     if (next) {
       setForm(EMPTY_FORM);
-      setLocalErrors({});
+      setLocalErrors({}, FIELD_ORDER);
     }
     setOpen(next);
   }
 
-  function fieldErrorFor(field: keyof FormState): string | undefined {
+  function fieldErrorFor(field: ErrorKey): string | undefined {
     return localErrors[field] ?? addCandidate.fieldErrors?.[field];
   }
 
   function validate(): boolean {
-    const errors: Record<string, string> = {};
+    const errors: Partial<Record<ErrorKey, string>> = {};
     if (!form.fullName.trim()) errors.fullName = "Full name is required";
     if (!form.email.trim()) errors.email = "Email is required";
-    setLocalErrors(errors);
+    setLocalErrors(errors, FIELD_ORDER);
     return Object.keys(errors).length === 0;
   }
 
@@ -103,6 +112,7 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
             }}
             error={fieldErrorFor("fullName")}
             icon={<User className="size-4" />}
+            required
           />
           <FormField
             id="add-candidate-email"
@@ -114,6 +124,7 @@ export function AddCandidateDialog({ recruitmentId, onChanged }: AddCandidateDia
             }}
             error={fieldErrorFor("email")}
             icon={<Mail className="size-4" />}
+            required
           />
           <FormField
             id="add-candidate-phone"

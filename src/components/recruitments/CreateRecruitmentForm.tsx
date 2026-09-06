@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
 import {
@@ -19,13 +20,16 @@ import {
 const inputBase =
   "w-full rounded-lg bg-input/30 border px-3 py-2 pl-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-colors";
 
-interface FormErrors {
-  title?: string;
-  department?: string;
-  location?: string;
-  openedAt?: string;
-  groupIds?: string;
-}
+type ErrorKey = "title" | "department" | "location" | "openedAt" | "groupIds";
+type FormErrors = Partial<Record<ErrorKey, string>>;
+
+const FIELD_ORDER: FieldOrderEntry<ErrorKey>[] = [
+  { key: "title", id: "title" },
+  { key: "department", id: "department" },
+  { key: "location", id: "location" },
+  { key: "openedAt", id: "openedAt" },
+  { key: "groupIds", id: "groupIds" },
+];
 
 function validate(state: {
   title: string;
@@ -50,17 +54,13 @@ export function CreateRecruitmentForm() {
   const [employmentType, setEmploymentType] = useState<EmploymentType>(employmentTypeSchema.options[0]);
   const [openedAt, setOpenedAt] = useState("");
   const [groupIds, setGroupIds] = useState<number[]>([]);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const { errors, setErrors, clearError } = useFormErrors<ErrorKey>();
 
   const groupsResource = useApiResource<SecurityGroupDto[]>("/api/security-groups");
   const { mutate, status, error } = useMutation<CreateRecruitmentCommand, RecruitmentListItemDto>(
     "/api/recruitments",
     "POST",
   );
-
-  function clearError(field: keyof FormErrors) {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
-  }
 
   function toggleGroup(groupId: number) {
     setGroupIds((prev) => (prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]));
@@ -70,7 +70,7 @@ export function CreateRecruitmentForm() {
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const nextErrors = validate({ title, department, location, openedAt, groupIds });
-    setErrors(nextErrors);
+    setErrors(nextErrors, FIELD_ORDER);
     if (Object.keys(nextErrors).length > 0) return;
 
     try {
@@ -97,6 +97,7 @@ export function CreateRecruitmentForm() {
         placeholder="e.g. Backend Engineer"
         error={errors.title}
         icon={<Briefcase className="size-4" />}
+        required
       />
 
       <FormField
@@ -110,6 +111,7 @@ export function CreateRecruitmentForm() {
         placeholder="e.g. Engineering"
         error={errors.department}
         icon={<Building2 className="size-4" />}
+        required
       />
 
       <FormField
@@ -123,6 +125,7 @@ export function CreateRecruitmentForm() {
         placeholder="e.g. Remote"
         error={errors.location}
         icon={<MapPin className="size-4" />}
+        required
       />
 
       <div>
@@ -156,6 +159,7 @@ export function CreateRecruitmentForm() {
         }}
         error={errors.openedAt}
         icon={<Calendar className="size-4" />}
+        required
       />
 
       <div>

@@ -39,8 +39,8 @@ describe("AddCandidateDialog", () => {
     render(<AddCandidateDialog recruitmentId="1" onChanged={onChanged} />);
     await openDialog(user);
 
-    await user.type(screen.getByLabelText("Full name"), "Ada Lovelace");
-    await user.type(screen.getByLabelText("Email"), "ada@example.com");
+    await user.type(screen.getByLabelText("Full name", { exact: false }), "Ada Lovelace");
+    await user.type(screen.getByLabelText("Email", { exact: false }), "ada@example.com");
     await user.type(screen.getByLabelText("Phone (optional)"), "+48 600 100 100");
     await user.click(screen.getByRole("button", { name: /^add candidate$/i }));
 
@@ -66,8 +66,8 @@ describe("AddCandidateDialog", () => {
     render(<AddCandidateDialog recruitmentId="1" onChanged={() => undefined} />);
     await openDialog(user);
 
-    await user.type(screen.getByLabelText("Full name"), "Ada Lovelace");
-    await user.type(screen.getByLabelText("Email"), "ada@example.com");
+    await user.type(screen.getByLabelText("Full name", { exact: false }), "Ada Lovelace");
+    await user.type(screen.getByLabelText("Email", { exact: false }), "ada@example.com");
     await user.click(screen.getByRole("button", { name: /^add candidate$/i }));
 
     await waitFor(() => {
@@ -101,14 +101,14 @@ describe("AddCandidateDialog", () => {
     render(<AddCandidateDialog recruitmentId="1" onChanged={() => undefined} />);
     await openDialog(user);
 
-    await user.type(screen.getByLabelText("Full name"), "Ada Lovelace");
-    await user.type(screen.getByLabelText("Email"), "ada@example.com");
+    await user.type(screen.getByLabelText("Full name", { exact: false }), "Ada Lovelace");
+    await user.type(screen.getByLabelText("Email", { exact: false }), "ada@example.com");
     await user.click(screen.getByRole("button", { name: /^add candidate$/i }));
 
     expect(
       await screen.findByText('A candidate with email ada@example.com already exists as "Ada Byron"'),
     ).toBeInTheDocument();
-    const nameInput = screen.getByLabelText("Full name");
+    const nameInput = screen.getByLabelText("Full name", { exact: false });
     expect(nameInput.closest("div")?.parentElement).toHaveTextContent("already exists as");
   });
 
@@ -127,8 +127,8 @@ describe("AddCandidateDialog", () => {
     render(<AddCandidateDialog recruitmentId="1" onChanged={() => undefined} />);
     await openDialog(user);
 
-    await user.type(screen.getByLabelText("Full name"), "Ada Lovelace");
-    await user.type(screen.getByLabelText("Email"), "ada@example.com");
+    await user.type(screen.getByLabelText("Full name", { exact: false }), "Ada Lovelace");
+    await user.type(screen.getByLabelText("Email", { exact: false }), "ada@example.com");
     await user.click(screen.getByRole("button", { name: /^add candidate$/i }));
 
     expect(await screen.findByText("You are not allowed to perform this action")).toBeInTheDocument();
