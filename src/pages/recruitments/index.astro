@@ -27,7 +27,7 @@ const initialStatus = Astro.url.searchParams.get("status") ?? undefined;
       {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
     </Fragment>
     <Fragment slot="page-title">
-      <h1 class="text-foreground text-3xl font-bold">Recruitments</h1>
+      <h1 class="text-foreground font-serif text-4xl font-bold">Recruitments</h1>
     </Fragment>
     <Fragment slot="page-actions">
       <a

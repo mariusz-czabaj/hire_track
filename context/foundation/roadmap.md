@@ -58,7 +58,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | in-progress |
 | S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | in-progress |
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | in-progress |
-| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new         |
+| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | in-progress |
 | S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new         |
 | S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new         |
 
@@ -166,7 +166,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Niskie ryzyko techniczne, wysokie ryzyko regresji testowej — to ekrany z największą liczbą asercji tekstowych w E2E, a kotwice `data-testid="candidate-list"` i stany puste (`No recruitments match this filter.`, `No recruitments are visible to you.`) muszą przetrwać co do znaku, jeśli nie zmieniamy ich świadomie. Dwie rzeczy do zachowania mimo restylingu: świadoma decyzja z S-06 o "cap-plus-hint" zamiast paginacji (nie wolno dorobić pagera) oraz duplikacja logiki filtrów w dwóch miejscach, którą ten wycinek ma skonsolidować w jeden komponent, a nie powielić po raz trzeci.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-13: Formularze, komunikaty błędów i potwierdzenia akcji
 

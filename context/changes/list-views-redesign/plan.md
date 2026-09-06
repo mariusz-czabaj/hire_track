@@ -312,30 +312,30 @@ Not applicable — no data model or schema changes.
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run build`
-- [x] 1.2 Linting passes: `npm run lint`
-- [x] 1.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts`
+- [x] 1.1 Type checking passes: `npm run build` — 06fb129
+- [x] 1.2 Linting passes: `npm run lint` — 06fb129
+- [x] 1.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts` — 06fb129
 
 #### Manual
 
-- [ ] 1.4 Recruitment list filter pills render identically to before (visual no-op at this phase)
-- [ ] 1.5 Kanban status-mutate buttons render identically to before (visual no-op at this phase)
+- [x] 1.4 Recruitment list filter pills render identically to before (visual no-op at this phase) — 06fb129
+- [x] 1.5 Kanban status-mutate buttons render identically to before (visual no-op at this phase) — 06fb129
 
 ### Phase 2: Recruitment List Redesign
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run build`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts`
+- [x] 2.1 Type checking passes: `npm run build`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Existing recruitment E2E spec passes unchanged: `npx playwright test tests/e2e/recruitments.spec.ts`
 
 #### Manual
 
-- [ ] 2.4 Recruitment list renders shadow-based cards with accent bar in both light and dark mode
-- [ ] 2.5 Page title renders in serif font at ~40px
-- [ ] 2.6 Recruitment list rows stack vertically below 768px viewport width and remain readable/usable
-- [ ] 2.7 Status filter pills still filter correctly and sync `?status=` in the URL
-- [ ] 2.8 Both empty-state strings still render correctly for their respective conditions
+- [x] 2.4 Recruitment list renders shadow-based cards with accent bar in both light and dark mode
+- [x] 2.5 Page title renders in serif font at ~40px
+- [x] 2.6 Recruitment list rows stack vertically below 768px viewport width and remain readable/usable
+- [x] 2.7 Status filter pills still filter correctly and sync `?status=` in the URL
+- [x] 2.8 Both empty-state strings still render correctly for their respective conditions
 
 ### Phase 3: Candidate List Redesign
 
