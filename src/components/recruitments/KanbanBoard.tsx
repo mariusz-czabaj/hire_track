@@ -137,7 +137,6 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-foreground text-2xl font-bold">{recruitment.title}</h1>
         <Badge variant={STATUS_PRESENTATION[recruitment.status].variant}>
           {STATUS_PRESENTATION[recruitment.status].label}
         </Badge>

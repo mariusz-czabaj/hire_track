@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
+import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
 import {
   employmentTypeSchema,
   type CreateRecruitmentCommand,
@@ -16,13 +17,6 @@ import {
 
 const inputBase =
   "w-full rounded-lg bg-input/30 border px-3 py-2 pl-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-colors";
-
-const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  contract: "Contract",
-  internship: "Internship",
-};
 
 interface FormErrors {
   title?: string;

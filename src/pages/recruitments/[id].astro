@@ -7,11 +7,31 @@ import { UserMenu } from "@/components/UserMenu";
 import { SidebarToggle } from "@/components/SidebarToggle";
 import { MobileNav } from "@/components/MobileNav";
 import { KanbanBoard } from "@/components/recruitments/KanbanBoard";
+import { createClient } from "@/lib/supabase";
+import { getRecruitmentDetail } from "@/lib/services/recruitments";
+import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
+import type { RecruitmentDetailDto } from "@/types";
 
 const { id } = Astro.params;
+
+const recruitmentId = Number(id);
+const supabase = Number.isInteger(recruitmentId) ? createClient(Astro.request.headers, Astro.cookies) : null;
+const recruitment: RecruitmentDetailDto | null = supabase ? await getRecruitmentDetail(supabase, recruitmentId) : null;
+
+const metadataEntries = recruitment
+  ? [
+      { label: "Department", value: recruitment.department },
+      { label: "Location", value: recruitment.location },
+      {
+        label: "Employment type",
+        value: recruitment.employmentType ? EMPLOYMENT_TYPE_LABELS[recruitment.employmentType] : null,
+      },
+      { label: "Opened", value: recruitment.openedAt },
+    ].filter((entry): entry is { label: string; value: string } => entry.value !== null)
+  : [];
 ---
 
-<Layout title="Recruitment board">
+<Layout title={recruitment ? recruitment.title : "Recruitment board"}>
   <AppShell containerWidth="wide">
     <Fragment slot="nav">
       <Sidebar />
@@ -26,6 +46,33 @@ const { id } = Astro.params;
       <ThemeToggle theme={Astro.locals.theme} client:load />
       {Astro.locals.user && <UserMenu email={Astro.locals.user.email ?? ""} client:load />}
     </Fragment>
-    <KanbanBoard recruitmentId={id} client:load />
+    {
+      recruitment && (
+        <Fragment slot="page-title">
+          <h1 class="text-foreground text-2xl font-bold">{recruitment.title}</h1>
+          {metadataEntries.length > 0 && (
+            <div class="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              {metadataEntries.map((entry) => (
+                <span>
+                  <span class="font-medium">{entry.label}:</span> {entry.value}
+                </span>
+              ))}
+            </div>
+          )}
+        </Fragment>
+      )
+    }
+    {
+      recruitment ? (
+        <KanbanBoard recruitmentId={id} client:load />
+      ) : (
+        <div class="border-border bg-muted text-muted-foreground rounded-xl border px-4 py-10 text-center">
+          <p class="mb-4">This recruitment could not be found.</p>
+          <a href="/recruitments" class="text-primary text-sm hover:underline">
+            &larr; Back to recruitments
+          </a>
+        </div>
+      )
+    }
   </AppShell>
 </Layout>

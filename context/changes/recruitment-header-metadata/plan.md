@@ -371,18 +371,18 @@ the omit-empty rule.
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `npm run lint`
-- [x] 1.2 Unit tests pass: `npx vitest run src/lib/services/recruitments.test.ts`
-- [x] 1.3 Build succeeds: `npm run build`
+- [x] 1.1 Type checking passes: `npm run lint` — d47cb72
+- [x] 1.2 Unit tests pass: `npx vitest run src/lib/services/recruitments.test.ts` — d47cb72
+- [x] 1.3 Build succeeds: `npm run build` — d47cb72
 
 ### Phase 2: Server-rendered header
 
 #### Automated
 
-- [ ] 2.1 Type checking and linting pass: `npm run lint`
-- [ ] 2.2 Existing unit tests still pass: `npx vitest run`
-- [ ] 2.3 Build succeeds: `npm run build`
-- [ ] 2.4 Existing E2E suite still passes: `npx playwright test tests/e2e/recruitments.spec.ts`
+- [x] 2.1 Type checking and linting pass: `npm run lint`
+- [x] 2.2 Existing unit tests still pass: `npx vitest run`
+- [x] 2.3 Build succeeds: `npm run build`
+- [x] 2.4 Existing E2E suite still passes: `npx playwright test tests/e2e/recruitments.spec.ts`
 
 #### Manual
 
