@@ -80,6 +80,16 @@ export interface RecruitmentListItemDto {
   candidateCount: number;
 }
 
+export interface RecruitmentDetailDto {
+  id: number;
+  title: string;
+  status: RecruitmentStatus;
+  department: string | null;
+  location: string | null;
+  employmentType: EmploymentType | null;
+  openedAt: string | null;
+}
+
 export interface KanbanStageDto {
   id: number;
   name: string;

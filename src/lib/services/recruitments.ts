@@ -1,11 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/db/database.types";
 import {
+  employmentTypeSchema,
   recruitmentStatusSchema,
   type CandidateCardDto,
   type CreateRecruitmentCommand,
+  type EmploymentType,
   type KanbanBoardDto,
   type KanbanStageDto,
+  type RecruitmentDetailDto,
   type RecruitmentListItemDto,
   type RecruitmentStagesDto,
   type RecruitmentStatus,
@@ -35,6 +38,14 @@ interface RecruitmentListRow {
 function toRecruitmentStatus(status: string): RecruitmentStatus {
   const parsed = recruitmentStatusSchema.safeParse(status);
   return parsed.success ? parsed.data : "draft";
+}
+
+function toEmploymentType(employmentType: string | null): EmploymentType | null {
+  if (employmentType === null) {
+    return null;
+  }
+  const parsed = employmentTypeSchema.safeParse(employmentType);
+  return parsed.success ? parsed.data : null;
 }
 
 export async function listRecruitments(
@@ -182,6 +193,35 @@ export async function getRecruitmentStages(
   return {
     stagesSource,
     stages: stages.map((stage) => ({ id: stage.id, name: stage.name, sortOrder: stage.sort_order })),
+  };
+}
+
+export async function getRecruitmentDetail(
+  client: Client,
+  recruitmentId: number,
+): Promise<RecruitmentDetailDto | null> {
+  const { data: recruitment, error } = await client
+    .from("recruitments")
+    .select("id, title, status, department, location, employment_type, opened_at")
+    .eq("id", recruitmentId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!recruitment) {
+    return null;
+  }
+
+  return {
+    id: recruitment.id,
+    title: recruitment.title,
+    status: toRecruitmentStatus(recruitment.status),
+    department: recruitment.department,
+    location: recruitment.location,
+    employmentType: toEmploymentType(recruitment.employment_type),
+    openedAt: recruitment.opened_at,
   };
 }
 

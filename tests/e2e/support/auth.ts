@@ -23,14 +23,16 @@ export async function signInAs(page: Page, user: SeededUserKey): Promise<void> {
 
   // The sign-in form is a client:load island; if it fills in before hydration
   // attaches React's onChange, the controlled input resets to empty once
-  // hydration completes. Retry the fill until the value actually sticks.
+  // hydration completes. Retry the fill until the value actually sticks, and
+  // keep the click inside the same retry so a reset landing between the
+  // check and the click is caught by the next attempt rather than
+  // submitting an emptied form.
   await expect(async () => {
     await emailInput.fill(email);
     await passwordInput.fill(PASSWORD);
     await expect(emailInput).toHaveValue(email);
     await expect(passwordInput).toHaveValue(PASSWORD);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL("/recruitments", { timeout: 5_000 });
   }).toPass({ timeout: 10_000 });
-
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL("/recruitments");
 }

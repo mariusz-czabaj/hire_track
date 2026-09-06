@@ -1,7 +1,7 @@
 ---
 change_id: app-shell-navigation
 title: Application navigation and removal of the starter surface
-status: implemented
+status: impl_reviewed
 created: 2026-09-05
 updated: 2026-09-06
 archived_at: null

@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 2
 status: draft
 created: 2026-08-27
-updated: 2026-09-05
+updated: 2026-09-06
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -55,7 +55,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | ----------- |
 | F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
 | S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | in-progress |
-| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | new         |
+| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | in-progress |
 | S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | new         |
 | S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new         |
 | S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new         |
@@ -128,7 +128,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Jedyny wycinek redesignu sięgający do backendu: `KanbanBoardDto.recruitment` niesie dziś tylko `id`, `title` i `status`, więc `/api/recruitments/[id]/board` trzeba rozszerzyć o `location`, `department`, `employmentType` i `openedAt` (pola istnieją w bazie i w `RecruitmentDto` — zmiana jest addytywna, ale wymaga testu integracyjnego). Drugie ryzyko to przeniesienie zmiany statusu do menu "…" — dziś to widoczny wprost zestaw pigułek z kotwicą `data-testid="status-control"`, którą trzeba przenieść dosłownie, a testy E2E dopisać o krok otwarcia menu. Wymaga instalacji prymitywu `dropdown-menu`.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-10: Kanban w nowym języku wizualnym
 

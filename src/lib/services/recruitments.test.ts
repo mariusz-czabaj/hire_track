@@ -4,6 +4,7 @@ import type { Database } from "@/db/database.types";
 import {
   createRecruitment,
   getKanbanBoard,
+  getRecruitmentDetail,
   listRecruitments,
   updateRecruitmentStatus,
 } from "@/lib/services/recruitments";
@@ -78,6 +79,16 @@ interface RecruitmentRow {
   id: number;
   title: string;
   status: string;
+}
+
+interface RecruitmentDetailRow {
+  id: number;
+  title: string;
+  status: string;
+  department: string | null;
+  location: string | null;
+  employment_type: string | null;
+  opened_at: string | null;
 }
 
 interface StageRow {
@@ -205,6 +216,12 @@ function makeUpdateStatusClient(result: QueryResult<{ id: number; status: string
   } as unknown as Client;
 }
 
+function makeDetailClient(result: QueryResult<RecruitmentDetailRow>): Client {
+  return {
+    from: () => new FakeQueryBuilder<RecruitmentDetailRow>(result),
+  } as unknown as Client;
+}
+
 describe("createRecruitment", () => {
   it("maps the RPC's returned row into a DTO with candidateCount 0", async () => {
     const client = makeCreateClient({
@@ -315,6 +332,128 @@ describe("listRecruitments", () => {
   it("propagates a Supabase error as a throw", async () => {
     const client = makeListClient([], { message: "boom" });
     await expect(listRecruitments(client)).rejects.toEqual({ message: "boom" });
+  });
+});
+
+describe("getRecruitmentDetail", () => {
+  it("maps a fully-populated row into a DTO", async () => {
+    const client = makeDetailClient({
+      data: {
+        id: 1,
+        title: "Backend Engineer",
+        status: "live",
+        department: "Engineering",
+        location: "Remote",
+        employment_type: "full-time",
+        opened_at: "2026-01-01",
+      },
+      error: null,
+    });
+
+    const dto = await getRecruitmentDetail(client, 1);
+
+    expect(dto).toEqual({
+      id: 1,
+      title: "Backend Engineer",
+      status: "live",
+      department: "Engineering",
+      location: "Remote",
+      employmentType: "full-time",
+      openedAt: "2026-01-01",
+    });
+  });
+
+  it("passes through a mix of populated and null fields", async () => {
+    const client = makeDetailClient({
+      data: {
+        id: 1,
+        title: "Backend Engineer",
+        status: "live",
+        department: "Engineering",
+        location: null,
+        employment_type: null,
+        opened_at: "2026-01-01",
+      },
+      error: null,
+    });
+
+    const dto = await getRecruitmentDetail(client, 1);
+
+    expect(dto).toEqual({
+      id: 1,
+      title: "Backend Engineer",
+      status: "live",
+      department: "Engineering",
+      location: null,
+      employmentType: null,
+      openedAt: "2026-01-01",
+    });
+  });
+
+  it("returns all four metadata fields as null when the row carries no metadata", async () => {
+    const client = makeDetailClient({
+      data: {
+        id: 1,
+        title: "Backend Engineer",
+        status: "live",
+        department: null,
+        location: null,
+        employment_type: null,
+        opened_at: null,
+      },
+      error: null,
+    });
+
+    const dto = await getRecruitmentDetail(client, 1);
+
+    expect(dto).toEqual({
+      id: 1,
+      title: "Backend Engineer",
+      status: "live",
+      department: null,
+      location: null,
+      employmentType: null,
+      openedAt: null,
+    });
+  });
+
+  it("returns null when the recruitment is not visible or does not exist", async () => {
+    const client = makeDetailClient({ data: null, error: null });
+    const dto = await getRecruitmentDetail(client, 999999);
+    expect(dto).toBeNull();
+  });
+
+  it("propagates a Supabase error as a throw", async () => {
+    const client = makeDetailClient({ data: null, error: { message: "boom" } });
+    await expect(getRecruitmentDetail(client, 1)).rejects.toEqual({ message: "boom" });
+  });
+
+  it("maps an unrecognized employment_type value to null without affecting other fields", async () => {
+    const client = makeDetailClient({
+      data: {
+        id: 1,
+        title: "Backend Engineer",
+        status: "live",
+        department: "Engineering",
+        location: "Remote",
+        employment_type: "freelance-gig",
+        opened_at: "2026-01-01",
+      },
+      error: null,
+    });
+
+    const dto = await getRecruitmentDetail(client, 1);
+
+    expect(dto?.employmentType).toBeNull();
+    expect(dto).toEqual({
+      id: 1,
+      title: "Backend Engineer",
+      status: "live",
+      department: "Engineering",
+      location: "Remote",
+      employmentType: null,
+      openedAt: "2026-01-01",
+    });
   });
 });
 
