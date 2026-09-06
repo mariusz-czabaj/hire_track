@@ -8,6 +8,7 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  type Announcements,
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
@@ -202,6 +203,40 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   );
   const activeCard = activeId !== null ? overlayCardById.get(activeId) : undefined;
 
+  const candidateNameById = new Map(
+    stages.flatMap((stage) =>
+      stage.candidates.map((candidate) => [candidate.candidateRecruitmentId, candidate.fullName]),
+    ),
+  );
+  const stageNameById = new Map(stages.map((stage) => [stage.id, stage.name]));
+
+  const announcements: Announcements = {
+    onDragStart({ active }) {
+      const name = candidateNameById.get(active.id as number);
+      return name
+        ? `Picked up candidate ${name}. Use arrow keys to move between columns, space or enter to drop.`
+        : undefined;
+    },
+    onDragOver({ active, over }) {
+      const name = candidateNameById.get(active.id as number);
+      const stageName = over ? stageNameById.get(over.id as number) : undefined;
+      return name && stageName ? `Candidate ${name} is over the ${stageName} column.` : undefined;
+    },
+    onDragEnd({ active, over }) {
+      const name = candidateNameById.get(active.id as number);
+      const stageName = over ? stageNameById.get(over.id as number) : undefined;
+      return name && stageName
+        ? `Candidate ${name} was dropped on the ${stageName} column.`
+        : name
+          ? `Candidate ${name} was dropped outside any column.`
+          : undefined;
+    },
+    onDragCancel({ active }) {
+      const name = candidateNameById.get(active.id as number);
+      return name ? `Moving candidate ${name} was cancelled.` : undefined;
+    },
+  };
+
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as number);
   }
@@ -227,7 +262,12 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
         <AddCandidateDialog recruitmentId={String(recruitment.id)} onChanged={handleChanged} />
       </div>
 
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        accessibility={{ announcements }}
+      >
         <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
           {stages.map((stage) => {
             const stageClasses = stageClassesForSortOrder(stage.sortOrder);

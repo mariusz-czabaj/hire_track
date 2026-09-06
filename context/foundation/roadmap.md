@@ -57,7 +57,7 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 | S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | in-progress |
 | S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | in-progress |
 | S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | in-progress |
-| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | new         |
+| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | in-progress |
 | S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | new         |
 | S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | new         |
 | S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | new         |
@@ -154,7 +154,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Unknowns:**
   - Czy po nieudanym zapisie karta wraca na miejsce z komunikatem, czy zostaje w stanie optymistycznym do ponowienia. — Owner: team. Block: nie (rozstrzygane na poziomie `/10x-plan`).
 - **Risk:** Jedyny wycinek M-2 wprowadzający nową funkcjonalność, a nie zmieniający wygląd — i jedyny dotykający reguły biznesowej z PRD (FR-013). Przeciąganie **nie może** stać się drogą na skróty omijającą notatkę: upuszczenie jest wyłącznie skrótem do otwarcia istniejącego `MoveCandidateDialog`, nigdy samodzielnym zapisem. Wymaga biblioteki DnD z obsługą klawiatury (przeciąganie samą myszą wykluczyłoby część użytkowników i złamałoby kryterium MS-09) oraz zachowania dotychczasowej ścieżki przez przycisk na karcie jako równorzędnej, nie zapasowej. Kotwica `data-testid="move-candidate-dialog"` i istniejące testy E2E ruchu kandydata muszą przejść bez zmian w warstwie asercji.
-- **Status:** new
+- **Status:** in-progress
 
 ### S-12: Widoki listowe w nowym języku wizualnym
 

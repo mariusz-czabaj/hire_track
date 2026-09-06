@@ -254,28 +254,28 @@ None — no data model or persisted-state changes.
 
 #### Automated
 
-- [x] 1.1 `npm run build` succeeds
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 Existing `KanbanBoard.test.tsx` contract tests still pass unchanged
+- [x] 1.1 `npm run build` succeeds — 3b7dd5e
+- [x] 1.2 `npm run lint` passes — 3b7dd5e
+- [x] 1.3 Existing `KanbanBoard.test.tsx` contract tests still pass unchanged — 3b7dd5e
 
 #### Manual
 
-- [x] 1.4 A card can be picked up with the mouse and dropped without a console error
-- [x] 1.5 Keyboard pickup/move/drop works via Tab, Space, Arrow keys, Space
-- [x] 1.6 The per-card Move button remains independently clickable while a card is draggable
+- [x] 1.4 A card can be picked up with the mouse and dropped without a console error — 3b7dd5e
+- [x] 1.5 Keyboard pickup/move/drop works via Tab, Space, Arrow keys, Space — 3b7dd5e
+- [x] 1.6 The per-card Move button remains independently clickable while a card is draggable — 3b7dd5e
 
 ### Phase 2: Drag visuals
 
 #### Automated
 
-- [ ] 2.1 `npm run build` succeeds
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run build` succeeds
+- [x] 2.2 `npm run lint` passes
 
 #### Manual
 
-- [ ] 2.3 Dragging shows a floating overlay copy and the hovered column highlights
-- [ ] 2.4 Highlight has sufficient contrast in both light and dark themes
-- [ ] 2.5 Screen reader announces pickup/move/drop guidance
+- [x] 2.3 Dragging shows a floating overlay copy and the hovered column highlights
+- [x] 2.4 Highlight has sufficient contrast in both light and dark themes
+- [x] 2.5 Screen reader announces pickup/move/drop guidance
 
 ### Phase 3: Dialog integration
 
