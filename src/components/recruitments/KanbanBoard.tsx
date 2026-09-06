@@ -1,4 +1,16 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import { useApiResource } from "@/components/hooks/useApiResource";
 import { useMutation } from "@/components/hooks/useMutation";
 import { ServerError } from "@/components/auth/ServerError";
@@ -49,6 +61,40 @@ function NotFoundState() {
       <a href="/recruitments" className="text-primary text-sm hover:underline">
         &larr; Back to recruitments
       </a>
+    </div>
+  );
+}
+
+function DroppableColumn({
+  stageId,
+  children,
+  className,
+  ...divProps
+}: { stageId: number; children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+  const { setNodeRef, isOver } = useDroppable({ id: stageId });
+  return (
+    <div ref={setNodeRef} className={cn(className, isOver && "ring-ring rounded-lg ring-2")} {...divProps}>
+      {children}
+    </div>
+  );
+}
+
+function DraggableCard({
+  candidateRecruitmentId,
+  fromStageId,
+  children,
+}: {
+  candidateRecruitmentId: number;
+  fromStageId: number;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: candidateRecruitmentId,
+    data: { fromStageId },
+  });
+  return (
+    <div ref={setNodeRef} {...listeners} {...attributes} className={cn(isDragging ? "cursor-move" : "cursor-grab")}>
+      {children}
     </div>
   );
 }
@@ -112,6 +158,11 @@ function StatusControl({
 export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
   const url = useMemo(() => `/api/recruitments/${encodeURIComponent(recruitmentId ?? "")}/board`, [recruitmentId]);
   const resource = useApiResource<KanbanBoardDto>(url);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor),
+  );
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   if (resource.status === "loading") {
     return <SkeletonColumns />;
@@ -137,6 +188,29 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
       .map((candidate, index) => [candidate.candidateRecruitmentId, index + 1]),
   );
 
+  const overlayCardById = new Map(
+    stages.flatMap((stage) =>
+      stage.candidates.map((candidate) => [
+        candidate.candidateRecruitmentId,
+        {
+          fullName: candidate.fullName,
+          addedAt: candidate.addedAt,
+          stageClasses: stageClassesForSortOrder(stage.sortOrder),
+        },
+      ]),
+    ),
+  );
+  const activeCard = activeId !== null ? overlayCardById.get(activeId) : undefined;
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as number);
+  }
+
+  function handleDragEnd(_event: DragEndEvent) {
+    // Wired up in Phase 3 (dialog integration); no-op for now.
+    setActiveId(null);
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -153,59 +227,90 @@ export function KanbanBoard({ recruitmentId }: KanbanBoardProps) {
         <AddCandidateDialog recruitmentId={String(recruitment.id)} onChanged={handleChanged} />
       </div>
 
-      <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
-        {stages.map((stage) => {
-          const stageClasses = stageClassesForSortOrder(stage.sortOrder);
-          const headingId = `stage-heading-${stage.id}`;
-          return (
-            <div key={stage.id} className="min-w-48 flex-1 shrink-0" role="region" aria-labelledby={headingId}>
-              <div
-                className={cn(
-                  "mb-3 flex items-center justify-between gap-2 rounded-full px-3 py-1.5",
-                  stageClasses.background,
-                  stageClasses.foreground,
-                )}
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <div data-testid="kanban-columns" className="flex gap-4 overflow-x-auto pb-2">
+          {stages.map((stage) => {
+            const stageClasses = stageClassesForSortOrder(stage.sortOrder);
+            const headingId = `stage-heading-${stage.id}`;
+            return (
+              <DroppableColumn
+                key={stage.id}
+                stageId={stage.id}
+                className="min-w-48 flex-1 shrink-0"
+                role="region"
+                aria-labelledby={headingId}
               >
-                <h2 id={headingId} className="truncate text-xs font-bold tracking-wide uppercase">
-                  {stage.name}
-                </h2>
-                <span className="text-xs font-bold">{stage.candidateCount}</span>
+                <div
+                  className={cn(
+                    "mb-3 flex items-center justify-between gap-2 rounded-full px-3 py-1.5",
+                    stageClasses.background,
+                    stageClasses.foreground,
+                  )}
+                >
+                  <h2 id={headingId} className="truncate text-xs font-bold tracking-wide uppercase">
+                    {stage.name}
+                  </h2>
+                  <span className="text-xs font-bold">{stage.candidateCount}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {stage.candidates.length === 0 && (
+                    <p className="border-border text-muted-foreground rounded-lg border border-dashed px-2 py-4 text-center text-xs">
+                      No candidates
+                    </p>
+                  )}
+                  {stage.candidates.map((candidate) => (
+                    <DraggableCard
+                      key={candidate.id}
+                      candidateRecruitmentId={candidate.candidateRecruitmentId}
+                      fromStageId={stage.id}
+                    >
+                      <Card className="relative gap-1 overflow-hidden border-0 p-3 pl-4 shadow-md">
+                        <div
+                          className={cn("absolute inset-y-0 left-0 w-1.5", stageClasses.background)}
+                          aria-hidden="true"
+                        />
+                        <div className="flex items-start justify-between gap-2">
+                          <a
+                            href={`/recruitments/${recruitment.id}/candidates/${candidate.candidateRecruitmentId}`}
+                            className="text-sm font-bold hover:underline"
+                            draggable={false}
+                          >
+                            {candidate.fullName}
+                          </a>
+                          <MoveCandidateDialog
+                            recruitmentId={String(recruitment.id)}
+                            candidateRecruitmentId={candidate.candidateRecruitmentId}
+                            triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
+                            stages={stages}
+                            onChanged={handleChanged}
+                          />
+                        </div>
+                        <p className="text-muted-foreground text-right text-xs">
+                          Added {formatDate(candidate.addedAt)}
+                        </p>
+                      </Card>
+                    </DraggableCard>
+                  ))}
+                </div>
+              </DroppableColumn>
+            );
+          })}
+        </div>
+        <DragOverlay>
+          {activeCard && (
+            <Card className="relative gap-1 overflow-hidden border-0 p-3 pl-4 shadow-lg">
+              <div
+                className={cn("absolute inset-y-0 left-0 w-1.5", activeCard.stageClasses.background)}
+                aria-hidden="true"
+              />
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-bold">{activeCard.fullName}</span>
               </div>
-              <div className="flex flex-col gap-2">
-                {stage.candidates.length === 0 && (
-                  <p className="border-border text-muted-foreground rounded-lg border border-dashed px-2 py-4 text-center text-xs">
-                    No candidates
-                  </p>
-                )}
-                {stage.candidates.map((candidate) => (
-                  <Card key={candidate.id} className="relative gap-1 overflow-hidden border-0 p-3 pl-4 shadow-md">
-                    <div
-                      className={cn("absolute inset-y-0 left-0 w-1.5", stageClasses.background)}
-                      aria-hidden="true"
-                    />
-                    <div className="flex items-start justify-between gap-2">
-                      <a
-                        href={`/recruitments/${recruitment.id}/candidates/${candidate.candidateRecruitmentId}`}
-                        className="text-sm font-bold hover:underline"
-                      >
-                        {candidate.fullName}
-                      </a>
-                      <MoveCandidateDialog
-                        recruitmentId={String(recruitment.id)}
-                        candidateRecruitmentId={candidate.candidateRecruitmentId}
-                        triggerLabel={`Move candidate ${cardIndexById.get(candidate.candidateRecruitmentId)}: ${candidate.fullName}`}
-                        stages={stages}
-                        onChanged={handleChanged}
-                      />
-                    </div>
-                    <p className="text-muted-foreground text-right text-xs">Added {formatDate(candidate.addedAt)}</p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              <p className="text-muted-foreground text-right text-xs">Added {formatDate(activeCard.addedAt)}</p>
+            </Card>
+          )}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }
