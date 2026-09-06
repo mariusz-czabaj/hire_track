@@ -379,21 +379,21 @@ the omit-empty rule.
 
 #### Automated
 
-- [x] 2.1 Type checking and linting pass: `npm run lint`
-- [x] 2.2 Existing unit tests still pass: `npx vitest run`
-- [x] 2.3 Build succeeds: `npm run build`
-- [x] 2.4 Existing E2E suite still passes: `npx playwright test tests/e2e/recruitments.spec.ts`
+- [x] 2.1 Type checking and linting pass: `npm run lint` — d3b23e6
+- [x] 2.2 Existing unit tests still pass: `npx vitest run` — d3b23e6
+- [x] 2.3 Build succeeds: `npm run build` — d3b23e6
+- [x] 2.4 Existing E2E suite still passes: `npx playwright test tests/e2e/recruitments.spec.ts` — d3b23e6
 
 #### Manual
 
-- [ ] 2.5 Board page shows title and metadata row with all four fields for a fully-populated recruitment
-- [ ] 2.6 A recruitment with some null fields shows only the populated ones, with no gaps or stray separators
-- [ ] 2.7 Page source (JS disabled) contains the title and metadata — confirming server render
-- [ ] 2.8 Browser tab shows the recruitment title
-- [ ] 2.9 Exactly one `<h1>` on the page, and the status badge appears exactly once
-- [ ] 2.10 Changing status via `StatusControl` updates the badge without a page reload and leaves the header intact
-- [ ] 2.11 An unknown recruitment id shows the not-found block and no Kanban board
-- [ ] 2.12 Header is readable in both light and dark themes, and wraps sensibly at mobile width
+- [x] 2.5 Board page shows title and metadata row with all four fields for a fully-populated recruitment
+- [x] 2.6 A recruitment with some null fields shows only the populated ones, with no gaps or stray separators
+- [x] 2.7 Page source (JS disabled) contains the title and metadata — confirming server render
+- [x] 2.8 Browser tab shows the recruitment title
+- [x] 2.9 Exactly one `<h1>` on the page, and the status badge appears exactly once
+- [x] 2.10 Changing status via `StatusControl` updates the badge without a page reload and leaves the header intact
+- [x] 2.11 An unknown recruitment id shows the not-found block and no Kanban board
+- [x] 2.12 Header is readable in both light and dark themes, and wraps sensibly at mobile width
 
 ### Phase 3: End-to-end coverage
 
