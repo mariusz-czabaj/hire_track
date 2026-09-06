@@ -91,6 +91,14 @@
   --stage-5-foreground: oklch(0.22 0.02 205);
   --stage-6: oklch(0.55 0.18 330);
   --stage-6-foreground: oklch(0.99 0 0);
+
+  /* Semantic feedback colors: success/warning/info, alongside --destructive. */
+  --success: oklch(0.45 0.14 145);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.75 0.16 70);
+  --warning-foreground: oklch(0.22 0.02 70);
+  --info: oklch(0.5 0.18 250);
+  --info-foreground: oklch(0.99 0 0);
 }
 
 /* No explicit theme choice yet: follow the system preference. */
@@ -140,6 +148,13 @@
     --stage-5-foreground: oklch(0.18 0.02 205);
     --stage-6: oklch(0.5 0.18 330);
     --stage-6-foreground: oklch(0.99 0 0);
+
+    --success: oklch(0.5 0.14 145);
+    --success-foreground: oklch(0.99 0 0);
+    --warning: oklch(0.8 0.14 70);
+    --warning-foreground: oklch(0.2 0.02 70);
+    --info: oklch(0.75 0.15 250);
+    --info-foreground: oklch(0.16 0.03 250);
   }
 }
 
@@ -189,6 +204,13 @@
   --stage-5-foreground: oklch(0.18 0.02 205);
   --stage-6: oklch(0.5 0.18 330);
   --stage-6-foreground: oklch(0.99 0 0);
+
+  --success: oklch(0.5 0.14 145);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.8 0.14 70);
+  --warning-foreground: oklch(0.2 0.02 70);
+  --info: oklch(0.75 0.15 250);
+  --info-foreground: oklch(0.16 0.03 250);
 }
 
 @theme inline {
@@ -239,6 +261,12 @@
   --color-stage-5-foreground: var(--stage-5-foreground);
   --color-stage-6: var(--stage-6);
   --color-stage-6-foreground: var(--stage-6-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "Fraunces", ui-serif, Georgia, serif;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { contrastRatio, meetsAA } from "./contrast";
+import { lightPalette, darkPalette, tokenPairs } from "./design-tokens";
 
 const WHITE = "oklch(1 0 0)";
 const BLACK = "oklch(0 0 0)";
@@ -31,5 +32,25 @@ describe("contrastRatio", () => {
     const ratio = contrastRatio("oklch(0.6 0 0)", WHITE);
     expect(ratio).toBeLessThan(4.5);
     expect(meetsAA(ratio)).toBe(false);
+  });
+});
+
+describe("semantic token pairs", () => {
+  const semanticPairs = tokenPairs.filter((pair) =>
+    ["success-foreground / success", "warning-foreground / warning", "info-foreground / info"].includes(pair.label),
+  );
+
+  it("covers all three semantic pairs", () => {
+    expect(semanticPairs).toHaveLength(3);
+  });
+
+  it.each(semanticPairs)("$label clears AA in light theme", (pair) => {
+    const ratio = contrastRatio(lightPalette[pair.foreground], lightPalette[pair.background]);
+    expect(meetsAA(ratio, pair.size)).toBe(true);
+  });
+
+  it.each(semanticPairs)("$label clears AA in dark theme", (pair) => {
+    const ratio = contrastRatio(darkPalette[pair.foreground], darkPalette[pair.background]);
+    expect(meetsAA(ratio, pair.size)).toBe(true);
   });
 });

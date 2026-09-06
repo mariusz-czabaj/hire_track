@@ -40,6 +40,12 @@ export interface TokenPalette {
   stage5Foreground: string;
   stage6: string;
   stage6Foreground: string;
+  success: string;
+  successForeground: string;
+  warning: string;
+  warningForeground: string;
+  info: string;
+  infoForeground: string;
 }
 
 export const lightPalette: TokenPalette = {
@@ -77,6 +83,12 @@ export const lightPalette: TokenPalette = {
   stage5Foreground: "oklch(0.22 0.02 205)",
   stage6: "oklch(0.55 0.18 330)",
   stage6Foreground: "oklch(0.99 0 0)",
+  success: "oklch(0.45 0.14 145)",
+  successForeground: "oklch(0.99 0 0)",
+  warning: "oklch(0.75 0.16 70)",
+  warningForeground: "oklch(0.22 0.02 70)",
+  info: "oklch(0.5 0.18 250)",
+  infoForeground: "oklch(0.99 0 0)",
 };
 
 export const darkPalette: TokenPalette = {
@@ -114,6 +126,12 @@ export const darkPalette: TokenPalette = {
   stage5Foreground: "oklch(0.18 0.02 205)",
   stage6: "oklch(0.5 0.18 330)",
   stage6Foreground: "oklch(0.99 0 0)",
+  success: "oklch(0.5 0.14 145)",
+  successForeground: "oklch(0.99 0 0)",
+  warning: "oklch(0.8 0.14 70)",
+  warningForeground: "oklch(0.2 0.02 70)",
+  info: "oklch(0.75 0.15 250)",
+  infoForeground: "oklch(0.16 0.03 250)",
 };
 
 export interface TokenPair {
@@ -162,4 +180,7 @@ export const tokenPairs: TokenPair[] = [
   { label: "stage-4-foreground / stage-4", size: "normal", foreground: "stage4Foreground", background: "stage4" },
   { label: "stage-5-foreground / stage-5", size: "normal", foreground: "stage5Foreground", background: "stage5" },
   { label: "stage-6-foreground / stage-6", size: "normal", foreground: "stage6Foreground", background: "stage6" },
+  { label: "success-foreground / success", size: "normal", foreground: "successForeground", background: "success" },
+  { label: "warning-foreground / warning", size: "normal", foreground: "warningForeground", background: "warning" },
+  { label: "info-foreground / info", size: "normal", foreground: "infoForeground", background: "info" },
 ];
