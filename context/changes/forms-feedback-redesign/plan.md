@@ -580,16 +580,16 @@ Phase 3 and must not survive into the final state.
 
 #### Automated
 
-- [x] 4.1 All unit tests pass: `npm test`
-- [x] 4.2 Full E2E suite passes: `npm run test:e2e`
-- [x] 4.3 Type checking passes: `npm run typecheck`
-- [x] 4.4 Linting passes: `npm run lint`
-- [x] 4.5 No Polish strings remain: `grep -rn "Uwaga\|Dokumentacja" src/`
+- [x] 4.1 All unit tests pass: `npm test` — 8b04ace
+- [x] 4.2 Full E2E suite passes: `npm run test:e2e` — 8b04ace
+- [x] 4.3 Type checking passes: `npm run typecheck` — 8b04ace
+- [x] 4.4 Linting passes: `npm run lint` — 8b04ace
+- [x] 4.5 No Polish strings remain: `grep -rn "Uwaga\|Dokumentacja" src/` — 8b04ace
 
 #### Manual
 
-- [x] 4.6 Create recruitment, add candidate, move candidate each show an auto-dismissing success toast
-- [x] 4.7 A toast fires correctly from a dialog that closes on success
-- [x] 4.8 Toasts are announced by a screen reader without stealing focus
-- [x] 4.9 The config banner renders in token colors in both themes
-- [x] 4.10 Toasts are legible in both light and dark themes
+- [x] 4.6 Create recruitment, add candidate, move candidate each show an auto-dismissing success toast — 8b04ace
+- [x] 4.7 A toast fires correctly from a dialog that closes on success — 8b04ace
+- [x] 4.8 Toasts are announced by a screen reader without stealing focus — 8b04ace
+- [x] 4.9 The config banner renders in token colors in both themes — 8b04ace
+- [x] 4.10 Toasts are legible in both light and dark themes — 8b04ace

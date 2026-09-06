@@ -3,7 +3,7 @@ change_id: forms-feedback-redesign
 title: Forms, error messages, and action confirmations
 roadmap_id: S-13
 milestone_id: MS-07
-status: implementing
+status: implemented
 created: 2026-09-06
 updated: 2026-09-06
 prd_refs: []
