@@ -347,26 +347,26 @@ The new length bounds apply on write only. Any existing row whose title exceeds 
 
 #### Automated
 
-- [ ] 1.1 Migration applies cleanly: `npx supabase db reset`
-- [ ] 1.2 Unit tests pass: `npm run test`
-- [ ] 1.3 Type checking and linting pass: `npm run lint`
-- [ ] 1.4 Existing create-path tests still pass unchanged: `npm run test -- recruitments`
+- [x] 1.1 Migration applies cleanly: `npx supabase db reset` — ae70277
+- [x] 1.2 Unit tests pass: `npm run test` — ae70277
+- [x] 1.3 Type checking and linting pass: `npm run lint` — ae70277
+- [x] 1.4 Existing create-path tests still pass unchanged: `npm run test -- recruitments` — ae70277
 
 #### Manual
 
-- [ ] 1.5 Creating a recruitment still works, and an over-length title is rejected with a field-level message
+- [x] 1.5 Creating a recruitment still works, and an over-length title is rejected with a field-level message — ae70277
 
 ### Phase 2: PATCH endpoint extension
 
 #### Automated
 
-- [ ] 2.1 Integration tests pass: `npm run test:integration`
-- [ ] 2.2 Type checking and linting pass: `npm run lint`
-- [ ] 2.3 Existing status-PATCH integration tests pass with no edits to their assertions
+- [x] 2.1 Integration tests pass: `npm run test:integration`
+- [x] 2.2 Type checking and linting pass: `npm run lint`
+- [x] 2.3 Existing status-PATCH integration tests pass with no edits to their assertions
 
 #### Manual
 
-- [ ] 2.4 Manual PATCH with a details body as a signed-in recruiter returns 200 and the updated detail DTO
+- [x] 2.4 Manual PATCH with a details body as a signed-in recruiter returns 200 and the updated detail DTO
 
 ### Phase 3: Header island, action menu, and edit dialog
 

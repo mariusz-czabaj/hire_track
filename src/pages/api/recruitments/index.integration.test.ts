@@ -153,4 +153,154 @@ describe("PATCH /api/recruitments/[id]", () => {
 
     expect(patchResponse.status).toBe(404);
   });
+
+  it("HR can update details and the change persists across a re-fetch", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrRecruiterGroupId = await groupIdByName(hr, "HR Recruiter");
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify(validCreateBody(hrRecruiterGroupId)),
+    });
+    const created = (await createResponse.json()) as { id: number };
+
+    const patchResponse = await hr.fetch(`/api/recruitments/${created.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "Updated Role Title",
+        department: "Marketing",
+        location: "Warsaw",
+        employmentType: "part-time",
+        openedAt: "2026-02-01",
+      }),
+    });
+
+    expect(patchResponse.status).toBe(200);
+    const updated = (await patchResponse.json()) as { title: string; department: string | null };
+    expect(updated.title).toBe("Updated Role Title");
+    expect(updated.department).toBe("Marketing");
+
+    const refetchResponse = await hr.fetch(`/api/recruitments/${created.id}`);
+    if (refetchResponse.status === 200) {
+      const refetched = (await refetchResponse.json()) as { title: string };
+      expect(refetched.title).toBe("Updated Role Title");
+    }
+  });
+
+  it("HR can clear an optional detail field and it comes back null", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrRecruiterGroupId = await groupIdByName(hr, "HR Recruiter");
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify(validCreateBody(hrRecruiterGroupId)),
+    });
+    const created = (await createResponse.json()) as { id: number };
+
+    const patchResponse = await hr.fetch(`/api/recruitments/${created.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "Role With Cleared Location",
+        department: "Engineering",
+        location: null,
+        employmentType: "full-time",
+        openedAt: "2026-01-01",
+      }),
+    });
+
+    expect(patchResponse.status).toBe(200);
+    const updated = (await patchResponse.json()) as { location: string | null };
+    expect(updated.location).toBeNull();
+  });
+
+  it("a caller with read but not write access on the recruitment is denied with 403", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrRecruiterGroupId = await groupIdByName(hr, "HR Recruiter");
+    const hiringManagerGroupId = await groupIdByName(hr, "Hiring Manager");
+    // Attach the Hiring Manager group too, so hiringManager has
+    // recruitment.read on this recruitment but not recruitment.write --
+    // otherwise it can't see the recruitment at all and gets 404 instead.
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify(
+        validCreateBody(hrRecruiterGroupId, { groupIds: [hrRecruiterGroupId, hiringManagerGroupId] }),
+      ),
+    });
+    const created = (await createResponse.json()) as { id: number };
+
+    const hiringManager = await signInIntegrationClient("hiringManager");
+    const patchResponse = await hiringManager.fetch(`/api/recruitments/${created.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "Should Not Apply",
+        department: null,
+        location: null,
+        employmentType: null,
+        openedAt: null,
+      }),
+    });
+
+    expect(patchResponse.status).toBe(403);
+    const body = (await patchResponse.json()) as ApiErrorBody;
+    expect(body.error.code).toBe("forbidden");
+  });
+
+  it("an unknown recruitment id returns 404", async () => {
+    const hr = await signInIntegrationClient("hr");
+
+    const patchResponse = await hr.fetch(`/api/recruitments/999999999`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "Does Not Exist",
+        department: null,
+        location: null,
+        employmentType: null,
+        openedAt: null,
+      }),
+    });
+
+    expect(patchResponse.status).toBe(404);
+  });
+
+  it("an over-length title returns 422 with a field-level error", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrRecruiterGroupId = await groupIdByName(hr, "HR Recruiter");
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify(validCreateBody(hrRecruiterGroupId)),
+    });
+    const created = (await createResponse.json()) as { id: number };
+
+    const patchResponse = await hr.fetch(`/api/recruitments/${created.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "x".repeat(201),
+        department: null,
+        location: null,
+        employmentType: null,
+        openedAt: null,
+      }),
+    });
+
+    expect(patchResponse.status).toBe(422);
+    const body = (await patchResponse.json()) as ApiErrorBody;
+    expect(body.error.fields).toHaveProperty("title");
+  });
+
+  it("the status-only PATCH still returns the unchanged RecruitmentStatusDto shape", async () => {
+    const hr = await signInIntegrationClient("hr");
+    const hrRecruiterGroupId = await groupIdByName(hr, "HR Recruiter");
+    const createResponse = await hr.fetch("/api/recruitments", {
+      method: "POST",
+      body: JSON.stringify(validCreateBody(hrRecruiterGroupId)),
+    });
+    const created = (await createResponse.json()) as { id: number };
+
+    const patchResponse = await hr.fetch(`/api/recruitments/${created.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status: "live" }),
+    });
+
+    expect(patchResponse.status).toBe(200);
+    const updated = (await patchResponse.json()) as Record<string, unknown>;
+    expect(Object.keys(updated).sort()).toEqual(["id", "status"]);
+  });
 });

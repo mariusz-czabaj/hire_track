@@ -3,7 +3,7 @@ project: System wspomagający rekrutację
 version: 2
 status: draft
 created: 2026-08-27
-updated: 2026-09-06
+updated: 2026-09-15
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -36,6 +36,7 @@ milestone_status: open
   - **MS-07:** Formularze, komunikaty błędów i potwierdzenia akcji na wspólnych prymitywach.
   - **MS-08:** Usunięcie powierzchni odziedziczonych po starterze (landing marketingowy, placeholderowy dashboard).
   - **MS-09:** WCAG 2.1 AA jako twarde kryterium odbioru, weryfikowane w obu motywach.
+  - **MS-10:** Edycja danych rekrutacji z poziomu jej strony detali — nagłówek przestaje być tylko do odczytu.
 
 ## Vision recap
 
@@ -51,16 +52,17 @@ M-1 dowiózł ten flow funkcjonalnie. M-2 nadaje mu formę: dziś aplikacja wygl
 
 ## At a glance
 
-| ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites | Scope anchors | Status      |
-| ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------- | ------------- | ----------- |
-| F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —             | MS-01, MS-02  | in-progress |
-| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02          | MS-02, MS-08  | in-progress |
-| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08    | MS-03         | in-progress |
-| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09    | MS-04         | in-progress |
-| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10          | MS-05         | in-progress |
-| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08    | MS-06         | in-progress |
-| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02          | MS-07         | in-progress |
-| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13     | MS-09         | in-progress |
+| ID   | Change ID                   | Outcome (user can …)                                                                                       | Prerequisites   | Scope anchors | Status      |
+| ---- | --------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------- | ------------- | ----------- |
+| F-02 | design-system-foundation    | (foundation) warstwa tokenów, motyw jasny/ciemny z przełącznikiem, `AppShell` i skala typografii           | —               | MS-01, MS-02  | in-progress |
+| S-08 | app-shell-navigation        | użytkownik porusza się po aplikacji stałym sidebarem i topbarem zamiast linkami "wstecz"                   | F-02            | MS-02, MS-08  | in-progress |
+| S-09 | recruitment-header-metadata | rekruter widzi w nagłówku rekrutacji jej lokalizację, dział, typ zatrudnienia i datę otwarcia              | F-02, S-08      | MS-03         | in-progress |
+| S-10 | kanban-visual-redesign      | rekruter czyta kanban po kolorze etapu — kolorowe nagłówki kolumn i karty z paskiem akcentu                | F-02, S-09      | MS-04         | in-progress |
+| S-11 | kanban-drag-and-drop        | rekruter przeciąga kartę kandydata między kolumnami, wciąż z wymuszoną notatką                             | S-10            | MS-05         | in-progress |
+| S-12 | list-views-redesign         | użytkownik przegląda listy rekrutacji, kandydatów i grup w nowym języku wizualnym, także na wąskim ekranie | F-02, S-08      | MS-06         | in-progress |
+| S-13 | forms-feedback-redesign     | użytkownik dostaje spójne pola formularzy, komunikaty błędów i potwierdzenia udanych akcji                 | F-02            | MS-07         | in-progress |
+| S-14 | accessibility-audit-wcag-aa | (weryfikacja) każdy ekran spełnia WCAG 2.1 AA w obu motywach                                               | S-08…S-13, S-15 | MS-09         | in-progress |
+| S-15 | recruitment-edit-details    | rekruter edytuje dane rekrutacji (tytuł, lokalizacja, dział, typ zatrudnienia, data otwarcia, grupy)       | S-09            | MS-10         | in-progress |
 
 ## Streams
 
@@ -70,6 +72,7 @@ Pomoc nawigacyjna — grupuje elementy dzielące ten sam łańcuch zależności.
 | ------ | ----------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A      | Kanban (ścieżka główna) | `F-02` → `S-08` → `S-09` → `S-10` → `S-11` | Dominujący ciąg — prowadzi do north star i dalej do jedynej nowej funkcjonalności w tym milestonie (DnD).                                                                                |
 | B      | Pozostałe powierzchnie  | `F-02` → `S-12`, `F-02` → `S-13`           | S-12 i S-13 nie zależą od siebie ani od kanbana — po F-02 (a S-12 dodatkowo po S-08) mogą iść równolegle z ścieżką A, osobnym agentem/branchem. Przy blokerze `time` to realna dźwignia. |
+| D      | Edycja rekrutacji       | `S-09` → `S-15`                            | Jedyny wycinek funkcjonalny poza ścieżką kanbana — korzysta z nagłówka z S-09, ale nie blokuje ani nie jest blokowany przez S-10/S-11. Może iść równolegle ze ścieżką A.                 |
 | C      | Domknięcie              | wszystko → `S-14`                          | Audyt dostępności jest z definicji ostatni — mierzy stan końcowy, nie pośredni.                                                                                                          |
 
 ## Baseline
@@ -181,12 +184,26 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 - **Risk:** `ServerError` jest **jedyną** powierzchnią błędu w całej aplikacji — jego zmiana dotyka każdego ekranu naraz, więc jest to jednocześnie najtańszy moment na dodanie `role="alert"` (dziś nieobecnego) i największe ryzyko regresji, jeśli asercje E2E opierają się na jego strukturze. Drugie: `FormField` ma własne stylowanie pola równoległe do `ui/input.tsx` — konsolidacja musi zachować ikonę wiodącą, przełącznik widoczności hasła i powiązanie `label`/`htmlFor`, na których stoi 37 lokatorów `getByLabel`. Przy okazji: `Banner.astro` zawiera polskie stringi ("Uwaga:", "Dokumentacja") łamiące regułę English-only z `context/foundation/lessons.md` — do naprawy w tym wycinku.
 - **Status:** in-progress
 
+### S-15: Edycja danych rekrutacji
+
+- **Outcome:** rekruter z uprawnieniem `recruitment.write` otwiera z menu akcji "…" w nagłówku rekrutacji formularz edycji i zmienia tytuł, lokalizację, dział, typ zatrudnienia, datę otwarcia oraz przypisane grupy bezpieczeństwa; po zapisie nagłówek i lista rekrutacji pokazują nowe wartości bez przeładowania strony, a błąd walidacji prezentuje ten sam komponent komunikatu co reszta aplikacji.
+- **Change ID:** recruitment-edit-details
+- **Scope anchors:** MS-10
+- **Prerequisites:** S-09 (menu akcji "…" w nagłówku jest punktem wejścia; nagłówek musi już nieść te metadane, żeby było co edytować)
+- **Parallel with:** S-10, S-11, S-12, S-13
+- **Blockers:** —
+- **Unknowns:**
+  - Czy zmiana przypisanych grup bezpieczeństwa wchodzi w zakres tego wycinka, czy zostaje wyłącznie w `/recruitments/new` — odebranie grupy może odciąć dostęp bieżącemu użytkownikowi do rekrutacji, którą właśnie edytuje. — Owner: user. Block: nie (rozstrzygane na poziomie `/10x-plan`; domyślnie w zakresie, z ostrzeżeniem przed zapisem odbierającym dostęp sobie).
+  - Czy edycja tworzy wpis w historii zmian rekrutacji (analogicznie do notatki przy zmianie statusu kandydata), czy jest cichą aktualizacją. — Owner: team. Block: nie.
+- **Risk:** Drugi po S-09 wycinek M-2 sięgający do backendu, i głębiej: `PATCH /api/recruitments/[id]` przyjmuje dziś **wyłącznie** `{ status }` (`updateStatusSchema` w `src/pages/api/recruitments/[id]/index.ts`), a serwis wystawia tylko `updateRecruitmentStatus`. Rozszerzenie musi zachować dotychczasowy kontrakt zmiany statusu — istniejące testy integracyjne i E2E na `data-testid="status-control"` przechodzą bez zmian — więc bezpieczniejszy jest jeden schemat z polami opcjonalnymi niż drugi endpoint. Walidacja pól musi być współdzielona z `CreateRecruitmentForm`, inaczej powstaną dwie rozjeżdżające się reguły dla tych samych pól (ten sam błąd, który S-12 naprawia przy filtrach statusu). RLS: zapis wymaga operacji `recruitment.write` — polityka musi być sprawdzona na poziomie bazy, nie tylko ukrycia przycisku w UI. Jako bug-fix-free feature nie wymaga testu reprodukującego, ale wymaga testu integracyjnego na nowym kształcie PATCH i E2E na ścieżce edycji.
+- **Status:** in-progress
+
 ### S-14: Audyt dostępności WCAG 2.1 AA
 
 - **Outcome:** (weryfikacja) każdy ekran aplikacji spełnia WCAG 2.1 AA w motywie jasnym i ciemnym: zmierzony kontrast tekstu i pigułek etapów, pełna obsługa z klawiatury (w tym przenoszenie kandydata), widoczny stan focus, komunikaty asynchroniczne ogłaszane czytnikowi ekranu; wynik audytu i ewentualne odstępstwa spisane w artefaktach change'u.
 - **Change ID:** accessibility-audit-wcag-aa
 - **Scope anchors:** MS-09
-- **Prerequisites:** S-08, S-09, S-10, S-11, S-12, S-13 (audyt mierzy stan końcowy, nie pośredni)
+- **Prerequisites:** S-08, S-09, S-10, S-11, S-12, S-13, S-15 (audyt mierzy stan końcowy, nie pośredni)
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
@@ -205,6 +222,7 @@ Wycinki poniżej zakładają, że to jest obecne i NIE budują tego ponownie.
 | S-12       | list-views-redesign         | Widoki listowe w nowym języku wizualnym                  | no                    | Czeka na F-02, S-08; może iść równolegle ze ścieżką kanbana                |
 | S-13       | forms-feedback-redesign     | Formularze, komunikaty błędów i potwierdzenia akcji      | no                    | Czeka na F-02; może iść równolegle ze ścieżką kanbana                      |
 | S-14       | accessibility-audit-wcag-aa | Audyt dostępności WCAG 2.1 AA                            | no                    | Czeka na wszystkie pozostałe wycinki M-2                                   |
+| S-15       | recruitment-edit-details    | Edycja danych rekrutacji ze strony detali                | no                    | Czeka na S-09; rozszerza `PATCH /api/recruitments/[id]` poza samo `status` |
 
 ## Open Roadmap Questions
 
