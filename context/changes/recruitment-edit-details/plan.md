@@ -372,26 +372,26 @@ The new length bounds apply on write only. Any existing row whose title exceeds 
 
 #### Automated
 
-- [x] 3.1 Unit and component tests pass: `npm run test`
-- [x] 3.2 Type checking and linting pass: `npm run lint`
-- [x] 3.3 Production build succeeds: `npm run build`
-- [x] 3.4 No dangling references: `grep -rn "RecruitmentStatusBadge" src/` returns nothing
+- [x] 3.1 Unit and component tests pass: `npm run test` — 9f39a50
+- [x] 3.2 Type checking and linting pass: `npm run lint` — 9f39a50
+- [x] 3.3 Production build succeeds: `npm run build` — 9f39a50
+- [x] 3.4 No dangling references: `grep -rn "RecruitmentStatusBadge" src/` returns nothing — 9f39a50
 
 #### Manual
 
-- [x] 3.5 Menu opens, dialog pre-fills, saving updates header without reload
-- [x] 3.6 Clearing an optional field removes it from the metadata row
-- [x] 3.7 Menu is absent for a user without `recruitment.write`
-- [x] 3.8 Keyboard-only operation works including focus return on close
+- [x] 3.5 Menu opens, dialog pre-fills, saving updates header without reload — 9f39a50
+- [x] 3.6 Clearing an optional field removes it from the metadata row — 9f39a50
+- [x] 3.7 Menu is absent for a user without `recruitment.write` — 9f39a50
+- [x] 3.8 Keyboard-only operation works including focus return on close — 9f39a50
 
 ### Phase 4: E2E and accessibility verification
 
 #### Automated
 
-- [ ] 4.1 E2E suite passes: `npm run test:e2e`
-- [ ] 4.2 Axe scan passes in light and dark
-- [ ] 4.3 Design-token assertions pass: `npm run test -- design-tokens`
-- [ ] 4.4 Full lint and build pass: `npm run lint && npm run build`
+- [x] 4.1 E2E suite passes: `npm run test:e2e`
+- [x] 4.2 Axe scan passes in light and dark
+- [x] 4.3 Design-token assertions pass: `npm run test -- design-tokens`
+- [x] 4.4 Full lint and build pass: `npm run lint && npm run build`
 
 #### Manual
 

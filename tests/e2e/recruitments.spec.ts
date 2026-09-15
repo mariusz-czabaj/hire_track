@@ -170,3 +170,72 @@ test.describe("HR creates a recruitment and manages its status", () => {
     await expect(page.locator('[data-slot="badge"]')).toHaveText("Live");
   });
 });
+
+test.describe("HR edits recruitment details from the header menu", () => {
+  test.beforeEach(async ({ page }) => {
+    await signInAs(page, "hr");
+  });
+
+  // Protects the recruitment-edit-details risk: the header (a client:load
+  // island separate from the edit dialog) must repaint title and metadata
+  // in place, with no navigation, and the change must survive a real reload
+  // -- not just live in the dialog's own component state.
+  test("edit details from the ... menu updates the header without reload and persists", async ({ page }) => {
+    const originalTitle = `E2E Edit Role ${Date.now()}`;
+
+    await page.goto("/recruitments/new");
+    await expect(async () => {
+      await page.getByLabel("Title").fill(originalTitle);
+      await page.getByLabel("Department").fill("Engineering");
+      await page.getByLabel("Location").fill("Remote");
+      await page.getByLabel("Opened date").fill("2026-02-01");
+      await page.getByLabel("HR Recruiter").check();
+      await expect(page.getByLabel("Title")).toHaveValue(originalTitle);
+    }).toPass({ timeout: 10_000 });
+    await page.getByRole("button", { name: "Create recruitment" }).click();
+    await expect(page).toHaveURL(/\/recruitments\/\d+$/);
+    const recruitmentUrl = page.url();
+
+    const updatedTitle = `${originalTitle} (edited)`;
+
+    // RecruitmentHeader is a client:load island; the menu trigger can be
+    // clicked before Radix's dropdown finishes attaching, closing again with
+    // no visible menu -- retry the open until the item actually appears
+    // (same hydration race documented in support/auth.ts).
+    await expect(async () => {
+      await page.getByRole("button", { name: "Recruitment actions" }).click();
+      await expect(page.getByRole("menuitem", { name: "Edit details" })).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 10_000 });
+    await page.getByRole("menuitem", { name: "Edit details" }).click();
+
+    const dialog = page.getByTestId("edit-recruitment-dialog");
+    await expect(dialog.getByRole("heading", { name: "Edit details" })).toBeVisible();
+
+    const titleInput = dialog.getByLabel("Title");
+    const departmentInput = dialog.getByLabel("Department");
+    await expect(titleInput).toHaveValue(originalTitle);
+    await expect(departmentInput).toHaveValue("Engineering");
+
+    await titleInput.fill(updatedTitle);
+    await departmentInput.fill("Platform");
+    await dialog.getByRole("button", { name: "Save" }).click();
+
+    // Dialog closes and the header (a different subtree) repaints in place --
+    // no navigation happened, proving the cross-island event, not a reload,
+    // delivered the update.
+    await expect(dialog).not.toBeVisible();
+    await expect(page).toHaveURL(recruitmentUrl);
+    await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
+    await expect(page.getByText("Department: Platform")).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole("heading", { name: updatedTitle })).toBeVisible();
+    await expect(page.getByText("Department: Platform")).toBeVisible();
+
+    // Cleanup: no delete-recruitment capability exists, so move the fixture
+    // out of Draft like the create test above, keeping later Draft-filter
+    // assertions from picking up stray fixtures.
+    await page.getByRole("button", { name: "Live", exact: true }).click();
+    await expect(page.locator('[data-slot="badge"]')).toHaveText("Live");
+  });
+});
