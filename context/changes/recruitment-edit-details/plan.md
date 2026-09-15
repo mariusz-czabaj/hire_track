@@ -360,29 +360,29 @@ The new length bounds apply on write only. Any existing row whose title exceeds 
 
 #### Automated
 
-- [x] 2.1 Integration tests pass: `npm run test:integration`
-- [x] 2.2 Type checking and linting pass: `npm run lint`
-- [x] 2.3 Existing status-PATCH integration tests pass with no edits to their assertions
+- [x] 2.1 Integration tests pass: `npm run test:integration` — d648de2
+- [x] 2.2 Type checking and linting pass: `npm run lint` — d648de2
+- [x] 2.3 Existing status-PATCH integration tests pass with no edits to their assertions — d648de2
 
 #### Manual
 
-- [x] 2.4 Manual PATCH with a details body as a signed-in recruiter returns 200 and the updated detail DTO
+- [x] 2.4 Manual PATCH with a details body as a signed-in recruiter returns 200 and the updated detail DTO — d648de2
 
 ### Phase 3: Header island, action menu, and edit dialog
 
 #### Automated
 
-- [ ] 3.1 Unit and component tests pass: `npm run test`
-- [ ] 3.2 Type checking and linting pass: `npm run lint`
-- [ ] 3.3 Production build succeeds: `npm run build`
-- [ ] 3.4 No dangling references: `grep -rn "RecruitmentStatusBadge" src/` returns nothing
+- [x] 3.1 Unit and component tests pass: `npm run test`
+- [x] 3.2 Type checking and linting pass: `npm run lint`
+- [x] 3.3 Production build succeeds: `npm run build`
+- [x] 3.4 No dangling references: `grep -rn "RecruitmentStatusBadge" src/` returns nothing
 
 #### Manual
 
-- [ ] 3.5 Menu opens, dialog pre-fills, saving updates header without reload
-- [ ] 3.6 Clearing an optional field removes it from the metadata row
-- [ ] 3.7 Menu is absent for a user without `recruitment.write`
-- [ ] 3.8 Keyboard-only operation works including focus return on close
+- [x] 3.5 Menu opens, dialog pre-fills, saving updates header without reload
+- [x] 3.6 Clearing an optional field removes it from the metadata row
+- [x] 3.7 Menu is absent for a user without `recruitment.write`
+- [x] 3.8 Keyboard-only operation works including focus return on close
 
 ### Phase 4: E2E and accessibility verification
 

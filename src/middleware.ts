@@ -14,31 +14,17 @@ const PROTECTED_ROUTES = ["/recruitments", "/candidates", "/admin"];
 // change permission-resolution semantics for routes that have nothing to do with auth.
 const PUBLIC_API_ROUTES = ["/api/preferences/theme", "/api/preferences/sidebar"];
 
-async function resolveCallerOperations(supabase: SupabaseClient<Database>, userId: string): Promise<Operation[]> {
-  const { data: memberships, error: membershipsError } = await supabase
-    .from("group_memberships")
-    .select("group_id")
-    .eq("user_id", userId);
+// group_operations' RLS is admin-only for SELECT (see rls_policies.sql), so a
+// non-admin caller's own client can never read it directly -- this RPC is
+// SECURITY DEFINER and returns only the calling user's own operations.
+async function resolveCallerOperations(supabase: SupabaseClient<Database>): Promise<Operation[]> {
+  const { data: operations, error } = await supabase.rpc("get_caller_operations");
 
-  if (membershipsError) {
-    throw membershipsError;
+  if (error) {
+    throw error;
   }
 
-  const groupIds = [...new Set(memberships.map((row) => row.group_id))];
-  if (groupIds.length === 0) {
-    return [];
-  }
-
-  const { data: operations, error: operationsError } = await supabase
-    .from("group_operations")
-    .select("operation")
-    .in("group_id", groupIds);
-
-  if (operationsError) {
-    throw operationsError;
-  }
-
-  return [...new Set(operations.map((row) => row.operation))];
+  return [...new Set(operations)];
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
@@ -71,7 +57,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     let operations: Operation[] = [];
     if (user && !isAuthRoute) {
       try {
-        operations = await resolveCallerOperations(supabase, user.id);
+        operations = await resolveCallerOperations(supabase);
       } catch (error) {
         console.error("Failed to resolve caller operations", error);
       }

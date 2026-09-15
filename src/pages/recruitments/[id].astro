@@ -7,33 +7,16 @@ import { UserMenu } from "@/components/UserMenu";
 import { SidebarToggle } from "@/components/SidebarToggle";
 import { MobileNav } from "@/components/MobileNav";
 import { KanbanBoard } from "@/components/recruitments/KanbanBoard";
-import { RecruitmentStatusBadge } from "@/components/recruitments/RecruitmentStatusBadge";
+import { RecruitmentHeader } from "@/components/recruitments/RecruitmentHeader";
 import { createClient } from "@/lib/supabase";
 import { getRecruitmentDetail } from "@/lib/services/recruitments";
-import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
 import type { RecruitmentDetailDto } from "@/types";
-
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en-CA");
-}
 
 const { id } = Astro.params;
 
 const recruitmentId = Number(id);
 const supabase = Number.isInteger(recruitmentId) ? createClient(Astro.request.headers, Astro.cookies) : null;
 const recruitment: RecruitmentDetailDto | null = supabase ? await getRecruitmentDetail(supabase, recruitmentId) : null;
-
-const metadataEntries = recruitment
-  ? [
-      { label: "Department", value: recruitment.department },
-      { label: "Location", value: recruitment.location },
-      {
-        label: "Employment type",
-        value: recruitment.employmentType ? EMPLOYMENT_TYPE_LABELS[recruitment.employmentType] : null,
-      },
-      { label: "Opened", value: recruitment.openedAt ? formatDate(recruitment.openedAt) : null },
-    ].filter((entry): entry is { label: string; value: string } => entry.value !== null)
-  : [];
 ---
 
 <Layout title={recruitment ? recruitment.title : "Recruitment board"}>
@@ -54,23 +37,11 @@ const metadataEntries = recruitment
     {
       recruitment && (
         <Fragment slot="page-title">
-          <div class="flex flex-wrap items-center gap-2">
-            <h1 class="text-foreground text-2xl font-bold">{recruitment.title}</h1>
-            <RecruitmentStatusBadge
-              recruitmentId={String(recruitment.id)}
-              initialStatus={recruitment.status}
-              client:load
-            />
-          </div>
-          {metadataEntries.length > 0 && (
-            <div class="text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              {metadataEntries.map((entry) => (
-                <span>
-                  <span class="font-medium">{entry.label}:</span> {entry.value}
-                </span>
-              ))}
-            </div>
-          )}
+          <RecruitmentHeader
+            recruitment={recruitment}
+            canEdit={Astro.locals.operations.includes("recruitment.write")}
+            client:load
+          />
         </Fragment>
       )
     }

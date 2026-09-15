@@ -508,6 +508,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      get_caller_operations: {
+        Args: never;
+        Returns: Database["public"]["Enums"]["operation"][];
+      };
       get_group_member_emails: {
         Args: { target_group_id: number };
         Returns: {
@@ -658,11 +662,11 @@ export type Database = {
       };
       update_recruitment: {
         Args: {
-          p_department: string | null;
-          p_employment_type: string | null;
+          p_department: string;
+          p_employment_type: string;
           p_id: number;
-          p_location: string | null;
-          p_opened_at: string | null;
+          p_location: string;
+          p_opened_at: string;
           p_title: string;
         };
         Returns: {
