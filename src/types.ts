@@ -60,6 +60,14 @@ export interface UpdateRecruitmentStatusCommand {
   status: RecruitmentStatus;
 }
 
+export interface UpdateRecruitmentDetailsCommand {
+  title: string;
+  department: string | null;
+  location: string | null;
+  employmentType: EmploymentType | null;
+  openedAt: string | null;
+}
+
 export interface RecruitmentStatusDto {
   id: number;
   status: RecruitmentStatus;

@@ -9,6 +9,7 @@ import { useMutation } from "@/components/hooks/useMutation";
 import { useFormErrors, type FieldOrderEntry } from "@/components/hooks/useFormErrors";
 import { toast } from "@/lib/toast-store";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/employment-type";
+import { createRecruitmentDetailsSchema } from "@/lib/validation/recruitment";
 import {
   employmentTypeSchema,
   type CreateRecruitmentCommand,
@@ -35,14 +36,18 @@ function validate(state: {
   title: string;
   department: string;
   location: string;
+  employmentType: EmploymentType;
   openedAt: string;
   groupIds: number[];
 }): FormErrors {
   const errors: FormErrors = {};
-  if (!state.title.trim()) errors.title = "Title is required";
-  if (!state.department.trim()) errors.department = "Department is required";
-  if (!state.location.trim()) errors.location = "Location is required";
-  if (!state.openedAt) errors.openedAt = "Opened date is required";
+  const parsed = createRecruitmentDetailsSchema.safeParse(state);
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      const key = issue.path.join(".") as ErrorKey;
+      errors[key] ??= issue.message;
+    }
+  }
   if (state.groupIds.length === 0) errors.groupIds = "Select at least one security group";
   return errors;
 }
@@ -69,7 +74,7 @@ export function CreateRecruitmentForm() {
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    const nextErrors = validate({ title, department, location, openedAt, groupIds });
+    const nextErrors = validate({ title, department, location, employmentType, openedAt, groupIds });
     setErrors(nextErrors, FIELD_ORDER);
     if (Object.keys(nextErrors).length > 0) return;
 

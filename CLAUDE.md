@@ -53,6 +53,17 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint + build on every push and PR to master. Requires `SUPABASE_URL` and `SUPABASE_KEY` repository secrets for the build step.
 
+## Bug fix workflow
+
+When fixing a bug, always write a failing test that reproduces it **before** touching the fix:
+
+1. Add a test (unit or integration, matching the existing suite for that code) that fails against the current, buggy behavior.
+2. Confirm it fails for the expected reason.
+3. Implement the fix.
+4. Re-run the test and confirm it now passes, along with the rest of the affected suite.
+
+Skip this only for changes that aren't bug fixes (new features, refactors, styling).
+
 ---
 
 <!-- BEGIN @przeprogramowani/10x-cli -->

@@ -14,6 +14,7 @@ import {
   type RecruitmentStatus,
   type RecruitmentStatusDto,
   type ReplaceRecruitmentStagesCommand,
+  type UpdateRecruitmentDetailsCommand,
 } from "@/types";
 
 type Client = SupabaseClient<Database>;
@@ -130,6 +131,35 @@ export async function updateRecruitmentStatus(
   return {
     id: row.id,
     status: toRecruitmentStatus(row.status),
+  };
+}
+
+export async function updateRecruitmentDetails(
+  client: Client,
+  recruitmentId: number,
+  command: UpdateRecruitmentDetailsCommand,
+): Promise<RecruitmentDetailDto> {
+  const { data: row, error } = await client.rpc("update_recruitment", {
+    p_id: recruitmentId,
+    p_title: command.title,
+    p_department: command.department,
+    p_location: command.location,
+    p_employment_type: command.employmentType,
+    p_opened_at: command.openedAt,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    status: toRecruitmentStatus(row.status),
+    department: row.department,
+    location: row.location,
+    employmentType: toEmploymentType(row.employment_type),
+    openedAt: row.opened_at,
   };
 }
 

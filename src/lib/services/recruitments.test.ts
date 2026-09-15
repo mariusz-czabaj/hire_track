@@ -6,6 +6,7 @@ import {
   getKanbanBoard,
   getRecruitmentDetail,
   listRecruitments,
+  updateRecruitmentDetails,
   updateRecruitmentStatus,
 } from "@/lib/services/recruitments";
 
@@ -216,6 +217,14 @@ function makeUpdateStatusClient(result: QueryResult<{ id: number; status: string
   } as unknown as Client;
 }
 
+function makeUpdateDetailsClient(config: {
+  rpc: { data: RecruitmentDetailRow | null; error: { message: string; code?: string } | null };
+}): Client {
+  return {
+    rpc: () => Promise.resolve(config.rpc),
+  } as unknown as Client;
+}
+
 function makeDetailClient(result: QueryResult<RecruitmentDetailRow>): Client {
   return {
     from: () => new FakeQueryBuilder<RecruitmentDetailRow>(result),
@@ -292,6 +301,59 @@ describe("updateRecruitmentStatus", () => {
   it("propagates a Supabase error as a throw", async () => {
     const client = makeUpdateStatusClient({ data: null, error: { message: "boom" } });
     await expect(updateRecruitmentStatus(client, 1, "live")).rejects.toEqual({ message: "boom" });
+  });
+});
+
+describe("updateRecruitmentDetails", () => {
+  it("maps the RPC's returned row into a detail DTO on success", async () => {
+    const client = makeUpdateDetailsClient({
+      rpc: {
+        data: {
+          id: 1,
+          title: "Senior Backend Engineer",
+          status: "live",
+          department: "Engineering",
+          location: null,
+          employment_type: "contract",
+          opened_at: "2026-02-01",
+        },
+        error: null,
+      },
+    });
+
+    const dto = await updateRecruitmentDetails(client, 1, {
+      title: "Senior Backend Engineer",
+      department: "Engineering",
+      location: null,
+      employmentType: "contract",
+      openedAt: "2026-02-01",
+    });
+
+    expect(dto).toEqual({
+      id: 1,
+      title: "Senior Backend Engineer",
+      status: "live",
+      department: "Engineering",
+      location: null,
+      employmentType: "contract",
+      openedAt: "2026-02-01",
+    });
+  });
+
+  it("propagates an RPC error as a throw", async () => {
+    const client = makeUpdateDetailsClient({
+      rpc: { data: null, error: { message: "insufficient_privilege", code: "42501" } },
+    });
+
+    await expect(
+      updateRecruitmentDetails(client, 1, {
+        title: "Senior Backend Engineer",
+        department: null,
+        location: null,
+        employmentType: null,
+        openedAt: null,
+      }),
+    ).rejects.toEqual({ message: "insufficient_privilege", code: "42501" });
   });
 });
 

@@ -656,6 +656,33 @@ export type Database = {
           isSetofReturn: true;
         };
       };
+      update_recruitment: {
+        Args: {
+          p_department: string | null;
+          p_employment_type: string | null;
+          p_id: number;
+          p_location: string | null;
+          p_opened_at: string | null;
+          p_title: string;
+        };
+        Returns: {
+          created_at: string;
+          department: string | null;
+          employment_type: string | null;
+          id: number;
+          location: string | null;
+          opened_at: string | null;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "recruitments";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
     };
     Enums: {
       operation: "recruitment.read" | "recruitment.write" | "candidate.read" | "candidate.write" | "group.manage";

@@ -3,18 +3,14 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { jsonError, jsonOk } from "@/lib/api-response";
 import { createRecruitment, listRecruitments } from "@/lib/services/recruitments";
-import { employmentTypeSchema, recruitmentStatusSchema } from "@/types";
+import { recruitmentStatusSchema } from "@/types";
+import { createRecruitmentDetailsSchema } from "@/lib/validation/recruitment";
 
 export const prerender = false;
 
 const statusParamSchema = z.union([recruitmentStatusSchema, z.literal("all")]).optional();
 
-const createRecruitmentSchema = z.object({
-  title: z.string().min(1),
-  department: z.string().min(1),
-  location: z.string().min(1),
-  employmentType: employmentTypeSchema,
-  openedAt: z.string().min(1),
+const createRecruitmentSchema = createRecruitmentDetailsSchema.extend({
   groupIds: z.array(z.number().int().positive()).min(1),
 });
 
