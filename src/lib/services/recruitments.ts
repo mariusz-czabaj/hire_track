@@ -139,6 +139,12 @@ export async function updateRecruitmentDetails(
   recruitmentId: number,
   command: UpdateRecruitmentDetailsCommand,
 ): Promise<RecruitmentDetailDto> {
+  // The generated RPC arg types are all `string` (Postgres doesn't track
+  // per-argument nullability the way it does for table columns), even
+  // though the function body writes these straight into nullable columns
+  // and accepts a real SQL NULL for any of them at runtime. Cast the whole
+  // args object to the generated shape rather than asserting away null on
+  // each field individually.
   const { data: row, error } = await client.rpc("update_recruitment", {
     p_id: recruitmentId,
     p_title: command.title,
@@ -146,7 +152,7 @@ export async function updateRecruitmentDetails(
     p_location: command.location,
     p_employment_type: command.employmentType,
     p_opened_at: command.openedAt,
-  });
+  } as Database["public"]["Functions"]["update_recruitment"]["Args"]);
 
   if (error) {
     throw error;
