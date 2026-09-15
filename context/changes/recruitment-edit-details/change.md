@@ -1,7 +1,7 @@
 ---
 change_id: recruitment-edit-details
 title: Recruitment edit details
-status: implementing
+status: implemented
 created: 2026-09-15
 updated: 2026-09-15
 archived_at: null

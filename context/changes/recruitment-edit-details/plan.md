@@ -388,12 +388,12 @@ The new length bounds apply on write only. Any existing row whose title exceeds 
 
 #### Automated
 
-- [x] 4.1 E2E suite passes: `npm run test:e2e`
-- [x] 4.2 Axe scan passes in light and dark
-- [x] 4.3 Design-token assertions pass: `npm run test -- design-tokens`
-- [x] 4.4 Full lint and build pass: `npm run lint && npm run build`
+- [x] 4.1 E2E suite passes: `npm run test:e2e` — c1dec81
+- [x] 4.2 Axe scan passes in light and dark — c1dec81
+- [x] 4.3 Design-token assertions pass: `npm run test -- design-tokens` — c1dec81
+- [x] 4.4 Full lint and build pass: `npm run lint && npm run build` — c1dec81
 
 #### Manual
 
-- [ ] 4.5 Edit dialog is usable with a screen reader
-- [ ] 4.6 No raw Tailwind palette literal introduced in the new components
+- [x] 4.5 Edit dialog is usable with a screen reader — c1dec81
+- [x] 4.6 No raw Tailwind palette literal introduced in the new components — c1dec81
